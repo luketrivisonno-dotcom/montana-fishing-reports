@@ -6,15 +6,37 @@ const { runAllScrapers } = require('./scrapers');
 
 const app = express();
 
-// Enable CORS for all origins
 app.use(cors());
 app.use(express.json());
 
-// Request logging
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-    next();
-});
+// Create table if not exists
+async function initDatabase() {
+    try {
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS reports (
+                id SERIAL PRIMARY KEY,
+                source VARCHAR(100) NOT NULL,
+                river VARCHAR(100) NOT NULL,
+                url TEXT NOT NULL,
+                title VARCHAR(255),
+                last_updated VARCHAR(50),
+                author VARCHAR(100),
+                scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT true
+            )
+        `);
+        
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
+        
+        console.log('Database initialized successfully');
+    } catch (error) {
+        console.error('Database init error:', error.message);
+    }
+}
+
+// Initialize database
+initDatabase();
 
 // Schedule scrapers every 6 hours
 cron.schedule('0 */6 * * *', () => {
@@ -85,6 +107,5 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Test: http://localhost:${PORT}/`);
     console.log(`Rivers: http://localhost:${PORT}/api/rivers`);
-    console.log(`Reports: http://localhost:${PORT}/api/reports/Gallatin%20River`);
     console.log('========================================\n');
 });
