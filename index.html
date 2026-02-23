@@ -1,0 +1,57 @@
+cat > index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Montana Fishing Reports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; margin: 0; padding: 20px; background: #f5f5f5; }
+        h1 { color: #2c3e50; }
+        .river { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer; }
+        .river:hover { background: #e8f4f8; }
+        .report { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        a { color: #3498db; text-decoration: none; }
+        .loading { text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+    <h1>🏔️ Montana Fishing Reports</h1>
+    <div id="content" class="loading">Loading...</div>
+
+    <script>
+        const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
+        
+        async function loadRivers() {
+            const res = await fetch(`${API_URL}/api/rivers`);
+            const data = await res.json();
+            
+            let html = '<h2>Select a River</h2>';
+            data.rivers.forEach(river => {
+                html += `<div class="river" onclick="loadReports('${river}')">${river}</div>`;
+            });
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        async function loadReports(river) {
+            document.getElementById('content').innerHTML = '<div class="loading">Loading...</div>';
+            const res = await fetch(`${API_URL}/api/reports/${encodeURIComponent(river)}`);
+            const data = await res.json();
+            
+            let html = `<h2>${river}</h2><button onclick="loadRivers()">← Back</button>`;
+            data.reports.forEach(report => {
+                html += `
+                    <div class="report">
+                        <strong>${report.source}</strong><br>
+                        <small>${report.last_updated || 'No date'}</small><br>
+                        <a href="${report.url}" target="_blank">Read Report →</a>
+                    </div>
+                `;
+            });
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        loadRivers();
+    </script>
+</body>
+</html>
+EOF
