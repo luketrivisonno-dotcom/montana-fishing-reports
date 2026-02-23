@@ -12,13 +12,11 @@ async function scrapeBigSkyAnglers() {
     
     const $ = cheerio.load(data);
     const pageText = $('body').text();
-    
-    // Look for date
     const dateMatch = pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     
     return {
       source: 'Big Sky Anglers',
-      river: 'Madison River', // They mainly report on Madison
+      river: 'Madison River',
       url: url,
       last_updated: dateMatch ? dateMatch[0] : null,
       scraped_at: new Date()

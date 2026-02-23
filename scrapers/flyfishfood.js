@@ -12,13 +12,11 @@ async function scrapeFlyFishFood() {
     
     const $ = cheerio.load(data);
     const pageText = $('body').text();
-    
-    // Look for date
     const dateMatch = pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     
     return {
       source: 'Fly Fish Food',
-      river: 'General Montana', // They cover multiple rivers
+      river: 'General Montana',
       url: url,
       last_updated: dateMatch ? dateMatch[0] : null,
       scraped_at: new Date()
