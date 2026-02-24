@@ -1,4 +1,3 @@
-cat > scrapers/bitterroot.js << 'EOF'
 async function scrapeBitterrootOrvis() {
     return {
         source: 'Orvis',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeBitterrootOrvis,
     scrapeBitterrootMontanaAngler
 };
-EOF
