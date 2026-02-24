@@ -1,4 +1,3 @@
-cat > scrapers/bighole.js << 'EOF'
 async function scrapeBigHoleMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeBigHoleMontanaAngler,
     scrapeBigHoleSunrise
 };
-EOF
