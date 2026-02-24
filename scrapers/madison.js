@@ -1,4 +1,3 @@
-cat > scrapers/madison.js << 'EOF'
 async function scrapeMadisonMT() {
     return [
         {
@@ -52,4 +51,3 @@ module.exports = {
     scrapeMadisonRiverOutfitters,
     scrapeMadisonYellowDog
 };
-EOF
