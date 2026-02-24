@@ -1,7 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// Troutfitters only has reports for these 7 rivers
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Upper Madison River': 'https://troutfitters.com/reports/upper-madison-river',
