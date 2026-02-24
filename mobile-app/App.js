@@ -25,7 +25,8 @@ const RIVER_IMAGES = {
   'Big Hole River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
   'Flathead River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
   'Jefferson River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80'
+  'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Swan River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80'
 };
 
 const COLORS = {
@@ -91,6 +92,7 @@ function HomeScreen({ navigation }) {
     if (river.includes('Big Hole')) return '🕳️';
     if (river.includes('Flathead')) return '🏔️';
     if (river.includes('Jefferson')) return '🇺🇸';
+    if (river.includes('Swan')) return '🦢';
     return '🎣';
   };
 
@@ -193,11 +195,15 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const openReport = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
 
   const openUSGS = (url) => {
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
 
   if (loading) {
@@ -232,14 +238,17 @@ function RiverDetailsScreen({ route, navigation }) {
         style={styles.detailScroll}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
       >
-        {/* Weather Card */}
+        {/* Weather Card with Location Label */}
         {data?.weather && (
           <View style={styles.dataCard}>
+            <View style={styles.locationLabelContainer}>
+              <Text style={styles.locationLabel}>📍 {data.weather.station || 'Local Weather Station'}</Text>
+            </View>
             <View style={styles.cardHeader}>
               <Text style={styles.weatherIconLarge}>{data.weather.icon || '☁️'}</Text>
               <View style={styles.cardTitleContainer}>
                 <Text style={styles.dataCardTitle}>Today's Weather</Text>
-                <Text style={styles.locationText}>📍 {data.weather.station}</Text>
+                <Text style={styles.cardSubtitle}>{data.weather.condition || 'Current Conditions'}</Text>
               </View>
             </View>
             <View style={styles.weatherRow}>
@@ -253,27 +262,35 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.weatherLabel}>Low</Text>
               </View>
               <View style={styles.weatherDivider} />
-              <View style={styles.weatherItemWide}>
-                <Text style={styles.weatherCondition}>{data.weather.condition}</Text>
+              <View style={styles.weatherItem}>
+                <Text style={styles.weatherValue}>{data.weather.wind || '--'}</Text>
+                <Text style={styles.weatherLabel}>Wind</Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* USGS Data Card */}
+        {/* USGS Data Card with Location Label - NOW A BUTTON */}
         {data?.usgs && (
-          <TouchableOpacity style={styles.dataCard} onPress={() => openUSGS(data.usgs.url)}>
+          <TouchableOpacity 
+            style={[styles.dataCard, styles.usgsCard]} 
+            onPress={() => openUSGS(data.usgs.url)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.locationLabelContainer}>
+              <Text style={styles.locationLabel}>📍 {data.usgs.location || 'USGS Gauge Location'}</Text>
+            </View>
             <View style={styles.cardHeader}>
               <Text style={styles.cardIcon}>📊</Text>
               <View style={styles.cardTitleContainer}>
-                <Text style={styles.dataCardTitle}>Current Conditions (USGS)</Text>
-                <Text style={styles.locationText}>📍 {data.usgs.location}</Text>
+                <Text style={styles.dataCardTitle}>River Conditions</Text>
+                <Text style={styles.cardSubtitle}>Live USGS Data</Text>
               </View>
             </View>
             <View style={styles.usgsRow}>
               <View style={styles.usgsItem}>
                 <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
-                <Text style={styles.usgsLabel}>Flow Rate</Text>
+                <Text style={styles.usgsLabel}>Flow (cfs)</Text>
               </View>
               <View style={styles.usgsDivider} />
               <View style={styles.usgsItem}>
@@ -281,11 +298,13 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.usgsLabel}>Water Temp</Text>
               </View>
             </View>
-            <Text style={styles.usgsLink}>Tap to view on USGS website →</Text>
+            <View style={styles.tapIndicator}>
+              <Text style={styles.tapIndicatorText}>Tap to view on USGS website →</Text>
+            </View>
           </TouchableOpacity>
         )}
 
-        {/* Reports Section - Flow data IS the button */}
+        {/* Reports Section */}
         <Text style={styles.sectionTitle}>Latest Fishing Reports</Text>
         {data?.reports?.map((report, index) => (
           <TouchableOpacity 
@@ -371,54 +390,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: '600',
   },
-  const styles = StyleSheet.create({
-  // ... keep all your existing styles ...
-
-  // New flow data styles
-  flowDataContainer: {
-    backgroundColor: COLORS.primary + '08',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '15',
-  },
-  flowDataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  flowDataItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  flowDataDivider: {
-    width: 1,
-    height: 35,
-    backgroundColor: COLORS.primary + '20',
-  },
-  flowDataValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  flowDataLabel: {
-    fontSize: 11,
-    color: COLORS.gray,
-    marginTop: 4,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  tapToView: {
-    fontSize: 13,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-
+  
   // Header with background image
   headerBackground: {
     height: 200,
@@ -557,7 +529,7 @@ const styles = StyleSheet.create({
   detailHeaderTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.white',
+    color: COLORS.white,
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -585,6 +557,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
   },
+  usgsCard: {
+    borderWidth: 2,
+    borderColor: COLORS.primary + '20',
+  },
+  locationLabelContainer: {
+    backgroundColor: COLORS.primary + '12',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '20',
+  },
+  locationLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -606,7 +597,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.dark,
   },
-  locationText: {
+  cardSubtitle: {
     fontSize: 14,
     color: COLORS.gray,
     marginTop: 2,
@@ -619,15 +610,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingVertical: 8,
+    paddingTop: 12,
   },
   weatherItem: {
     alignItems: 'center',
     flex: 1,
-  },
-  weatherItemWide: {
-    alignItems: 'center',
-    flex: 2,
-    paddingHorizontal: 8,
   },
   weatherDivider: {
     width: 1,
@@ -646,12 +633,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-  },
-  weatherCondition: {
-    fontSize: 16,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   
   // USGS styles
@@ -683,12 +664,17 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  usgsLink: {
+  tapIndicator: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.primary + '15',
+    alignItems: 'center',
+  },
+  tapIndicatorText: {
     fontSize: 14,
     color: COLORS.secondary,
     fontWeight: '600',
-    marginTop: 12,
-    textAlign: 'center',
   },
   
   // Reports section
@@ -753,5 +739,50 @@ const styles = StyleSheet.create({
   emptyText: {
     color: COLORS.gray,
     fontSize: 16,
+  },
+  
+  // Flow data styles
+  flowDataContainer: {
+    backgroundColor: COLORS.primary + '08',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '15',
+  },
+  flowDataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  flowDataItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  flowDataDivider: {
+    width: 1,
+    height: 35,
+    backgroundColor: COLORS.primary + '20',
+  },
+  flowDataValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  flowDataLabel: {
+    fontSize: 11,
+    color: COLORS.gray,
+    marginTop: 4,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  tapToView: {
+    fontSize: 13,
+    color: COLORS.secondary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 8,
   },
 });
