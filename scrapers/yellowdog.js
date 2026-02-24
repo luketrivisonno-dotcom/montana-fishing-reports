@@ -1,6 +1,3 @@
-cd ~/fishing-reports-app/backend/scrapers
-
-cat > yellowdog.js << 'ENDOFFILE'
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -48,4 +45,3 @@ async function scrapeYellowDog() {
 }
 
 module.exports = scrapeYellowDog;
-ENDOFFILE
