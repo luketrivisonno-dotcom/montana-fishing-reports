@@ -13,13 +13,11 @@ async function scrapeSunriseFlyShop() {
     const $ = cheerio.load(data);
     const pageText = $('body').text();
     
-    // Look for date in the page
     const dateMatch = 
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    // Sunrise covers Big Hole and Beaverhead in one report
-    const reports = [
+    return [
       {
         source: 'Sunrise Fly Shop',
         river: 'Big Hole River',
@@ -35,8 +33,6 @@ async function scrapeSunriseFlyShop() {
         scraped_at: new Date()
       }
     ];
-    
-    return reports;
     
   } catch (error) {
     console.error('Sunrise Fly Shop error:', error.message);
