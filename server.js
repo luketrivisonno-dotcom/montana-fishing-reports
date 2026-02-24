@@ -15,41 +15,94 @@ app.use((req, res, next) => {
     next();
 });
 
-// Date standardization function
+// Normalize source name for deduplication
+function normalizeSource(source) {
+    if (!source) return '';
+    return source.toLowerCase()
+        .replace(/\([^)]*\)/g, '')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+}
+
+// Standardize date to ISO format
 function standardizeDate(dateString) {
+    if (!dateString) return null;
+    
+    try {
+        const isoDate = new Date(dateString);
+        if (!isNaN(isoDate.getTime())) {
+            return isoDate.toISOString();
+        }
+        
+        const formats = [
+            /^(\w{3,})\s+(\d{1,2}),?\s+(\d{4})$/i,
+            /^(\d{1,2})\s+(\w{3,})\s+(\d{4})$/i,
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
+            /^(\d{4})-(\d{2})-(\d{2})$/
+        ];
+        
+        const months = {
+            'jan': 0, 'january': 0, 'feb': 1, 'february': 1,
+            'mar': 2, 'march': 2, 'apr': 3, 'april': 3,
+            'may': 4, 'jun': 5, 'june': 5, 'jul': 6, 'july': 6,
+            'aug': 7, 'august': 7, 'sep': 8, 'sept': 8, 'september': 8,
+            'oct': 9, 'october': 9, 'nov': 10, 'november': 10,
+            'dec': 11, 'december': 11
+        };
+        
+        for (const regex of formats) {
+            const match = dateString.match(regex);
+            if (match) {
+                let year, month, day;
+                
+                if (regex.source.includes('^\\w')) {
+                    month = months[match[1].toLowerCase()];
+                    day = parseInt(match[2]);
+                    year = parseInt(match[3]);
+                } else if (regex.source.includes('^\\d{4}')) {
+                    year = parseInt(match[1]);
+                    month = parseInt(match[2]) - 1;
+                    day = parseInt(match[3]);
+                } else if (regex.source.includes('\\/')) {
+                    month = parseInt(match[1]) - 1;
+                    day = parseInt(match[2]);
+                    year = parseInt(match[3]);
+                } else {
+                    day = parseInt(match[1]);
+                    month = months[match[2].toLowerCase()];
+                    year = parseInt(match[3]);
+                }
+                
+                if (month !== undefined && !isNaN(day) && !isNaN(year)) {
+                    const date = new Date(year, month, day);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString();
+                    }
+                }
+            }
+        }
+        
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Format date for display
+function formatDateForDisplay(dateString) {
     if (!dateString) return 'Recently updated';
     
     try {
-        let date;
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Recently updated';
         
-        if (dateString instanceof Date) {
-            date = dateString;
-        } 
-        else if (dateString.includes(',')) {
-            date = new Date(dateString);
-        }
-        else if (dateString.includes('/')) {
-            const parts = dateString.split('/');
-            if (parts.length === 3) {
-                let month = parseInt(parts[0]) - 1;
-                let day = parseInt(parts[1]);
-                let year = parseInt(parts[2]);
-                if (year < 100) year += 2000;
-                date = new Date(year, month, day);
-            }
-        }
-        else {
-            date = new Date(dateString);
-        }
-        
-        if (isNaN(date.getTime())) {
-            return dateString;
-        }
-        
-        const options = { month: 'long', day: 'numeric', year: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     } catch (e) {
-        return dateString;
+        return 'Recently updated';
     }
 }
 
@@ -59,17 +112,22 @@ async function initDatabase() {
             CREATE TABLE IF NOT EXISTS reports (
                 id SERIAL PRIMARY KEY,
                 source VARCHAR(100) NOT NULL,
+                source_normalized VARCHAR(100) NOT NULL,
                 river VARCHAR(100) NOT NULL,
                 url TEXT NOT NULL,
                 title VARCHAR(255),
-                last_updated VARCHAR(50),
+                last_updated TIMESTAMP,
+                last_updated_text VARCHAR(50),
                 author VARCHAR(100),
                 scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_active BOOLEAN DEFAULT true
             )
         `);
+        
         await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_source_normalized ON reports(source_normalized)`);
+        
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Database init error:', error.message);
@@ -87,8 +145,8 @@ app.get('/', (req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Montana Fishing Reports API',
-        version: '2.1',
-        features: ['Weather', 'USGS Data', 'Upper/Lower Madison', '15+ Rivers', '25+ Sources'],
+        version: '2.2',
+        features: ['Weather', 'USGS Data', 'Duplicate Prevention', 'Date Standardization'],
         timestamp: new Date().toISOString()
     });
 });
@@ -97,6 +155,45 @@ app.post('/api/scrape', async (req, res) => {
     try {
         const results = await runAllScrapers();
         res.json({ message: 'Scrape completed', results });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Cleanup endpoint - remove duplicates and broken links
+app.post('/api/cleanup', async (req, res) => {
+    try {
+        const brokenResult = await db.query(`
+            DELETE FROM reports
+            WHERE url IS NULL 
+               OR url = '' 
+               OR url = 'undefined'
+               OR url = 'null'
+               OR url NOT LIKE 'http%'
+            RETURNING id
+        `);
+        
+        const dupResult = await db.query(`
+            DELETE FROM reports
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY river, source_normalized 
+                               ORDER BY scraped_at DESC
+                           ) as rn
+                    FROM reports
+                ) t
+                WHERE t.rn > 1
+            )
+            RETURNING id
+        `);
+        
+        res.json({
+            message: 'Cleanup completed',
+            brokenLinksRemoved: brokenResult.rowCount,
+            duplicatesRemoved: dupResult.rowCount
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -129,16 +226,22 @@ app.get('/api/reports/:river', async (req, res) => {
     try {
         const { river } = req.params;
         const result = await db.query(
-            `SELECT id, source, river, url, last_updated, scraped_at 
+            `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at 
              FROM reports 
              WHERE river = $1 AND is_active = true
              ORDER BY scraped_at DESC`,
             [river]
         );
+        
+        const reports = result.rows.map(report => ({
+            ...report,
+            last_updated: formatDateForDisplay(report.last_updated)
+        }));
+        
         res.json({
             river: river,
-            count: result.rows.length,
-            reports: result.rows
+            count: reports.length,
+            reports: reports
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -177,52 +280,23 @@ app.get('/api/river-details/:river', async (req, res) => {
   try {
     const { river } = req.params;
     
-    // Get weather and USGS data
     const weather = await getWeatherForRiver(river);
     const usgs = await getUSGSData(river);
     
-    // Get reports - only most recent per source, filter out USGS from reports
     const reportsResult = await db.query(
-      `SELECT DISTINCT ON (source) * FROM reports 
+      `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at 
+       FROM reports 
        WHERE river = $1 
        AND is_active = true 
        AND source NOT LIKE '%USGS%'
-       ORDER BY source, scraped_at DESC`,
+       AND url IS NOT NULL
+       AND url != ''
+       AND url LIKE 'http%'
+       ORDER BY scraped_at DESC`,
       [river]
     );
     
-    res.json({
-      river,
-      weather,
-      usgs,
-      reports: reportsResult.rows
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch river details' });
-  }
-});
-
-app.get('/api/weather-icon/:code', (req, res) => {
-    const { code } = req.params;
-    const icons = {
-        0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
-        45: '🌫️', 48: '🌫️',
-        51: '🌦️', 53: '🌧️', 55: '🌧️',
-        61: '🌧️', 63: '🌧️', 65: '🌧️',
-        71: '🌨️', 73: '🌨️', 75: '🌨️', 77: '🌨️',
-        80: '🌦️', 81: '🌧️', 82: '🌧️',
-        85: '🌨️', 86: '🌨️',
-        95: '⛈️', 96: '⛈️', 99: '⛈️'
-    };
-    res.json({ icon: icons[code] || '☁️' });
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`\n========================================`);
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Test: http://localhost:${PORT}/`);
-    console.log(`River Details: http://localhost:${PORT}/api/river-details/Gallatin%20River`);
-    console.log('========================================\n');
-});
+    const seenSources = new Set();
+    const reports = reportsResult.rows
+        .map(report => ({
+            ...report
