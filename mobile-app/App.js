@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   View, Text, FlatList, TouchableOpacity, 
   RefreshControl, StyleSheet, Linking, ActivityIndicator,
-  SafeAreaView, StatusBar, ImageBackground, ScrollView
+  SafeAreaView, StatusBar, ImageBackground, ScrollView, Dimensions
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,20 +11,21 @@ const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 // River background images
 const RIVER_IMAGES = {
-  'Gallatin River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
-  'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
-  'Missouri River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Clark Fork River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
-  'Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
-  'Bitterroot River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
-  'Rock Creek': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
-  'Bighorn River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Beaverhead River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
-  'Big Hole River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
-  'Flathead River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
-  'Jefferson River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'
+  'Gallatin River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
+  'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Lower Madison River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Missouri River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Clark Fork River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
+  'Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+  'Bitterroot River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80',
+  'Rock Creek': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+  'Bighorn River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Beaverhead River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Big Hole River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+  'Flathead River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
+  'Jefferson River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80'
 };
 
 const COLORS = {
@@ -35,35 +36,11 @@ const COLORS = {
   white: '#ffffff',
   dark: '#2c3e50',
   gray: '#7f8c8d',
-  glass: 'rgba(255,255,255,0.9)'
+  glass: 'rgba(255,255,255,0.95)',
+  glassDark: 'rgba(0,0,0,0.4)'
 };
 
-// Format date to "Month Day, Year"
-function formatDate(dateString) {
-  if (!dateString || dateString === 'No date') return 'No date';
-  
-  try {
-    // Try to parse the date
-    let date;
-    if (dateString.includes('/')) {
-      // Handle MM/DD/YYYY format
-      const parts = dateString.split('/');
-      date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
-    } else if (dateString.includes('-')) {
-      // Handle YYYY-MM-DD format
-      date = new Date(dateString);
-    } else {
-      date = new Date(dateString);
-    }
-    
-    if (isNaN(date.getTime())) return dateString;
-    
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
-  } catch (e) {
-    return dateString;
-  }
-}
+const { width } = Dimensions.get('window');
 
 function HomeScreen({ navigation }) {
   const [rivers, setRivers] = useState([]);
@@ -78,9 +55,15 @@ function HomeScreen({ navigation }) {
     try {
       const response = await fetch(`${API_URL}/api/rivers`);
       const data = await response.json();
-      setRivers(data.rivers || []);
+      const sortedRivers = data.rivers.sort((a, b) => {
+        if (a.includes('Madison') && b.includes('Madison')) {
+          return a.localeCompare(b);
+        }
+        return a.localeCompare(b);
+      });
+      setRivers(sortedRivers);
     } catch (error) {
-      console.error('Error fetching rivers:', error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -94,6 +77,8 @@ function HomeScreen({ navigation }) {
 
   const getRiverIcon = (river) => {
     if (river.includes('Gallatin')) return '🏔️';
+    if (river.includes('Upper Madison')) return '⬆️';
+    if (river.includes('Lower Madison')) return '⬇️';
     if (river.includes('Madison')) return '🎣';
     if (river.includes('Yellowstone')) return '🌲';
     if (river.includes('Missouri')) return '🚣';
@@ -107,6 +92,12 @@ function HomeScreen({ navigation }) {
     if (river.includes('Flathead')) return '🏔️';
     if (river.includes('Jefferson')) return '🇺🇸';
     return '🎣';
+  };
+
+  const getRiverSubtitle = (river) => {
+    if (river.includes('Upper Madison')) return 'Ennis to Quake Lake';
+    if (river.includes('Lower Madison')) return 'Three Forks to Ennis';
+    return 'Tap for flows, weather & reports';
   };
 
   if (loading) {
@@ -123,12 +114,13 @@ function HomeScreen({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800' }}
+        source={{ uri: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80' }}
         style={styles.headerBackground}
       >
         <View style={styles.headerOverlay}>
-          <Text style={styles.headerTitle}>🏔️ Montana Fishing</Text>
-          <Text style={styles.headerSubtitle}>{rivers.length} Rivers • Real-Time Reports</Text>
+          <Text style={styles.headerEmoji}>🏔️</Text>
+          <Text style={styles.headerTitle}>Montana Fishing</Text>
+          <Text style={styles.headerSubtitle}>{rivers.length} Rivers • Live Reports & Conditions</Text>
         </View>
       </ImageBackground>
 
@@ -143,20 +135,22 @@ function HomeScreen({ navigation }) {
           <TouchableOpacity 
             style={styles.riverCard}
             onPress={() => navigation.navigate('RiverDetails', { river: item })}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Gallatin River'] }}
+              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Madison River'] }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
             >
               <View style={styles.riverCardOverlay}>
-                <View style={styles.riverIconContainer}>
-                  <Text style={styles.riverIcon}>{getRiverIcon(item)}</Text>
-                </View>
-                <View style={styles.riverInfo}>
-                  <Text style={styles.riverName}>{item}</Text>
-                  <Text style={styles.riverSubtext}>Tap for flows, weather & reports</Text>
+                <View style={styles.riverContent}>
+                  <View style={styles.riverIconContainer}>
+                    <Text style={styles.riverIcon}>{getRiverIcon(item)}</Text>
+                  </View>
+                  <View style={styles.riverInfo}>
+                    <Text style={styles.riverName}>{item}</Text>
+                    <Text style={styles.riverSubtext}>{getRiverSubtitle(item)}</Text>
+                  </View>
                 </View>
                 <View style={styles.arrowContainer}>
                   <Text style={styles.arrow}>›</Text>
@@ -186,7 +180,7 @@ function RiverDetailsScreen({ route, navigation }) {
       const result = await response.json();
       setData(result);
     } catch (error) {
-      console.error('Error fetching river data:', error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -199,11 +193,11 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const openReport = (url) => {
-    if (url) Linking.openURL(url);
+    Linking.openURL(url);
   };
 
   const openUSGS = (url) => {
-    if (url) Linking.openURL(url);
+    Linking.openURL(url);
   };
 
   if (loading) {
@@ -220,7 +214,7 @@ function RiverDetailsScreen({ route, navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       <ImageBackground
-        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Gallatin River'] }}
+        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Madison River'] }}
         style={styles.detailHeaderBackground}
       >
         <View style={styles.detailHeaderOverlay}>
@@ -229,77 +223,90 @@ function RiverDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
           <Text style={styles.detailHeaderTitle}>{river}</Text>
           <Text style={styles.detailHeaderSubtitle}>
-            {data?.reports?.length || 0} Sources • Updated Today
+            {data?.reports?.length || 0} Report Sources
           </Text>
         </View>
       </ImageBackground>
 
       <ScrollView 
         style={styles.detailScroll}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
       >
-        {/* Weather Card with Icon and Location */}
+        {/* Weather Card */}
         {data?.weather && (
           <View style={styles.dataCard}>
-            <Text style={styles.dataCardTitle}>🌤️ Today's Weather</Text>
-            <Text style={styles.weatherLocation}>{data.weather.location}</Text>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>{data.weather.icon || '🌤️'}</Text>
+              <Text style={styles.dataCardTitle}>Today's Weather</Text>
+            </View>
+            <Text style={styles.locationText}>📍 {data.weather.station}</Text>
             <View style={styles.weatherRow}>
               <View style={styles.weatherItem}>
                 <Text style={styles.weatherValue}>{data.weather.high}°</Text>
                 <Text style={styles.weatherLabel}>High</Text>
               </View>
+              <View style={styles.weatherDivider} />
               <View style={styles.weatherItem}>
                 <Text style={styles.weatherValue}>{data.weather.low}°</Text>
                 <Text style={styles.weatherLabel}>Low</Text>
               </View>
+              <View style={styles.weatherDivider} />
               <View style={styles.weatherItemWide}>
-                <Text style={styles.weatherIcon}>{data.weather.icon || '🌤️'}</Text>
                 <Text style={styles.weatherCondition}>{data.weather.condition}</Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* USGS Data Card - Clickable to open USGS */}
+        {/* USGS Data Card */}
         {data?.usgs && (
-          <TouchableOpacity 
-            style={styles.dataCard}
-            onPress={() => openUSGS(data.usgs.url)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.dataCardTitle}>📊 Current Conditions (USGS) →</Text>
+          <TouchableOpacity style={styles.dataCard} onPress={() => openUSGS(data.usgs.url)}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>📊</Text>
+              <Text style={styles.dataCardTitle}>Current Conditions (USGS)</Text>
+            </View>
+            <Text style={styles.locationText}>📍 {data.usgs.location}</Text>
             <View style={styles.usgsRow}>
               <View style={styles.usgsItem}>
                 <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
-                <Text style={styles.usgsLabel}>Flow</Text>
+                <Text style={styles.usgsLabel}>Flow Rate</Text>
               </View>
+              <View style={styles.usgsDivider} />
               <View style={styles.usgsItem}>
                 <Text style={styles.usgsValue}>{data.usgs.temp}</Text>
                 <Text style={styles.usgsLabel}>Water Temp</Text>
               </View>
             </View>
-            <Text style={styles.tapHint}>Tap to view on USGS website</Text>
+            <Text style={styles.usgsLink}>Tap to view on USGS website →</Text>
           </TouchableOpacity>
         )}
 
         {/* Reports Section */}
-        <Text style={styles.sectionTitle}>📰 Fishing Reports</Text>
-        {data?.reports?.map((report) => (
+        <Text style={styles.sectionTitle}>Latest Fishing Reports</Text>
+        {data?.reports?.map((report, index) => (
           <TouchableOpacity 
-            key={report.id}
+            key={report.id || index}
             style={styles.reportCard}
             onPress={() => openReport(report.url)}
             activeOpacity={0.8}
           >
             <View style={styles.reportHeader}>
               <View style={styles.sourceBadge}>
-                <Text style={styles.sourceText}>{report.source}</Text>
+                <Text style={styles.sourceText} numberOfLines={1}>{report.source}</Text>
               </View>
-              <Text style={styles.dateText}>{formatDate(report.last_updated)}</Text>
+              <Text style={styles.dateText}>{report.last_updated || 'Recently updated'}</Text>
             </View>
-            <Text style={styles.linkButton}>Read Full Report →</Text>
+            <View style={styles.reportFooter}>
+              <Text style={styles.linkButton}>Read Full Report →</Text>
+            </View>
           </TouchableOpacity>
         ))}
+        
+        {(!data?.reports || data.reports.length === 0) && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>No reports available</Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -332,117 +339,141 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: COLORS.gray,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   
   // Header with background image
   headerBackground: {
-    height: 180,
+    height: 200,
     justifyContent: 'flex-end',
   },
   headerOverlay: {
-    backgroundColor: 'rgba(26, 95, 122, 0.85)',
-    padding: 20,
-    paddingTop: 50,
+    backgroundColor: 'rgba(26, 95, 122, 0.9)',
+    padding: 24,
+    paddingTop: 60,
+    alignItems: 'center',
+  },
+  headerEmoji: {
+    fontSize: 40,
+    marginBottom: 8,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: COLORS.white,
+    letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.accent,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   
   // River cards with images
   listContainer: {
-    padding: 12,
+    padding: 16,
+    paddingTop: 8,
   },
   riverCard: {
     marginVertical: 8,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
-    elevation: 4,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  riverCardBackground: {
+    height: 130,
+  },
+  riverCardImage: {
+    borderRadius: 20,
+  },
+  riverCardOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  riverContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  riverIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-  },
-  riverCardBackground: {
-    height: 120,
-  },
-  riverCardImage: {
-    borderRadius: 16,
-  },
-  riverCardOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  riverIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
+    elevation: 3,
   },
   riverIcon: {
-    fontSize: 24,
+    fontSize: 28,
   },
   riverInfo: {
     flex: 1,
   },
   riverName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: COLORS.white,
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+    marginBottom: 4,
   },
   riverSubtext: {
-    fontSize: 13,
+    fontSize: 14,
     color: 'rgba(255,255,255,0.9)',
-    marginTop: 2,
+    fontWeight: '500',
   },
   arrowContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 12,
   },
   arrow: {
-    fontSize: 24,
+    fontSize: 28,
     color: COLORS.primary,
-    fontWeight: '300',
+    fontWeight: '400',
   },
   
   // Detail screen
   detailHeaderBackground: {
-    height: 200,
+    height: 220,
   },
   detailHeaderOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(26, 95, 122, 0.8)',
+    backgroundColor: 'rgba(26, 95, 122, 0.85)',
     justifyContent: 'flex-end',
-    padding: 20,
-    paddingTop: 50,
+    padding: 24,
+    paddingTop: 60,
   },
   backButton: {
     position: 'absolute',
     left: 20,
     top: 50,
+    zIndex: 10,
   },
   backArrow: {
-    fontSize: 36,
+    fontSize: 40,
     color: COLORS.white,
     fontWeight: '300',
   },
@@ -450,11 +481,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: COLORS.white,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   detailHeaderSubtitle: {
     fontSize: 14,
     color: COLORS.accent,
     marginTop: 4,
+    fontWeight: '500',
   },
   detailScroll: {
     flex: 1,
@@ -464,33 +499,42 @@ const styles = StyleSheet.create({
   // Data cards
   dataCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 20,
     marginBottom: 16,
-    elevation: 2,
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 6,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cardIcon: {
+    fontSize: 24,
+    marginRight: 8,
   },
   dataCardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.dark,
-    marginBottom: 8,
+  },
+  locationText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginBottom: 16,
+    fontWeight: '500',
   },
   
   // Weather styles
-  weatherLocation: {
-    fontSize: 14,
-    color: COLORS.gray,
-    marginBottom: 12,
-    fontStyle: 'italic',
-  },
   weatherRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    paddingVertical: 8,
   },
   weatherItem: {
     alignItems: 'center',
@@ -499,6 +543,12 @@ const styles = StyleSheet.create({
   weatherItemWide: {
     alignItems: 'center',
     flex: 2,
+    paddingHorizontal: 8,
+  },
+  weatherDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#e0e0e0',
   },
   weatherValue: {
     fontSize: 36,
@@ -509,13 +559,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     marginTop: 4,
-  },
-  weatherIcon: {
-    fontSize: 48,
-    marginBottom: 4,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   weatherCondition: {
-    fontSize: 14,
+    fontSize: 16,
     color: COLORS.secondary,
     fontWeight: '600',
     textAlign: 'center',
@@ -525,27 +574,37 @@ const styles = StyleSheet.create({
   usgsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   usgsItem: {
     alignItems: 'center',
     flex: 1,
   },
+  usgsDivider: {
+    width: 1,
+    height: 50,
+    backgroundColor: '#e0e0e0',
+  },
   usgsValue: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   usgsLabel: {
     fontSize: 12,
     color: COLORS.gray,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  tapHint: {
-    fontSize: 11,
-    color: COLORS.gray,
-    textAlign: 'center',
+  usgsLink: {
+    fontSize: 14,
+    color: COLORS.secondary,
+    fontWeight: '600',
     marginTop: 12,
-    fontStyle: 'italic',
+    textAlign: 'center',
   },
   
   // Reports section
@@ -553,18 +612,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.dark,
-    marginBottom: 12,
+    marginBottom: 16,
     marginTop: 8,
+    paddingHorizontal: 4,
   },
   reportCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 16,
+    padding: 18,
     marginBottom: 12,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
   },
   reportHeader: {
@@ -574,25 +634,40 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sourceBadge: {
-    backgroundColor: COLORS.primary + '15',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: COLORS.primary + '12',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
     flex: 1,
-    marginRight: 8,
+    marginRight: 12,
   },
   sourceText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   dateText: {
     fontSize: 12,
     color: COLORS.gray,
+    fontWeight: '500',
+  },
+  reportFooter: {
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    paddingTop: 14,
+    marginTop: 4,
   },
   linkButton: {
     fontSize: 15,
     color: COLORS.secondary,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    color: COLORS.gray,
+    fontSize: 16,
   },
 });
