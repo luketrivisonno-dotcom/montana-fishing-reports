@@ -101,7 +101,7 @@ function HomeScreen({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80' }}
+        source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Gallatin_River_Montana.jpg/800px-Gallatin_River_Montana.jpg' }}
         style={styles.headerBackground}
       >
         <View style={styles.headerOverlay}>
