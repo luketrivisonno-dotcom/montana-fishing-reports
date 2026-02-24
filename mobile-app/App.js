@@ -81,28 +81,8 @@ function HomeScreen({ navigation }) {
   };
 
   const getRiverIcon = (river) => {
-    if (river.includes('Gallatin')) return '🏔️';
-    if (river.includes('Upper Madison')) return '⬆️';
-    if (river.includes('Lower Madison')) return '⬇️';
-    if (river.includes('Madison')) return '🎣';
-    if (river.includes('Yellowstone')) return '🌲';
-    if (river.includes('Missouri')) return '🚣';
-    if (river.includes('Bighorn')) return '🦌';
-    if (river.includes('Blackfoot')) return '🌲';
-    if (river.includes('Clark')) return '⛰️';
-    if (river.includes('Bitterroot')) return '🏔️';
-    if (river.includes('Rock')) return '🪨';
-    if (river.includes('Beaverhead')) return '🦫';
-    if (river.includes('Big Hole')) return '🕳️';
-    if (river.includes('Flathead')) return '🏔️';
-    if (river.includes('Jefferson')) return '🇺🇸';
-    if (river.includes('Swan')) return '🦢';
-    if (river.includes('Spring')) return '🌸';
-    if (river.includes('Boulder')) return '🪨';
-    if (river.includes('Ruby')) return '💎';
-    if (river.includes('Stillwater')) return '🌊';
-    return '🎣';
-  };
+  return null; // No icons
+};
 
   const getRiverSubtitle = (river) => {
     if (river.includes('Upper Madison')) return 'Ennis to Quake Lake';
