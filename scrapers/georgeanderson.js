@@ -2,7 +2,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 async function scrapeGeorgeAnderson() {
-  // Yellowstone Angler (George Anderson's shop)
   const url = 'https://www.yellowstoneangler.com/fishing-reports/';
   
   try {
@@ -19,7 +18,6 @@ async function scrapeGeorgeAnderson() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    // Yellowstone Angler covers these rivers
     const rivers = [
       'Yellowstone River',
       'Madison River',
