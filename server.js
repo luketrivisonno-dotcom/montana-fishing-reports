@@ -141,9 +141,10 @@ async function runDatabaseCleanup() {
         `);
         
         console.log(`✅ Cleanup complete: Removed ${brokenResult.rowCount} broken links and ${dupResult.rowCount} duplicates`);
-        
+        return { broken: brokenResult.rowCount, duplicates: dupResult.rowCount };
     } catch (error) {
         console.error('❌ Cleanup error:', error.message);
+        return { error: error.message };
     }
 }
 
@@ -230,10 +231,11 @@ app.post('/api/scrape', async (req, res) => {
     }
 });
 
-// Manual cleanup endpoint
+// Manual cleanup endpoint - THIS MUST BE BEFORE app.listen
 app.post('/api/cleanup', async (req, res) => {
+    console.log('Received cleanup request');
     try {
-        await runDatabaseCleanup();
+        const cleanup = await runDatabaseCleanup();
         
         const counts = await db.query(`
             SELECT 
@@ -246,9 +248,11 @@ app.post('/api/cleanup', async (req, res) => {
         
         res.json({
             message: 'Cleanup completed successfully',
+            removed: cleanup,
             stats: counts.rows[0]
         });
     } catch (error) {
+        console.error('Cleanup endpoint error:', error);
         res.status(500).json({ error: error.message });
     }
 });
