@@ -1,3 +1,4 @@
+cat > ~/montana-fishing-reports/server.js << 'ENDOFFILE'
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
@@ -231,7 +232,7 @@ app.post('/api/scrape', async (req, res) => {
     }
 });
 
-// Manual cleanup endpoint - THIS MUST BE BEFORE app.listen
+// Manual cleanup endpoint
 app.post('/api/cleanup', async (req, res) => {
     console.log('Received cleanup request');
     try {
@@ -404,3 +405,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = { normalizeSource, standardizeDate, formatDateForDisplay };
+ENDOFFILE
