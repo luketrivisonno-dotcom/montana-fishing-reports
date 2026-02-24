@@ -236,10 +236,12 @@ function RiverDetailsScreen({ route, navigation }) {
         {data?.weather && (
           <View style={styles.dataCard}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>{data.weather.icon || '🌤️'}</Text>
-              <Text style={styles.dataCardTitle}>Today's Weather</Text>
+              <Text style={styles.weatherIconLarge}>{data.weather.icon || '☁️'}</Text>
+              <View style={styles.cardTitleContainer}>
+                <Text style={styles.dataCardTitle}>Today's Weather</Text>
+                <Text style={styles.locationText}>📍 {data.weather.station}</Text>
+              </View>
             </View>
-            <Text style={styles.locationText}>📍 {data.weather.station}</Text>
             <View style={styles.weatherRow}>
               <View style={styles.weatherItem}>
                 <Text style={styles.weatherValue}>{data.weather.high}°</Text>
@@ -263,9 +265,11 @@ function RiverDetailsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.dataCard} onPress={() => openUSGS(data.usgs.url)}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardIcon}>📊</Text>
-              <Text style={styles.dataCardTitle}>Current Conditions (USGS)</Text>
+              <View style={styles.cardTitleContainer}>
+                <Text style={styles.dataCardTitle}>Current Conditions (USGS)</Text>
+                <Text style={styles.locationText}>📍 {data.usgs.location}</Text>
+              </View>
             </View>
-            <Text style={styles.locationText}>📍 {data.usgs.location}</Text>
             <View style={styles.usgsRow}>
               <View style={styles.usgsItem}>
                 <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
