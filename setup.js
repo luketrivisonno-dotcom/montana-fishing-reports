@@ -1,4 +1,3 @@
-cat > setup.js << 'EOF'
 const { runAllScrapers } = require('./scrapers');
 
 async function setup() {
@@ -23,4 +22,3 @@ async function setup() {
 }
 
 setup();
-EOF
