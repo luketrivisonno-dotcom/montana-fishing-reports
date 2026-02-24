@@ -1,4 +1,3 @@
-cat > scrapers/missouri.js << 'EOF'
 async function scrapeMissouriMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -34,4 +33,3 @@ module.exports = {
     scrapeMissouriHeadhunters,
     scrapeMissouriRiversEdge
 };
-EOF
