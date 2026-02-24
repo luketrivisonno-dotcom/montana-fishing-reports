@@ -1,4 +1,3 @@
-cat > scrapers/flathead.js << 'EOF'
 async function scrapeFlatheadMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeFlatheadMontanaAngler,
     scrapeFlatheadCrown
 };
-EOF
