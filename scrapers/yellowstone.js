@@ -1,4 +1,3 @@
-cat > scrapers/yellowstone.js << 'EOF'
 async function scrapeYellowstoneMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -34,4 +33,3 @@ module.exports = {
     scrapeYellowstoneRiversEdge,
     scrapeYellowstoneYellowDog
 };
-EOF
