@@ -130,7 +130,7 @@ function HomeScreen({ navigation }) {
         <View style={styles.headerOverlay}>
           <Text style={styles.headerEmoji}>🏔️</Text>
           <Text style={styles.headerTitle}>Montana Fishing</Text>
-          <Text style={styles.headerSubtitle}>{rivers.length} Rivers • Live Reports & Conditions</Text>
+          <Text style={styles.headerSubtitle}>Most up to date Fishing Reports</Text>
         </View>
       </ImageBackground>
 
