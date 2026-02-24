@@ -1,4 +1,3 @@
-cat > scrapers/clarkfork.js << 'EOF'
 async function scrapeClarkForkOrvis() {
     return {
         source: 'Orvis',
@@ -34,4 +33,3 @@ module.exports = {
     scrapeClarkForkGrizzly,
     scrapeClarkForkBlackfoot
 };
-EOF
