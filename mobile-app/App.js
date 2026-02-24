@@ -345,6 +345,19 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: '600',
   },
+  weatherIconLarge: {
+  fontSize: 40,
+  marginRight: 12,
+},
+cardTitleContainer: {
+  flex: 1,
+},
+locationText: {
+  fontSize: 14,
+  color: COLORS.gray,
+  marginTop: 2,
+  fontWeight: '500',
+},
   
   // Header with background image
   headerBackground: {
