@@ -1,4 +1,3 @@
-cat > scrapers/bigskyanglers.js << 'EOF'
 async function scrapeBigSkyAnglers() {
     return {
         source: 'Big Sky Anglers',
@@ -9,4 +8,3 @@ async function scrapeBigSkyAnglers() {
     };
 }
 module.exports = scrapeBigSkyAnglers;
-EOF
