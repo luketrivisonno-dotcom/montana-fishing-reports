@@ -1,5 +1,4 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
 
 async function scrapePerfectFly() {
   const url = 'https://perfectflystore.com/your-streams/fly-fishing-stillwater-river-montana/';
@@ -9,9 +8,6 @@ async function scrapePerfectFly() {
       headers: { 'User-Agent': 'Mozilla/5.0' },
       timeout: 10000
     });
-    
-    const $ = cheerio.load(data);
-    const pageText = $('body').text();
     
     // Look for dateModified in JSON-LD schema
     const schemaMatch = data.match(/"dateModified":"([^"]+)"/);
