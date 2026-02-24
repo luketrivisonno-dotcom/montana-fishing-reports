@@ -174,35 +174,33 @@ app.get('/api/usgs/:river', async (req, res) => {
 });
 
 app.get('/api/river-details/:river', async (req, res) => {
-    try {
-        const { river } = req.params;
-        const reportsResult = await db.query(
-            `SELECT id, source, river, url, last_updated, scraped_at 
-             FROM reports 
-             WHERE river = $1 AND is_active = true
-             ORDER BY scraped_at DESC`,
-            [river]
-        );
-        
-        // Standardize dates
-        const standardizedReports = reportsResult.rows.map(r => ({
-            ...r,
-            last_updated: standardizeDate(r.last_updated)
-        }));
-        
-        const weather = await getWeatherForRiver(river);
-        const usgs = await getUSGSData(river);
-        
-        res.json({
-            river: river,
-            reports: standardizedReports,
-            weather: weather,
-            usgs: usgs,
-            reportCount: standardizedReports.length
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+    const { river } = req.params;
+    
+    // Get weather and USGS data
+    const weather = await getWeatherForRiver(river);
+    const usgs = await getUSGSData(river);
+    
+    // Get reports - only most recent per source, filter out USGS from reports
+    const reportsResult = await db.query(
+      `SELECT DISTINCT ON (source) * FROM reports 
+       WHERE river = $1 
+       AND is_active = true 
+       AND source NOT LIKE '%USGS%'
+       ORDER BY source, scraped_at DESC`,
+      [river]
+    );
+    
+    res.json({
+      river,
+      weather,
+      usgs,
+      reports: reportsResult.rows
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch river details' });
+  }
 });
 
 app.get('/api/weather-icon/:code', (req, res) => {
