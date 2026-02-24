@@ -1,4 +1,3 @@
-cat > scrapers/jefferson.js << 'EOF'
 async function scrapeJeffersonMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeJeffersonMontanaAngler,
     scrapeJeffersonHeadhunters
 };
-EOF
