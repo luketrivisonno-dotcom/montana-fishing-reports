@@ -37,7 +37,6 @@ async function getUSGSData(riverName) {
       const values = series.values[0].value;
       if (values.length > 0) {
         const latest = values[values.length - 1];
-        // Check for valid data (not -999999 which means ice/no data)
         if (latest.value !== '-999999') {
           if (param === '00060') flow = Math.round(parseFloat(latest.value));
           if (param === '00010') temp = Math.round(parseFloat(latest.value) * 9/5 + 32);
