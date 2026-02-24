@@ -1,4 +1,3 @@
-cat > scrapers/gallatin.js << 'EOF'
 async function scrapeYellowDog() {
     return {
         source: 'Yellow Dog Fly Fishing',
@@ -56,4 +55,3 @@ module.exports = {
     scrapeOrvis,
     scrapeBozemanFlySupply
 };
-EOF
