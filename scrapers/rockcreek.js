@@ -1,4 +1,3 @@
-cat > scrapers/rockcreek.js << 'EOF'
 async function scrapeRockCreekOrvis() {
     return {
         source: 'Orvis',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeRockCreekOrvis,
     scrapeRockCreekMontanaAngler
 };
-EOF
