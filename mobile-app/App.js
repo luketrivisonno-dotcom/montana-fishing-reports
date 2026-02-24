@@ -22,16 +22,16 @@ const RIVER_IMAGES = {
   'Rock Creek': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
   'Bighorn River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
   'Beaverhead River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Big Hole River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Big Hole River': 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg?auto=compress&cs=tinysrgb&w=800',
   'Flathead River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Jefferson River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80',
-  'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Swan River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Spring Creeks': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Boulder River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
-  'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Stillwater River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
-  'Yellowstone National Park': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80'
+  'Jefferson River': 'https://images.pexels.com/photos/1761279/pexels-photo-1761279.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Madison River': 'https://images.pexels.com/photos/1547813/pexels-photo-1547813.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Swan River': 'https://images.pexels.com/photos/356830/pexels-photo-356830.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Spring Creeks': 'https://images.pexels.com/photos/709552/pexels-photo-709552.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Boulder River': 'https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Ruby River': 'https://images.pexels.com/photos/355321/pexels-photo-355321.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Stillwater River': 'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Yellowstone National Park': 'https://images.pexels.com/photos/1770809/pexels-photo-1770809.jpeg?auto=compress&cs=tinysrgb&w=800'
 };
 const COLORS = {
   primary: '#1a5f7a',
