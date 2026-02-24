@@ -117,8 +117,6 @@ async function runAllScrapers() {
     // New rivers
     { name: 'Spring Creeks', fn: require('./springcreeks') },
     { name: 'Boulder River', fn: require('./boulder') },
-    { name: 'Ruby River', fn: require('./ruby') },
-    { name: 'Stillwater River', fn: require('./stillwater') }
   ];
   
   let successCount = 0;
