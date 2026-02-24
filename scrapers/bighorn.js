@@ -1,4 +1,3 @@
-cat > scrapers/bighorn.js << 'EOF'
 async function scrapeBighornNorthFork() {
     return {
         source: 'North Fork Anglers',
@@ -34,4 +33,3 @@ module.exports = {
     scrapeBighornYellowDog,
     scrapeBighornAngler
 };
-EOF
