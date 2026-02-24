@@ -1,4 +1,3 @@
-cat > scrapers/yellowstoneangler.js << 'EOF'
 async function scrapeYellowstoneAngler() {
     return {
         source: 'Yellowstone Angler',
@@ -9,4 +8,3 @@ async function scrapeYellowstoneAngler() {
     };
 }
 module.exports = scrapeYellowstoneAngler;
-EOF
