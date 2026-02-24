@@ -1,3 +1,4 @@
+cat > finsfeathers.js << 'ENDOFFILE'
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -17,7 +18,6 @@ async function scrapeFinsFeathers() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2})/i);
     
-    // Fins & Feathers covers multiple Montana rivers
     const rivers = [
       'Gallatin River',
       'Madison River',
@@ -41,3 +41,4 @@ async function scrapeFinsFeathers() {
 }
 
 module.exports = scrapeFinsFeathers;
+ENDOFFILE
