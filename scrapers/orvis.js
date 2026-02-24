@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+// Orvis URLs - removed Bitterroot (broken)
 const ORVIS_URLS = {
   'Gallatin River': 'https://www.orvis.com/fishing-report/gallatin-river',
   'Upper Madison River': 'https://www.orvis.com/fishing-report/upper-madison-river',
@@ -10,12 +11,13 @@ const ORVIS_URLS = {
   'Big Hole River': 'https://www.orvis.com/fishing-report/big-hole-river',
   'Beaverhead River': 'https://www.orvis.com/fishing-report/beaverhead-river',
   'Bighorn River': 'https://www.orvis.com/fishing-report/bighorn-river',
-  'Bitterroot River': 'https://www.orvis.com/fishing-report/bitterroot-river',
   'Rock Creek': 'https://www.orvis.com/fishing-report/rock-creek',
   'Clark Fork River': 'https://www.orvis.com/fishing-report/clark-fork-river',
   'Blackfoot River': 'https://www.orvis.com/fishing-report/blackfoot-river',
   'Flathead River': 'https://www.orvis.com/fishing-report/flathead-river',
-  'Jefferson River': 'https://www.orvis.com/fishing-report/jefferson-river'
+  'Jefferson River': 'https://www.orvis.com/fishing-report/jefferson-river',
+  'Ruby River': 'https://www.orvis.com/fishing-report/ruby-river',
+  'Stillwater River': 'https://www.orvis.com/fishing-report/stillwater-river'
 };
 
 async function scrapeOrvis() {
@@ -25,13 +27,8 @@ async function scrapeOrvis() {
     try {
       const { data } = await axios.get(url, {
         headers: { 
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'DNT': '1',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         },
         timeout: 15000
       });
@@ -39,14 +36,12 @@ async function scrapeOrvis() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      // Look for date patterns in the page
       const dateMatch = 
         pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
         pageText.match(/Report\s+Date[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
         pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
-      // Try to find the report date in meta tags or specific elements
       const metaDate = $('meta[property="article:modified_time"]').attr('content') ||
                        $('meta[property="article:published_time"]').attr('content');
       
