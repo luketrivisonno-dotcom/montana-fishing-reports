@@ -19,8 +19,8 @@ async function scrapeBigforkAnglers() {
     try {
       const { data } = await axios.get(url, {
         headers: { 
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+          'User-Agent': 'Mozilla/5.0',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         },
         timeout: 10000
       });
@@ -28,7 +28,6 @@ async function scrapeBigforkAnglers() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      // Look for date patterns
       const dateMatch = 
         pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
         pageText.match(/Report\s+Date[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
