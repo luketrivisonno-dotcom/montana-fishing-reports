@@ -9,7 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
-// River background images
+// River background images - NO TRAILING SPACES
 const RIVER_IMAGES = {
   'Gallatin River': 'https://images.unsplash.com/photo-1542662565-7e4b66b529c5?w=800&q=80',
   'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
@@ -33,6 +33,7 @@ const RIVER_IMAGES = {
   'Stillwater River': 'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&w=800',
   'Yellowstone National Park': 'https://images.pexels.com/photos/1770809/pexels-photo-1770809.jpeg?auto=compress&cs=tinysrgb&w=800'
 };
+
 const COLORS = {
   primary: '#1a5f7a',
   secondary: '#159895',
@@ -80,10 +81,6 @@ function HomeScreen({ navigation }) {
     setRefreshing(false);
   };
 
-  const getRiverIcon = (river) => {
-  return null; // No icons
-};
-
   const getRiverSubtitle = (river) => {
     if (river.includes('Upper Madison')) return 'Ennis to Quake Lake';
     if (river.includes('Lower Madison')) return 'Three Forks to Ennis';
@@ -110,7 +107,7 @@ function HomeScreen({ navigation }) {
         <View style={styles.headerOverlay}>
           <Text style={styles.headerEmoji}>🏔️</Text>
           <Text style={styles.headerTitle}>Montana Fishing</Text>
-          <Text style={styles.headerSubtitle}>Most up to date Fishing Reports</Text>
+          <Text style={styles.headerSubtitle}>Most up to date fishing reports</Text>
         </View>
       </ImageBackground>
 
@@ -134,9 +131,6 @@ function HomeScreen({ navigation }) {
             >
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverContent}>
-                  <View style={styles.riverIconContainer}>
-                    <Text style={styles.riverIcon}>{getRiverIcon(item)}</Text>
-                  </View>
                   <View style={styles.riverInfo}>
                     <Text style={styles.riverName}>{item}</Text>
                     <Text style={styles.riverSubtext}>{getRiverSubtitle(item)}</Text>
@@ -442,23 +436,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-  },
-  riverIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  riverIcon: {
-    fontSize: 28,
+    paddingLeft: 8,
   },
   riverInfo: {
     flex: 1,
