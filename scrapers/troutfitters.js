@@ -11,7 +11,11 @@ const TROUTFITTERS_URLS = {
   'Beaverhead River': 'https://troutfitters.com/reports/beaverhead-river',
   'Bighorn River': 'https://troutfitters.com/reports/bighorn-river',
   'Bitterroot River': 'https://troutfitters.com/reports/bitterroot-river',
-  'Rock Creek': 'https://troutfitters.com/reports/rock-creek'
+  'Rock Creek': 'https://troutfitters.com/reports/rock-creek',
+  'Clark Fork River': 'https://troutfitters.com/reports/clark-fork-river',
+  'Blackfoot River': 'https://troutfitters.com/reports/blackfoot-river',
+  'Flathead River': 'https://troutfitters.com/reports/flathead-river',
+  'Jefferson River': 'https://troutfitters.com/reports/jefferson-river'
 };
 
 async function scrapeTroutfitters() {
