@@ -345,19 +345,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: '600',
   },
-  weatherIconLarge: {
-  fontSize: 40,
-  marginRight: 12,
-},
-cardTitleContainer: {
-  flex: 1,
-},
-locationText: {
-  fontSize: 14,
-  color: COLORS.gray,
-  marginTop: 2,
-  fontWeight: '500',
-},
   
   // Header with background image
   headerBackground: {
@@ -497,7 +484,7 @@ locationText: {
   detailHeaderTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: COLORS.white,
+    color: COLORS.white',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -530,9 +517,16 @@ locationText: {
     alignItems: 'center',
     marginBottom: 8,
   },
+  weatherIconLarge: {
+    fontSize: 40,
+    marginRight: 12,
+  },
   cardIcon: {
     fontSize: 24,
-    marginRight: 8,
+    marginRight: 12,
+  },
+  cardTitleContainer: {
+    flex: 1,
   },
   dataCardTitle: {
     fontSize: 18,
@@ -542,7 +536,7 @@ locationText: {
   locationText: {
     fontSize: 14,
     color: COLORS.gray,
-    marginBottom: 16,
+    marginTop: 2,
     fontWeight: '500',
   },
   
