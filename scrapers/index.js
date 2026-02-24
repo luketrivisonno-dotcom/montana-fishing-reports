@@ -36,18 +36,18 @@ async function runAllScrapers() {
   console.log('========================================\n');
   
   const allScrapers = [
-    // Multi-river scrapers (these return arrays for multiple rivers)
-    { name: 'Yellow Dog', fn: scrapeYellowDog },        // 6 rivers
-    { name: 'Fins & Feathers', fn: scrapeFinsFeathers }, // 5 rivers + new ones
-    { name: 'Orvis', fn: scrapeOrvis },                  // 14 rivers (fixed)
-    { name: 'Troutfitters', fn: scrapeTroutfitters },    // 7 rivers (fixed - no Beaverhead, Flathead, Jefferson)
-    { name: 'Bigfork Anglers', fn: scrapeBigforkAnglers }, // 8 rivers + Swan
-    { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply }, // Gallatin, Madison, Yellowstone
-    { name: 'Montana Angler', fn: scrapeMontanaAngler }, // All rivers
-    { name: 'Dan Bailey\'s', fn: scrapeDanBaileys },     // All rivers
-    { name: 'George Anderson', fn: scrapeGeorgeAnderson }, // Yellowstone, etc
-    { name: 'Sunrise Fly Shop', fn: scrapeSunriseFlyShop }, // New
-    { name: 'Stonefly Shop', fn: scrapeStoneflyShop },   // New
+    // Multi-river scrapers
+    { name: 'Yellow Dog', fn: scrapeYellowDog },
+    { name: 'Fins & Feathers', fn: scrapeFinsFeathers },
+    { name: 'Orvis', fn: scrapeOrvis },
+    { name: 'Troutfitters', fn: scrapeTroutfitters },
+    { name: 'Bigfork Anglers', fn: scrapeBigforkAnglers },
+    { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },
+    { name: 'Montana Angler', fn: scrapeMontanaAngler },
+    { name: 'Dan Bailey\'s', fn: scrapeDanBaileys },
+    { name: 'George Anderson\'s', fn: scrapeGeorgeAnderson },
+    { name: 'Sunrise Fly Shop', fn: scrapeSunriseFlyShop },
+    { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
     
     // River-specific scrapers
     { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
@@ -55,33 +55,33 @@ async function runAllScrapers() {
     { name: 'Big Sky Anglers', fn: scrapeBigSkyAnglers },
     { name: 'Fly Fish Food', fn: scrapeFlyFishFood },
     
-    // Madison River specific
+    // Madison River
     { name: 'Montana Trout (Madison)', fn: madison.scrapeMadisonMT },
     { name: 'Madison River Outfitters', fn: madison.scrapeMadisonRiverOutfitters },
     
-    // Yellowstone River specific
+    // Yellowstone River
     { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
     
-    // Missouri River specific
+    // Missouri River
     { name: 'Headhunters Fly Shop', fn: missouri.scrapeMissouriHeadhunters },
     { name: 'River\'s Edge (Missouri)', fn: missouri.scrapeMissouriRiversEdge },
     
-    // Clark Fork River specific
+    // Clark Fork River
     { name: 'Grizzly Hackle (Clark Fork)', fn: clarkfork.scrapeClarkForkGrizzly },
     { name: 'Blackfoot River Outfitters (Clark Fork)', fn: clarkfork.scrapeClarkForkBlackfoot },
     
-    // Blackfoot River specific
+    // Blackfoot River
     { name: 'Grizzly Hackle (Blackfoot)', fn: blackfoot.scrapeBlackfootGrizzly },
     { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
     
-    // Bighorn River specific
+    // Bighorn River
     { name: 'North Fork Anglers', fn: bighorn.scrapeBighornNorthFork },
     { name: 'Bighorn Angler', fn: bighorn.scrapeBighornAngler },
     
-    // Bitterroot River specific - REMOVED Orvis (broken link)
+    // Bitterroot River
     { name: 'Montana Angler (Bitterroot)', fn: bitterroot.scrapeBitterrootMontanaAngler },
     
-    // Rock Creek specific - ADDED Grizzly Hackle and Fly Fish Food
+    // Rock Creek
     { name: 'Grizzly Hackle (Rock Creek)', fn: rockcreek.scrapeRockCreekGrizzly },
     { name: 'Montana Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMontanaAngler },
     
@@ -101,19 +101,16 @@ async function runAllScrapers() {
     try {
       const result = await scraper.fn();
       
-      // Handle array results (for split rivers or multiple reports)
       const results = Array.isArray(result) ? result : [result];
       
       for (const item of results) {
         if (item && item.last_updated) {
-          // Check for existing report from same source and river
           const existing = await db.query(
             'SELECT * FROM reports WHERE source = $1 AND river = $2 ORDER BY scraped_at DESC LIMIT 1',
             [item.source, item.river]
           );
           
           if (existing.rows.length === 0) {
-            // Insert new report
             await db.query(
               `INSERT INTO reports (source, river, url, last_updated, scraped_at, is_active) 
                VALUES ($1, $2, $3, $4, $5, true)`,
@@ -122,7 +119,6 @@ async function runAllScrapers() {
             console.log(`✓ Inserted: ${item.source} (${item.river})`);
             successCount++;
           } else {
-            // Only update if this is newer
             const existingDate = new Date(existing.rows[0].last_updated);
             const newDate = new Date(item.last_updated);
             
@@ -149,7 +145,7 @@ async function runAllScrapers() {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
   
-  // Deactivate old duplicate reports - keep only most recent per source/river
+  // Deactivate old duplicates
   await db.query(`
     UPDATE reports 
     SET is_active = false 
