@@ -34,11 +34,11 @@ async function runAllScrapers() {
   
   const allScrapers = [
     // Multi-river scrapers (these return arrays for multiple rivers)
-    { name: 'Yellow Dog', fn: scrapeYellowDog },
-    { name: 'Fins & Feathers', fn: scrapeFinsFeathers },
-    { name: 'Orvis', fn: scrapeOrvis },
-    { name: 'Troutfitters', fn: scrapeTroutfitters },
-    { name: 'Bigfork Anglers', fn: scrapeBigforkAnglers },
+    { name: 'Yellow Dog', fn: scrapeYellowDog },        // 6 rivers
+    { name: 'Fins & Feathers', fn: scrapeFinsFeathers }, // 5 rivers
+    { name: 'Orvis', fn: scrapeOrvis },                  // 14 rivers
+    { name: 'Troutfitters', fn: scrapeTroutfitters },    // 7 rivers
+    { name: 'Bigfork Anglers', fn: scrapeBigforkAnglers }, // 8 rivers + Swan
     
     // Gallatin River specific
     { name: 'Montana Angler (Gallatin)', fn: scrapeMontanaAngler },
