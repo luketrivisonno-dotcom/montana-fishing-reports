@@ -1,4 +1,3 @@
-cat > scrapers/danbaileys.js << 'EOF'
 async function scrapeDanBaileys() {
     return {
         source: "Dan Bailey's",
@@ -9,4 +8,3 @@ async function scrapeDanBaileys() {
     };
 }
 module.exports = scrapeDanBaileys;
-EOF
