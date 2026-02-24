@@ -1,4 +1,4 @@
-const axios = require('cheerio');
+const axios = require('axios');
 const cheerio = require('cheerio');
 
 async function scrapeStoneflyShop() {
@@ -18,14 +18,14 @@ async function scrapeStoneflyShop() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    // The Stonefly guides on: Big Hole, Beaverhead, Jefferson, Clark Fork, Madison, Missouri
     const rivers = [
       'Big Hole River',
       'Beaverhead River',
       'Jefferson River',
       'Clark Fork River',
       'Madison River',
-      'Missouri River'
+      'Missouri River',
+      'Rock Creek'
     ];
     
     return rivers.map(river => ({
