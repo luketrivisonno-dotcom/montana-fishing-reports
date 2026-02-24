@@ -19,7 +19,6 @@ const bitterroot = require('./bitterroot');
 const rockcreek = require('./rockcreek');
 
 // New scrapers
-const scrapeYellowstoneAngler = require('./yellowstoneangler');
 const scrapeFlyFishingBozeman = require('./flyfishingbozeman');
 const scrapeDanBaileys = require('./danbaileys');
 const scrapeBigSkyAnglers = require('./bigskyanglers');
@@ -34,13 +33,9 @@ const scrapeGeorgeAnderson = require('./georgeanderson');
 function parseDate(dateString) {
   if (!dateString) return new Date();
   
-  // Try to parse various date formats
   const formats = [
-    // February 26, 2026
     /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
-    // 2/26/2026 or 02/26/2026
     /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-    // 2026-02-26
     /(\d{4})-(\d{2})-(\d{2})/
   ];
   
@@ -79,7 +74,6 @@ async function runAllScrapers() {
     { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
     
     // River-specific scrapers
-    { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
     { name: 'Fly Fishing Bozeman', fn: scrapeFlyFishingBozeman },
     { name: 'Big Sky Anglers', fn: scrapeBigSkyAnglers },
     { name: 'Fly Fish Food', fn: scrapeFlyFishFood },
@@ -135,7 +129,7 @@ async function runAllScrapers() {
       for (const item of results) {
         if (item && item.last_updated) {
           const parsedDate = parseDate(item.last_updated);
-          const dateString = parsedDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+          const dateString = parsedDate.toISOString().split('T')[0];
           
           const existing = await db.query(
             'SELECT * FROM reports WHERE source = $1 AND river = $2 ORDER BY scraped_at DESC LIMIT 1',
@@ -177,7 +171,7 @@ async function runAllScrapers() {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
   
-  // Deactivate old duplicates - keep only most recent per source/river
+  // Deactivate old duplicates
   await db.query(`
     UPDATE reports 
     SET is_active = false 
