@@ -17,6 +17,9 @@ const blackfoot = require('./blackfoot');
 const bighorn = require('./bighorn');
 const bitterroot = require('./bitterroot');
 const rockcreek = require('./rockcreek');
+const scrapeYellowstoneCountry = require('./yellowstonecountry');
+const scrapeBlueRibbonFlies = require('./blueribbonflies');
+const scrapeJacklins = require('./jacklins');
 
 // New scrapers
 const scrapeFlyFishingBozeman = require('./flyfishingbozeman');
@@ -72,6 +75,9 @@ async function runAllScrapers() {
     { name: 'George Anderson\'s', fn: scrapeGeorgeAnderson },
     { name: 'Sunrise Fly Shop', fn: scrapeSunriseFlyShop },
     { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
+    { name: 'Yellowstone Country Fly Fishing', fn: scrapeYellowstoneCountry },
+    { name: 'Blue Ribbon Flies', fn: scrapeBlueRibbonFlies },
+    { name: 'Jacklin\'s Fly Shop', fn: scrapeJacklins },
     
     // River-specific scrapers
     { name: 'Fly Fishing Bozeman', fn: scrapeFlyFishingBozeman },
