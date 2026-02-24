@@ -19,18 +19,12 @@ async function scrapeFinsFeathers() {
     
     const rivers = [
       'Gallatin River',
-<<<<<<< HEAD
       'Upper Madison River',
       'Lower Madison River',
       'Madison River',
       'Yellowstone River',
       'Missouri River',
       'Jefferson River',
-=======
-      'Madison River',
-      'Yellowstone River',
-      'Missouri River',
->>>>>>> 0acb36d (Fix Yellow Dog, Fins & Feathers, and Troutfitters scrapers to cover all rivers)
       'Bighorn River'
     ];
     
