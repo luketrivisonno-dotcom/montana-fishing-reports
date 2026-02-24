@@ -1,4 +1,3 @@
-cat > scrapers/blackfoot.js << 'EOF'
 async function scrapeBlackfootOrvis() {
     return {
         source: 'Orvis',
@@ -34,4 +33,3 @@ module.exports = {
     scrapeBlackfootGrizzly,
     scrapeBlackfootBRO
 };
-EOF
