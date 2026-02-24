@@ -299,4 +299,50 @@ app.get('/api/river-details/:river', async (req, res) => {
     const seenSources = new Set();
     const reports = reportsResult.rows
         .map(report => ({
-            ...report
+            ...report,
+            last_updated: formatDateForDisplay(report.last_updated)
+        }))
+        .filter(report => {
+            const normalized = normalizeSource(report.source);
+            if (seenSources.has(normalized)) return false;
+            seenSources.add(normalized);
+            return true;
+        });
+    
+    res.json({
+      river,
+      weather,
+      usgs,
+      reports: reports
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch river details' });
+  }
+});
+
+app.get('/api/weather-icon/:code', (req, res) => {
+    const { code } = req.params;
+    const icons = {
+        0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+        45: '🌫️', 48: '🌫️',
+        51: '🌦️', 53: '🌧️', 55: '🌧️',
+        61: '🌧️', 63: '🌧️', 65: '🌧️',
+        71: '🌨️', 73: '🌨️', 75: '🌨️', 77: '🌨️',
+        80: '🌦️', 81: '🌧️', 82: '🌧️',
+        85: '🌨️', 86: '🌨️',
+        95: '⛈️', 96: '⛈️', 99: '⛈️'
+    };
+    res.json({ icon: icons[code] || '☁️' });
+});
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`\n========================================`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Test: http://localhost:${PORT}/`);
+    console.log(`Cleanup: POST http://localhost:${PORT}/api/cleanup`);
+    console.log('========================================\n');
+});
+
+module.exports = { normalizeSource, standardizeDate, formatDateForDisplay };
