@@ -1,4 +1,3 @@
-cat > scrapers/flyfishingbozeman.js << 'EOF'
 async function scrapeFlyFishingBozeman() {
     return {
         source: 'Fly Fishing Bozeman',
@@ -9,4 +8,3 @@ async function scrapeFlyFishingBozeman() {
     };
 }
 module.exports = scrapeFlyFishingBozeman;
-EOF
