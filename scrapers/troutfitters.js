@@ -1,21 +1,15 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+// Troutfitters only has reports for these 7 rivers
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Upper Madison River': 'https://troutfitters.com/reports/upper-madison-river',
   'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
   'Missouri River': 'https://troutfitters.com/reports/missouri-river',
-  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
-  'Beaverhead River': 'https://troutfitters.com/reports/beaverhead-river',
   'Bighorn River': 'https://troutfitters.com/reports/bighorn-river',
-  'Bitterroot River': 'https://troutfitters.com/reports/bitterroot-river',
-  'Rock Creek': 'https://troutfitters.com/reports/rock-creek',
-  'Clark Fork River': 'https://troutfitters.com/reports/clark-fork-river',
-  'Blackfoot River': 'https://troutfitters.com/reports/blackfoot-river',
-  'Flathead River': 'https://troutfitters.com/reports/flathead-river',
-  'Jefferson River': 'https://troutfitters.com/reports/jefferson-river'
+  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river'
 };
 
 async function scrapeTroutfitters() {
