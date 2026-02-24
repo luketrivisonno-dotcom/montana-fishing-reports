@@ -24,6 +24,7 @@ const scrapeFlyFishingBozeman = require('./flyfishingbozeman');
 const scrapeDanBaileys = require('./danbaileys');
 const scrapeBigSkyAnglers = require('./bigskyanglers');
 const scrapeFlyFishFood = require('./flyfishfood');
+const scrapeTroutfitters = require('./troutfitters');
 
 async function runAllScrapers() {
   console.log('\n========================================');
@@ -37,11 +38,15 @@ async function runAllScrapers() {
     { name: 'Fins & Feathers', fn: scrapeFinsFeathers },
     { name: 'Orvis (Gallatin)', fn: scrapeOrvis },
     { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },
+    { name: 'Troutfitters (Gallatin)', fn: scrapeTroutfitters },
     
     // Madison River (split into Upper/Lower)
     { name: 'Montana Trout (Madison)', fn: madison.scrapeMadisonMT },
     { name: 'Madison River Outfitters', fn: madison.scrapeMadisonRiverOutfitters },
     { name: 'Yellow Dog (Upper Madison)', fn: madison.scrapeMadisonYellowDog },
+    { name: 'Big Sky Anglers', fn: scrapeBigSkyAnglers },
+    { name: 'Dan Bailey\'s (Madison)', fn: scrapeDanBaileys },
+    { name: 'Troutfitters (Madison)', fn: scrapeTroutfitters },
     
     // Yellowstone River
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
@@ -49,38 +54,59 @@ async function runAllScrapers() {
     { name: 'Yellow Dog (Yellowstone)', fn: yellowstone.scrapeYellowstoneYellowDog },
     { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
     { name: 'Fly Fishing Bozeman (Yellowstone)', fn: scrapeFlyFishingBozeman },
+    { name: 'Dan Bailey\'s (Yellowstone)', fn: scrapeDanBaileys },
+    { name: 'Troutfitters (Yellowstone)', fn: scrapeTroutfitters },
     
     // Missouri River
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
     { name: 'Headhunters Fly Shop', fn: missouri.scrapeMissouriHeadhunters },
     { name: 'River\'s Edge (Missouri)', fn: missouri.scrapeMissouriRiversEdge },
+    { name: 'Yellow Dog (Missouri)', fn: scrapeYellowDog },
+    { name: 'Fins & Feathers (Missouri)', fn: scrapeFinsFeathers },
+    { name: 'Dan Bailey\'s (Missouri)', fn: scrapeDanBaileys },
+    { name: 'Troutfitters (Missouri)', fn: scrapeTroutfitters },
     
     // Clark Fork River
     { name: 'Orvis (Clark Fork)', fn: clarkfork.scrapeClarkForkOrvis },
     { name: 'Grizzly Hackle (Clark Fork)', fn: clarkfork.scrapeClarkForkGrizzly },
     { name: 'Blackfoot River Outfitters (Clark Fork)', fn: clarkfork.scrapeClarkForkBlackfoot },
+    { name: 'Troutfitters (Clark Fork)', fn: scrapeTroutfitters },
     
     // Blackfoot River
     { name: 'Orvis (Blackfoot)', fn: blackfoot.scrapeBlackfootOrvis },
     { name: 'Grizzly Hackle (Blackfoot)', fn: blackfoot.scrapeBlackfootGrizzly },
     { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
+    { name: 'Troutfitters (Blackfoot)', fn: scrapeTroutfitters },
     
     // Bighorn River
     { name: 'North Fork Anglers', fn: bighorn.scrapeBighornNorthFork },
     { name: 'Yellow Dog (Bighorn)', fn: bighorn.scrapeBighornYellowDog },
     { name: 'Bighorn Angler', fn: bighorn.scrapeBighornAngler },
+    { name: 'Troutfitters (Bighorn)', fn: scrapeTroutfitters },
     
     // Bitterroot River
     { name: 'Orvis (Bitterroot)', fn: bitterroot.scrapeBitterrootOrvis },
     { name: 'Montana Angler (Bitterroot)', fn: bitterroot.scrapeBitterrootMontanaAngler },
+    { name: 'Troutfitters (Bitterroot)', fn: scrapeTroutfitters },
     
     // Rock Creek
     { name: 'Orvis (Rock Creek)', fn: rockcreek.scrapeRockCreekOrvis },
     { name: 'Montana Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMontanaAngler },
+    { name: 'Troutfitters (Rock Creek)', fn: scrapeTroutfitters },
     
-    // New sources
-    { name: 'Dan Bailey\'s', fn: scrapeDanBaileys },
-    { name: 'Big Sky Anglers', fn: scrapeBigSkyAnglers },
+    // Beaverhead River
+    { name: 'Troutfitters (Beaverhead)', fn: scrapeTroutfitters },
+    
+    // Big Hole River
+    { name: 'Troutfitters (Big Hole)', fn: scrapeTroutfitters },
+    
+    // Flathead River
+    { name: 'Troutfitters (Flathead)', fn: scrapeTroutfitters },
+    
+    // Jefferson River
+    { name: 'Troutfitters (Jefferson)', fn: scrapeTroutfitters },
+    
+    // General sources
     { name: 'Fly Fish Food', fn: scrapeFlyFishFood }
   ];
   
@@ -93,7 +119,7 @@ async function runAllScrapers() {
     try {
       const result = await scraper.fn();
       
-      // Handle array results (for split rivers)
+      // Handle array results (for split rivers or multiple reports)
       const results = Array.isArray(result) ? result : [result];
       
       for (const item of results) {
