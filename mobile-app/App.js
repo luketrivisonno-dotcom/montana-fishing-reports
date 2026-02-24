@@ -27,6 +27,10 @@ const RIVER_IMAGES = {
   'Jefferson River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
   'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
   'Swan River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80'
+  'Spring Creeks': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Boulder River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+  'Ruby River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Stillwater River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80'
 };
 
 const COLORS = {
@@ -93,6 +97,10 @@ function HomeScreen({ navigation }) {
     if (river.includes('Flathead')) return '🏔️';
     if (river.includes('Jefferson')) return '🇺🇸';
     if (river.includes('Swan')) return '🦢';
+    if (river.includes('Spring')) return '🌸';
+    if (river.includes('Boulder')) return '🪨';
+    if (river.includes('Ruby')) return '💎';
+    if (river.includes('Stillwater')) return '🌊';
     return '🎣';
   };
 
