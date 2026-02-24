@@ -2,11 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
 const db = require('./db');
-const { getWeatherForRiver, getWeatherIcon } = require('./utils/weather');
 const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
 const { getUSGSData } = require('./utils/usgs');
-
 const app = express();
 
 app.use(cors());
