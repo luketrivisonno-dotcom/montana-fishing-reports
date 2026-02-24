@@ -9,11 +9,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
-// River background images (Unsplash free images)
+// River background images
 const RIVER_IMAGES = {
   'Gallatin River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
   'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
+  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
   'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
   'Missouri River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
   'Clark Fork River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
@@ -21,7 +21,10 @@ const RIVER_IMAGES = {
   'Bitterroot River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
   'Rock Creek': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
   'Bighorn River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800'
+  'Beaverhead River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
+  'Big Hole River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
+  'Flathead River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
+  'Jefferson River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'
 };
 
 const COLORS = {
@@ -34,6 +37,33 @@ const COLORS = {
   gray: '#7f8c8d',
   glass: 'rgba(255,255,255,0.9)'
 };
+
+// Format date to "Month Day, Year"
+function formatDate(dateString) {
+  if (!dateString || dateString === 'No date') return 'No date';
+  
+  try {
+    // Try to parse the date
+    let date;
+    if (dateString.includes('/')) {
+      // Handle MM/DD/YYYY format
+      const parts = dateString.split('/');
+      date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+    } else if (dateString.includes('-')) {
+      // Handle YYYY-MM-DD format
+      date = new Date(dateString);
+    } else {
+      date = new Date(dateString);
+    }
+    
+    if (isNaN(date.getTime())) return dateString;
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  } catch (e) {
+    return dateString;
+  }
+}
 
 function HomeScreen({ navigation }) {
   const [rivers, setRivers] = useState([]);
@@ -48,9 +78,9 @@ function HomeScreen({ navigation }) {
     try {
       const response = await fetch(`${API_URL}/api/rivers`);
       const data = await response.json();
-      setRivers(data.rivers);
+      setRivers(data.rivers || []);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching rivers:', error);
     } finally {
       setLoading(false);
     }
@@ -72,6 +102,10 @@ function HomeScreen({ navigation }) {
     if (river.includes('Clark')) return '⛰️';
     if (river.includes('Bitterroot')) return '🏔️';
     if (river.includes('Rock')) return '🪨';
+    if (river.includes('Beaverhead')) return '🦫';
+    if (river.includes('Big Hole')) return '🕳️';
+    if (river.includes('Flathead')) return '🏔️';
+    if (river.includes('Jefferson')) return '🇺🇸';
     return '🎣';
   };
 
@@ -112,7 +146,7 @@ function HomeScreen({ navigation }) {
             activeOpacity={0.8}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Madison River'] }}
+              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Gallatin River'] }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
             >
@@ -152,7 +186,7 @@ function RiverDetailsScreen({ route, navigation }) {
       const result = await response.json();
       setData(result);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching river data:', error);
     } finally {
       setLoading(false);
     }
@@ -165,7 +199,11 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const openReport = (url) => {
-    Linking.openURL(url);
+    if (url) Linking.openURL(url);
+  };
+
+  const openUSGS = (url) => {
+    if (url) Linking.openURL(url);
   };
 
   if (loading) {
@@ -182,7 +220,7 @@ function RiverDetailsScreen({ route, navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       <ImageBackground
-        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Madison River'] }}
+        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Gallatin River'] }}
         style={styles.detailHeaderBackground}
       >
         <View style={styles.detailHeaderOverlay}>
@@ -200,10 +238,11 @@ function RiverDetailsScreen({ route, navigation }) {
         style={styles.detailScroll}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Weather Card */}
+        {/* Weather Card with Icon and Location */}
         {data?.weather && (
           <View style={styles.dataCard}>
             <Text style={styles.dataCardTitle}>🌤️ Today's Weather</Text>
+            <Text style={styles.weatherLocation}>{data.weather.location}</Text>
             <View style={styles.weatherRow}>
               <View style={styles.weatherItem}>
                 <Text style={styles.weatherValue}>{data.weather.high}°</Text>
@@ -214,16 +253,21 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.weatherLabel}>Low</Text>
               </View>
               <View style={styles.weatherItemWide}>
+                <Text style={styles.weatherIcon}>{data.weather.icon || '🌤️'}</Text>
                 <Text style={styles.weatherCondition}>{data.weather.condition}</Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* USGS Data Card */}
+        {/* USGS Data Card - Clickable to open USGS */}
         {data?.usgs && (
-          <View style={styles.dataCard}>
-            <Text style={styles.dataCardTitle}>📊 Current Conditions (USGS)</Text>
+          <TouchableOpacity 
+            style={styles.dataCard}
+            onPress={() => openUSGS(data.usgs.url)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.dataCardTitle}>📊 Current Conditions (USGS) →</Text>
             <View style={styles.usgsRow}>
               <View style={styles.usgsItem}>
                 <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
@@ -234,7 +278,8 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.usgsLabel}>Water Temp</Text>
               </View>
             </View>
-          </View>
+            <Text style={styles.tapHint}>Tap to view on USGS website</Text>
+          </TouchableOpacity>
         )}
 
         {/* Reports Section */}
@@ -250,7 +295,7 @@ function RiverDetailsScreen({ route, navigation }) {
               <View style={styles.sourceBadge}>
                 <Text style={styles.sourceText}>{report.source}</Text>
               </View>
-              <Text style={styles.dateText}>{report.last_updated || 'No date'}</Text>
+              <Text style={styles.dateText}>{formatDate(report.last_updated)}</Text>
             </View>
             <Text style={styles.linkButton}>Read Full Report →</Text>
           </TouchableOpacity>
@@ -432,10 +477,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.dark,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   
   // Weather styles
+  weatherLocation: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginBottom: 12,
+    fontStyle: 'italic',
+  },
   weatherRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -459,8 +510,12 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     marginTop: 4,
   },
+  weatherIcon: {
+    fontSize: 48,
+    marginBottom: 4,
+  },
   weatherCondition: {
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.secondary,
     fontWeight: '600',
     textAlign: 'center',
@@ -484,6 +539,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     marginTop: 4,
+  },
+  tapHint: {
+    fontSize: 11,
+    color: COLORS.gray,
+    textAlign: 'center',
+    marginTop: 12,
+    fontStyle: 'italic',
   },
   
   // Reports section
