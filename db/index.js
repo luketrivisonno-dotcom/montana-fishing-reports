@@ -1,4 +1,3 @@
-cat > db/index.js << 'EOF'
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -20,4 +19,3 @@ pool.query('SELECT NOW()', (err, res) => {
 module.exports = {
     query: (text, params) => pool.query(text, params)
 };
-EOF
