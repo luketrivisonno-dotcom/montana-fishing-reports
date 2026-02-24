@@ -11,27 +11,27 @@ const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 // River background images - NO TRAILING SPACES
 const RIVER_IMAGES = {
-  'Gallatin River': 'https://images.unsplash.com/photo-1542662565-7e4b66b529c5?w=800&q=80',
-  'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
-  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Missouri River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Clark Fork River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
-  'Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Bitterroot River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80',
-  'Rock Creek': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Bighorn River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Beaverhead River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Big Hole River': 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Flathead River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Jefferson River': 'https://images.pexels.com/photos/1761279/pexels-photo-1761279.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Madison River': 'https://images.pexels.com/photos/1547813/pexels-photo-1547813.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Swan River': 'https://images.pexels.com/photos/356830/pexels-photo-356830.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Spring Creeks': 'https://images.pexels.com/photos/709552/pexels-photo-709552.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Boulder River': 'https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Ruby River': 'https://images.pexels.com/photos/355321/pexels-photo-355321.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Stillwater River': 'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'Yellowstone National Park': 'https://images.pexels.com/photos/1770809/pexels-photo-1770809.jpeg?auto=compress&cs=tinysrgb&w=800'
+  'Gallatin River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Gallatin_River_Montana.jpg/800px-Gallatin_River_Montana.jpg',
+  'Upper Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Madison_River_near_Ennis.jpg/800px-Madison_River_near_Ennis.jpg',
+  'Lower Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Madison_River_Montana.jpg/800px-Madison_River_Montana.jpg',
+  'Yellowstone River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellowstone_River_in_Yellowstone_NP.jpg/800px-Yellowstone_River_in_Yellowstone_NP.jpg',
+  'Missouri River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Missouri_River_in_Omaha.jpg/800px-Missouri_River_in_Omaha.jpg',
+  'Clark Fork River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Clark_Fork_River_Missoula.jpg/800px-Clark_Fork_River_Missoula.jpg',
+  'Blackfoot River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Blackfoot_River_Montana.jpg/800px-Blackfoot_River_Montana.jpg',
+  'Bitterroot River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Bitterroot_River.jpg/800px-Bitterroot_River.jpg',
+  'Rock Creek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Rock_Creek_Montana.jpg/800px-Rock_Creek_Montana.jpg',
+  'Bighorn River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bighorn_River_Wyoming.jpg/800px-Bighorn_River_Wyoming.jpg',
+  'Beaverhead River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Beaverhead_River_Montana.jpg/800px-Beaverhead_River_Montana.jpg',
+  'Big Hole River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Big_Hole_River.jpg/800px-Big_Hole_River.jpg',
+  'Flathead River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flathead_River_Montana.jpg/800px-Flathead_River_Montana.jpg',
+  'Jefferson River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Jefferson_River_Montana.jpg/800px-Jefferson_River_Montana.jpg',
+  'Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Madison_River_near_Ennis.jpg/800px-Madison_River_near_Ennis.jpg',
+  'Swan River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Swan_River_Montana.jpg/800px-Swan_River_Montana.jpg',
+  'Spring Creeks': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Spring_Creek_Montana.jpg/800px-Spring_Creek_Montana.jpg',
+  'Boulder River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Boulder_River_Montana.jpg/800px-Boulder_River_Montana.jpg',
+  'Ruby River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Ruby_River_Montana.jpg/800px-Ruby_River_Montana.jpg',
+  'Stillwater River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Stillwater_River_Montana.jpg/800px-Stillwater_River_Montana.jpg',
+  'Yellowstone National Park': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellowstone_River_in_Yellowstone_NP.jpg/800px-Yellowstone_River_in_Yellowstone_NP.jpg'
 };
 
 const COLORS = {
