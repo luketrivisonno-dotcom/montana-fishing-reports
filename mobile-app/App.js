@@ -285,7 +285,7 @@ function RiverDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         )}
 
-        {/* Reports Section */}
+        {/* Reports Section - Flow data IS the button */}
         <Text style={styles.sectionTitle}>Latest Fishing Reports</Text>
         {data?.reports?.map((report, index) => (
           <TouchableOpacity 
@@ -300,9 +300,35 @@ function RiverDetailsScreen({ route, navigation }) {
               </View>
               <Text style={styles.dateText}>{report.last_updated || 'Recently updated'}</Text>
             </View>
-            <View style={styles.reportFooter}>
-              <Text style={styles.linkButton}>Read Full Report →</Text>
-            </View>
+            
+            {/* Flow Data as the clickable link */}
+            {report.flow && (
+              <View style={styles.flowDataContainer}>
+                <View style={styles.flowDataRow}>
+                  <View style={styles.flowDataItem}>
+                    <Text style={styles.flowDataValue}>{report.flow}</Text>
+                    <Text style={styles.flowDataLabel}>Flow</Text>
+                  </View>
+                  {report.temp && (
+                    <>
+                      <View style={styles.flowDataDivider} />
+                      <View style={styles.flowDataItem}>
+                        <Text style={styles.flowDataValue}>{report.temp}</Text>
+                        <Text style={styles.flowDataLabel}>Temp</Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+                <Text style={styles.tapToView}>Tap to view full report →</Text>
+              </View>
+            )}
+            
+            {/* Fallback if no flow data */}
+            {!report.flow && (
+              <View style={styles.reportFooter}>
+                <Text style={styles.linkButton}>Read Full Report →</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
         
@@ -345,7 +371,54 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: '600',
   },
-  
+  const styles = StyleSheet.create({
+  // ... keep all your existing styles ...
+
+  // New flow data styles
+  flowDataContainer: {
+    backgroundColor: COLORS.primary + '08',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '15',
+  },
+  flowDataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  flowDataItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  flowDataDivider: {
+    width: 1,
+    height: 35,
+    backgroundColor: COLORS.primary + '20',
+  },
+  flowDataValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  flowDataLabel: {
+    fontSize: 11,
+    color: COLORS.gray,
+    marginTop: 4,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  tapToView: {
+    fontSize: 13,
+    color: COLORS.secondary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+
   // Header with background image
   headerBackground: {
     height: 200,
