@@ -1,4 +1,3 @@
-cat > scrapers/flyfishfood.js << 'EOF'
 async function scrapeFlyFishFood() {
     return {
         source: 'Fly Fish Food',
@@ -9,4 +8,3 @@ async function scrapeFlyFishFood() {
     };
 }
 module.exports = scrapeFlyFishFood;
-EOF
