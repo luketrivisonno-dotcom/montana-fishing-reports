@@ -106,13 +106,55 @@ function formatDateForDisplay(dateString) {
     }
 }
 
+// Cleanup function
+async function runDatabaseCleanup() {
+    try {
+        console.log('🧹 Running database cleanup...');
+        
+        // Remove broken links
+        const brokenResult = await db.query(`
+            DELETE FROM reports
+            WHERE url IS NULL 
+               OR url = '' 
+               OR url = 'undefined'
+               OR url = 'null'
+               OR url NOT LIKE 'http%'
+            RETURNING id
+        `);
+        
+        // Remove duplicates (keep most recent)
+        const dupResult = await db.query(`
+            DELETE FROM reports
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY river, source_normalized 
+                               ORDER BY scraped_at DESC
+                           ) as rn
+                    FROM reports
+                    WHERE source_normalized IS NOT NULL
+                ) t
+                WHERE t.rn > 1
+            )
+            RETURNING id
+        `);
+        
+        console.log(`✅ Cleanup complete: Removed ${brokenResult.rowCount} broken links and ${dupResult.rowCount} duplicates`);
+        
+    } catch (error) {
+        console.error('❌ Cleanup error:', error.message);
+    }
+}
+
 async function initDatabase() {
     try {
+        // Create table if not exists
         await db.query(`
             CREATE TABLE IF NOT EXISTS reports (
                 id SERIAL PRIMARY KEY,
                 source VARCHAR(100) NOT NULL,
-                source_normalized VARCHAR(100) NOT NULL,
+                source_normalized VARCHAR(100),
                 river VARCHAR(100) NOT NULL,
                 url TEXT NOT NULL,
                 title VARCHAR(255),
@@ -124,13 +166,41 @@ async function initDatabase() {
             )
         `);
         
+        // Add new columns if they don't exist
+        try {
+            await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS source_normalized VARCHAR(100)`);
+            await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS last_updated_text VARCHAR(50)`);
+            console.log('✅ Added new columns');
+        } catch (e) {
+            console.log('Columns already exist');
+        }
+        
+        // Create indexes
         await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_source_normalized ON reports(source_normalized)`);
         
-        console.log('Database initialized successfully');
+        // Populate source_normalized for existing records
+        await db.query(`
+            UPDATE reports 
+            SET source_normalized = LOWER(REGEXP_REPLACE(REGEXP_REPLACE(source, '\\([^)]*\\)', '', 'g'), '[^a-zA-Z0-9]', '', 'g'))
+            WHERE source_normalized IS NULL OR source_normalized = ''
+        `);
+        
+        // Populate last_updated_text for existing records
+        await db.query(`
+            UPDATE reports 
+            SET last_updated_text = last_updated::text
+            WHERE last_updated_text IS NULL AND last_updated IS NOT NULL
+        `);
+        
+        console.log('✅ Database schema updated');
+        
+        // Run cleanup automatically on startup
+        await runDatabaseCleanup();
+        
     } catch (error) {
-        console.error('Database init error:', error.message);
+        console.error('❌ Database init error:', error.message);
     }
 }
 
@@ -160,39 +230,23 @@ app.post('/api/scrape', async (req, res) => {
     }
 });
 
-// Cleanup endpoint - remove duplicates and broken links
+// Manual cleanup endpoint
 app.post('/api/cleanup', async (req, res) => {
     try {
-        const brokenResult = await db.query(`
-            DELETE FROM reports
-            WHERE url IS NULL 
-               OR url = '' 
-               OR url = 'undefined'
-               OR url = 'null'
-               OR url NOT LIKE 'http%'
-            RETURNING id
-        `);
+        await runDatabaseCleanup();
         
-        const dupResult = await db.query(`
-            DELETE FROM reports
-            WHERE id IN (
-                SELECT id FROM (
-                    SELECT id,
-                           ROW_NUMBER() OVER (
-                               PARTITION BY river, source_normalized 
-                               ORDER BY scraped_at DESC
-                           ) as rn
-                    FROM reports
-                ) t
-                WHERE t.rn > 1
-            )
-            RETURNING id
+        const counts = await db.query(`
+            SELECT 
+                COUNT(*) as total_reports,
+                COUNT(DISTINCT river) as unique_rivers,
+                COUNT(DISTINCT source) as unique_sources
+            FROM reports 
+            WHERE is_active = true
         `);
         
         res.json({
-            message: 'Cleanup completed',
-            brokenLinksRemoved: brokenResult.rowCount,
-            duplicatesRemoved: dupResult.rowCount
+            message: 'Cleanup completed successfully',
+            stats: counts.rows[0]
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
