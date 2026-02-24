@@ -1,9 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-HEAD
-
-HEAD
 // Troutfitters only has reports for these 7 rivers
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
