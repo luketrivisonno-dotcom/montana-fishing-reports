@@ -25,7 +25,8 @@ async function scrapeStoneflyShop() {
       'Clark Fork River',
       'Madison River',
       'Missouri River',
-      'Rock Creek'
+      'Rock Creek',
+      'Ruby River'
     ];
     
     return rivers.map(river => ({
