@@ -30,6 +30,35 @@ const scrapeSunriseFlyShop = require('./sunriseflyshop');
 const scrapeStoneflyShop = require('./stoneflyshop');
 const scrapeGeorgeAnderson = require('./georgeanderson');
 
+// Helper function to parse date strings
+function parseDate(dateString) {
+  if (!dateString) return new Date();
+  
+  // Try to parse various date formats
+  const formats = [
+    // February 26, 2026
+    /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
+    // 2/26/2026 or 02/26/2026
+    /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
+    // 2026-02-26
+    /(\d{4})-(\d{2})-(\d{2})/
+  ];
+  
+  for (const format of formats) {
+    const match = dateString.match(format);
+    if (match) {
+      try {
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) return date;
+      } catch (e) {
+        continue;
+      }
+    }
+  }
+  
+  return new Date();
+}
+
 async function runAllScrapers() {
   console.log('\n========================================');
   console.log('Starting scraper run:', new Date().toISOString());
@@ -105,6 +134,9 @@ async function runAllScrapers() {
       
       for (const item of results) {
         if (item && item.last_updated) {
+          const parsedDate = parseDate(item.last_updated);
+          const dateString = parsedDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+          
           const existing = await db.query(
             'SELECT * FROM reports WHERE source = $1 AND river = $2 ORDER BY scraped_at DESC LIMIT 1',
             [item.source, item.river]
@@ -114,22 +146,22 @@ async function runAllScrapers() {
             await db.query(
               `INSERT INTO reports (source, river, url, last_updated, scraped_at, is_active) 
                VALUES ($1, $2, $3, $4, $5, true)`,
-              [item.source, item.river, item.url, item.last_updated, item.scraped_at]
+              [item.source, item.river, item.url, dateString, item.scraped_at]
             );
-            console.log(`✓ Inserted: ${item.source} (${item.river})`);
+            console.log(`✓ Inserted: ${item.source} (${item.river}) - ${dateString}`);
             successCount++;
           } else {
             const existingDate = new Date(existing.rows[0].last_updated);
-            const newDate = new Date(item.last_updated);
+            const newDate = parsedDate;
             
-            if (newDate >= existingDate) {
+            if (newDate >= existingDate || isNaN(existingDate.getTime())) {
               await db.query(
                 `UPDATE reports 
                  SET last_updated = $1, scraped_at = $2, url = $3, is_active = true 
                  WHERE source = $4 AND river = $5`,
-                [item.last_updated, item.scraped_at, item.url, item.source, item.river]
+                [dateString, item.scraped_at, item.url, item.source, item.river]
               );
-              console.log(`✓ Updated: ${item.source} (${item.river})`);
+              console.log(`✓ Updated: ${item.source} (${item.river}) - ${dateString}`);
               successCount++;
             } else {
               console.log(`⊘ Skipped (older): ${item.source} (${item.river})`);
@@ -145,7 +177,7 @@ async function runAllScrapers() {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
   
-  // Deactivate old duplicates
+  // Deactivate old duplicates - keep only most recent per source/river
   await db.query(`
     UPDATE reports 
     SET is_active = false 
