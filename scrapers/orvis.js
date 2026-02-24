@@ -16,8 +16,6 @@ const ORVIS_URLS = {
   'Blackfoot River': 'https://www.orvis.com/fishing-report/blackfoot-river',
   'Flathead River': 'https://www.orvis.com/fishing-report/flathead-river',
   'Jefferson River': 'https://www.orvis.com/fishing-report/jefferson-river',
-  'Ruby River': 'https://www.orvis.com/fishing-report/ruby-river',
-  'Stillwater River': 'https://www.orvis.com/fishing-report/stillwater-river'
 };
 
 async function scrapeOrvis() {
