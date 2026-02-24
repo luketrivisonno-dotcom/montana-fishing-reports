@@ -1,4 +1,3 @@
-cat > cleanup.js << 'EOF'
 const db = require('./db');
 
 async function cleanupDatabase() {
@@ -38,4 +37,3 @@ async function cleanupDatabase() {
 }
 
 cleanupDatabase();
-EOF
