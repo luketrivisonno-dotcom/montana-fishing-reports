@@ -13,17 +13,24 @@ async function scrapePerfectFly() {
     const $ = cheerio.load(data);
     const pageText = $('body').text();
     
-    // Look for date patterns in the page
-    const dateMatch = 
-      pageText.match(/(\d{2}\/\d{2}\/\d{2})/) ||
-      pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-      pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
+    // Look for dateModified in JSON-LD schema
+    const schemaMatch = data.match(/"dateModified":"([^"]+)"/);
+    let lastUpdated = new Date().toLocaleDateString();
+    
+    if (schemaMatch) {
+      const date = new Date(schemaMatch[1]);
+      lastUpdated = date.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+    }
     
     return [{
       source: 'Perfect Fly Store',
       river: 'Stillwater River',
       url: url,
-      last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
+      last_updated: lastUpdated,
       scraped_at: new Date()
     }];
     
