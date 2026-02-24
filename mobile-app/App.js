@@ -30,7 +30,8 @@ const RIVER_IMAGES = {
   'Spring Creeks': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
   'Boulder River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
   'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Stillwater River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80'
+  'Stillwater River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
+  'Yellowstone National Park': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80'
 };
 
 const COLORS = {
