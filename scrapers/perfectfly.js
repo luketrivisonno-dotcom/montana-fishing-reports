@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 async function scrapePerfectFly() {
-  const url = 'https://www.perfectflystore.com/Stillwater-River-fishing-report.php';
+  const url = 'https://perfectflystore.com/your-streams/fly-fishing-stillwater-river-montana/';
   
   try {
     const { data } = await axios.get(url, {
@@ -13,10 +13,11 @@ async function scrapePerfectFly() {
     const $ = cheerio.load(data);
     const pageText = $('body').text();
     
+    // Look for date patterns in the page
     const dateMatch = 
+      pageText.match(/(\d{2}\/\d{2}\/\d{2})/) ||
       pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-      pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
-      pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+      pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     
     return [{
       source: 'Perfect Fly Store',
