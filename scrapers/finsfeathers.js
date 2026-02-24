@@ -19,9 +19,12 @@ async function scrapeFinsFeathers() {
     
     const rivers = [
       'Gallatin River',
+      'Upper Madison River',
+      'Lower Madison River',
       'Madison River',
       'Yellowstone River',
       'Missouri River',
+      'Jefferson River',
       'Bighorn River'
     ];
     
