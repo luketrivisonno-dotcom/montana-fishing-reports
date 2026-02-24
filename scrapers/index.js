@@ -8,6 +8,7 @@ const scrapeMontanaAngler = require('./montanaangler');
 const scrapeFinsFeathers = require('./finsfeathers');
 const scrapeOrvis = require('./orvis');
 const scrapeBozemanFlySupply = require('./bozemanflysupply');
+const scrapePerfectFly = require('./perfectfly');
 
 const madison = require('./madison');
 const yellowstone = require('./yellowstone');
@@ -78,6 +79,7 @@ async function runAllScrapers() {
     { name: 'Yellowstone Country Fly Fishing', fn: scrapeYellowstoneCountry },
     { name: 'Blue Ribbon Flies', fn: scrapeBlueRibbonFlies },
     { name: 'Jacklin\'s Fly Shop', fn: scrapeJacklins },
+    { name: 'Perfect Fly Store', fn: scrapePerfectFly },
     
     // River-specific scrapers
     { name: 'Fly Fishing Bozeman', fn: scrapeFlyFishingBozeman },
