@@ -33,7 +33,6 @@ const RIVER_IMAGES = {
   'Stillwater River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
   'Yellowstone National Park': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80'
 };
-
 const COLORS = {
   primary: '#1a5f7a',
   secondary: '#159895',
