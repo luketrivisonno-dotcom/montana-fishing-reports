@@ -1,33 +1,17 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+HEAD
+
+HEAD
 // Troutfitters only has reports for these 7 rivers
-=======
->>>>>>> 0acb36d (Fix Yellow Dog, Fins & Feathers, and Troutfitters scrapers to cover all rivers)
->>>>>>> 34deed0 (Fix Yellow Dog, Fins & Feathers, and Troutfitters scrapers to cover all rivers)
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Upper Madison River': 'https://troutfitters.com/reports/upper-madison-river',
   'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
   'Missouri River': 'https://troutfitters.com/reports/missouri-river',
-<<<<<<< HEAD
-  'Bighorn River': 'https://troutfitters.com/reports/bighorn-river',
   'Big Hole River': 'https://troutfitters.com/reports/big-hole-river'
-=======
-  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
-  'Beaverhead River': 'https://troutfitters.com/reports/beaverhead-river',
-  'Bighorn River': 'https://troutfitters.com/reports/bighorn-river',
-  'Bitterroot River': 'https://troutfitters.com/reports/bitterroot-river',
-  'Rock Creek': 'https://troutfitters.com/reports/rock-creek',
-  'Clark Fork River': 'https://troutfitters.com/reports/clark-fork-river',
-  'Blackfoot River': 'https://troutfitters.com/reports/blackfoot-river',
-  'Flathead River': 'https://troutfitters.com/reports/flathead-river',
-  'Jefferson River': 'https://troutfitters.com/reports/jefferson-river'
->>>>>>> 0acb36d (Fix Yellow Dog, Fins & Feathers, and Troutfitters scrapers to cover all rivers)
 };
 
 async function scrapeTroutfitters() {
