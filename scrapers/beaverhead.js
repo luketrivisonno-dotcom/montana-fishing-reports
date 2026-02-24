@@ -1,4 +1,3 @@
-cat > scrapers/beaverhead.js << 'EOF'
 async function scrapeBeaverheadMontanaAngler() {
     return {
         source: 'Montana Angler',
@@ -23,4 +22,3 @@ module.exports = {
     scrapeBeaverheadMontanaAngler,
     scrapeBeaverheadHeadhunters
 };
-EOF
