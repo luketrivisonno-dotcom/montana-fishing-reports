@@ -15,7 +15,10 @@ const USGS_SITES = {
   'Beaverhead River': { id: '06017000', location: 'Dillon, MT' },
   'Big Hole River': { id: '06025500', location: 'Melrose, MT' },
   'Flathead River': { id: '12389000', location: 'Columbia Falls, MT' },
-  'Jefferson River': { id: '06026500', location: 'Twin Bridges, MT' }
+  'Jefferson River': { id: '06026500', location: 'Twin Bridges, MT' },
+  'Ruby River': { id: '06019500', location: 'Alder, MT' },
+  'Stillwater River': { id: '06205000', location: 'Absarokee, MT' },
+  'Swan River': { id: '12370000', location: 'Big Fork, MT' }
 };
 
 async function getUSGSData(riverName) {
