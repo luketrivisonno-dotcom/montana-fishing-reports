@@ -15,7 +15,11 @@ const RIVER_LOCATIONS = {
   'Beaverhead River': { lat: 45.2163, lon: -112.6381, station: 'Dillon' },
   'Big Hole River': { lat: 45.1847, lon: -113.4081, station: 'Divide' },
   'Flathead River': { lat: 48.4733, lon: -114.0834, station: 'Columbia Falls' },
-  'Jefferson River': { lat: 45.8933, lon: -111.5053, station: 'Twin Bridges' }
+  'Jefferson River': { lat: 45.8933, lon: -111.5053, station: 'Twin Bridges' },
+  'Ruby River': { lat: 45.3295, lon: -112.1076, station: 'Alder' },
+  'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee' },
+  'Swan River': { lat: 47.7458, lon: -114.0856, station: 'Big Fork' },
+  'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone' }
 };
 
 // WMO Weather codes to icons
@@ -48,24 +52,37 @@ function getWeatherCondition(code) {
   return conditions[code] || 'Unknown';
 }
 
+function getWindDirection(degrees) {
+  const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  const index = Math.round(degrees / 22.5) % 16;
+  return directions[index];
+}
+
 async function getWeatherForRiver(riverName) {
   const location = RIVER_LOCATIONS[riverName];
   if (!location) return null;
 
   try {
     const response = await axios.get(
-      `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=America/Denver&forecast_days=1&temperature_unit=fahrenheit`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=America/Denver&forecast_days=1&temperature_unit=fahrenheit&windspeed_unit=mph`,
       { timeout: 5000 }
     );
 
     const daily = response.data.daily;
+    const current = response.data.current_weather;
     const weatherCode = daily.weathercode[0];
+    
+    const windSpeed = Math.round(current.windspeed);
+    const windDir = getWindDirection(current.winddirection);
     
     return {
       high: Math.round(daily.temperature_2m_max[0]),
       low: Math.round(daily.temperature_2m_min[0]),
       condition: getWeatherCondition(weatherCode),
       icon: getWeatherIcon(weatherCode),
+      wind: `${windSpeed} mph ${windDir}`,
+      windSpeed: windSpeed,
+      windDirection: windDir,
       station: location.station,
       river: riverName
     };
