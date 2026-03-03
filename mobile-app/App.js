@@ -52,16 +52,12 @@ const { width } = Dimensions.get('window');
 const formatDate = (dateString) => {
   if (!dateString) return 'Recently updated';
   
-  // Try to parse the date
   const date = new Date(dateString);
   
-  // Check if valid date
   if (isNaN(date.getTime())) {
-    // If not a valid date, return original string if it's short
     return dateString.length > 20 ? dateString.substring(0, 20) + '...' : dateString;
   }
   
-  // Format: "Feb 24, 2025" or "2/24/25"
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -75,15 +71,12 @@ const removeDuplicateReports = (reports) => {
   
   const seen = new Set();
   return reports.filter(report => {
-    // Skip reports without URLs
     if (!report.url || report.url.trim() === '') {
       return false;
     }
     
-    // Normalize source name for comparison
     const source = (report.source || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     
-    // Check if we've seen this source before
     if (seen.has(source)) {
       return false;
     }
@@ -205,7 +198,6 @@ function RiverDetailsScreen({ route, navigation }) {
       const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
       const result = await response.json();
       
-      // Filter out reports without URLs and remove duplicates
       if (result.reports) {
         result.reports = removeDuplicateReports(result.reports);
       }
@@ -292,7 +284,7 @@ function RiverDetailsScreen({ route, navigation }) {
               </View>
               <View style={styles.weatherDivider} />
               <View style={styles.weatherItem}>
-                <Text style={styles.weatherValue}>{data.weather.wind || '--'}</Text>
+                <Text style={styles.weatherValueSmall}>{data.weather.wind || '--'}</Text>
                 <Text style={styles.weatherLabel}>Wind</Text>
               </View>
             </View>
@@ -317,12 +309,12 @@ function RiverDetailsScreen({ route, navigation }) {
             </View>
             <View style={styles.usgsRow}>
               <View style={styles.usgsItem}>
-                <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
+                <Text style={styles.usgsValueSmall}>{data.usgs.flow}</Text>
                 <Text style={styles.usgsLabel}>Flow (cfs)</Text>
               </View>
               <View style={styles.usgsDivider} />
               <View style={styles.usgsItem}>
-                <Text style={styles.usgsValue}>{data.usgs.temp}</Text>
+                <Text style={styles.usgsValueSmall}>{data.usgs.temp}</Text>
                 <Text style={styles.usgsLabel}>Water Temp</Text>
               </View>
             </View>
@@ -416,31 +408,30 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // SMALLER HEADERS
   headerBackground: {
-    height: 160, // Reduced from 200
+    height: 160,
     justifyContent: 'flex-end',
   },
   headerOverlay: {
     backgroundColor: 'rgba(26, 95, 122, 0.9)',
-    padding: 16, // Reduced from 24
-    paddingTop: 40, // Reduced from 60
+    padding: 16,
+    paddingTop: 40,
     alignItems: 'center',
   },
   headerEmoji: {
-    fontSize: 32, // Reduced from 40
-    marginBottom: 4, // Reduced from 8
+    fontSize: 32,
+    marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 24, // Reduced from 32
+    fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.white,
     letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: 12, // Reduced from 14
+    fontSize: 12,
     color: COLORS.accent,
-    marginTop: 4, // Reduced from 6
+    marginTop: 4,
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -471,8 +462,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.35)',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 16,
+    // ARROW REMOVED - no justifyContent: 'space-between'
   },
   riverContent: {
     flexDirection: 'row',
@@ -497,32 +488,31 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontWeight: '500',
   },
-  // ARROW REMOVED - no arrowContainer or arrow styles
+  // NO ARROW CONTAINER STYLES - COMPLETELY REMOVED
   
-  // SMALLER DETAIL HEADER
   detailHeaderBackground: {
-    height: 180, // Reduced from 220
+    height: 180,
   },
   detailHeaderOverlay: {
     flex: 1,
     backgroundColor: 'rgba(26, 95, 122, 0.85)',
     justifyContent: 'flex-end',
-    padding: 20, // Reduced from 24
-    paddingTop: 50, // Reduced from 60
+    padding: 20,
+    paddingTop: 50,
   },
   backButton: {
     position: 'absolute',
-    left: 16, // Reduced from 20
-    top: 40, // Reduced from 50
+    left: 16,
+    top: 40,
     zIndex: 10,
   },
   backArrow: {
-    fontSize: 32, // Reduced from 40
+    fontSize: 32,
     color: COLORS.white,
     fontWeight: '300',
   },
   detailHeaderTitle: {
-    fontSize: 24, // Reduced from 28
+    fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.white,
     textShadowColor: 'rgba(0,0,0,0.3)',
@@ -530,7 +520,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   detailHeaderSubtitle: {
-    fontSize: 13, // Reduced from 14
+    fontSize: 13,
     color: COLORS.accent,
     marginTop: 4,
     fontWeight: '500',
@@ -615,12 +605,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   weatherValue: {
-    fontSize: 36,
+    fontSize: 28, // REDUCED from 36
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  weatherValueSmall: {
+    fontSize: 20, // SMALLER for wind
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   weatherLabel: {
-    fontSize: 12,
+    fontSize: 11, // REDUCED from 12
     color: COLORS.gray,
     marginTop: 4,
     fontWeight: '600',
@@ -644,12 +639,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   usgsValue: {
-    fontSize: 32,
+    fontSize: 28, // REDUCED from 32
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  usgsValueSmall: {
+    fontSize: 22, // SMALLER for flow/temp
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   usgsLabel: {
-    fontSize: 12,
+    fontSize: 11, // REDUCED from 12
     color: COLORS.gray,
     marginTop: 6,
     fontWeight: '600',
