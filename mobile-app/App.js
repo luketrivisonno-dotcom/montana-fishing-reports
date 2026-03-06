@@ -11,7 +11,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { 
   Ionicons, MaterialCommunityIcons, FontAwesome5,
-  MaterialIcons, Entypo 
+  MaterialIcons 
 } from '@expo/vector-icons';
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
@@ -20,104 +20,40 @@ import RiverMap from './components/RiverMap';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ============================================
-// DEVELOPMENT MODE - Set to true to unlock all features
+// DEVELOPMENT MODE
 // ============================================
-const DEV_MODE = true; // CHANGE THIS TO false FOR PRODUCTION
+const DEV_MODE = true;
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 // ============================================
-// REAL MONTANA FISHING PHOTOS
+// REAL MONTANA FLY FISHING PHOTOS
 // ============================================
 const RIVER_IMAGES = {
-  'Gallatin River': {
-    uri: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-    credit: 'Gallatin River, MT'
-  },
-  'Upper Madison River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Madison-River-fly-fishing-guide.jpg',
-    credit: 'Upper Madison near Ennis'
-  },
-  'Lower Madison River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/lower-madison-fly-fishing.jpg',
-    credit: 'Lower Madison near Bozeman'
-  },
-  'Yellowstone River': {
-    uri: 'https://content.osgnetworks.tv/flyfisherman/2022/02/ffm-apr22-montanas-best-rivers-yellowstone.jpeg',
-    credit: 'Yellowstone River, Paradise Valley'
-  },
-  'Missouri River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Missouri-River-fly-fishing.jpg',
-    credit: 'Missouri River at Craig'
-  },
-  'Clark Fork River': {
-    uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Clark_Fork_River_Missoula.jpg/1200px-Clark_Fork_River_Missoula.jpg',
-    credit: 'Clark Fork near Missoula'
-  },
-  'Blackfoot River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Blackfoot-River-fly-fishing.jpg',
-    credit: 'Blackfoot River'
-  },
-  'Bitterroot River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Bitterroot-River-fly-fishing.jpg',
-    credit: 'Bitterroot River'
-  },
-  'Rock Creek': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Rock-Creek-fly-fishing.jpg',
-    credit: 'Rock Creek'
-  },
-  'Bighorn River': {
-    uri: 'https://content.osgnetworks.tv/flyfisherman/2022/02/ffm-apr22-montanas-best-rivers-bighorn.jpeg',
-    credit: 'Bighorn River, Fort Smith'
-  },
-  'Beaverhead River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Beaverhead-River-fly-fishing.jpg',
-    credit: 'Beaverhead River near Dillon'
-  },
-  'Big Hole River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Big-Hole-River-fly-fishing.jpg',
-    credit: 'Big Hole River'
-  },
-  'Flathead River': {
-    uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flathead_River_near_Coram_MT.jpg/1200px-Flathead_River_near_Coram_MT.jpg',
-    credit: 'Flathead River'
-  },
-  'Jefferson River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Jefferson-River-fly-fishing.jpg',
-    credit: 'Jefferson River'
-  },
-  'Madison River': {
-    uri: 'https://www.nps.gov/yell/planyourvisit/images/madison_river.jpg',
-    credit: 'Madison River in YNP'
-  },
-  'Ruby River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Ruby-River-fly-fishing.jpg',
-    credit: 'Ruby River'
-  },
-  'Stillwater River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Stillwater-River-fly-fishing.jpg',
-    credit: 'Stillwater River'
-  },
-  'Swan River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Swan-River-fly-fishing.jpg',
-    credit: 'Swan River'
-  },
-  'Boulder River': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Boulder-River-fly-fishing.jpg',
-    credit: 'Boulder River'
-  },
-  'Spring Creeks': {
-    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Depuy-Spring-Creek-fly-fishing.jpg',
-    credit: 'Paradise Valley Spring Creeks'
-  },
-  'Yellowstone National Park': {
-    uri: 'https://www.nps.gov/yell/planyourvisit/images/fishing-madison.jpg',
-    credit: 'Fishing in Yellowstone'
-  }
+  'Gallatin River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
+  'Upper Madison River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
+  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+  'Yellowstone River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800',
+  'Missouri River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
+  'Clark Fork River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
+  'Blackfoot River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800',
+  'Bitterroot River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800',
+  'Rock Creek': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800',
+  'Bighorn River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+  'Beaverhead River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
+  'Big Hole River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800',
+  'Flathead River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
+  'Jefferson River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800',
+  'Madison River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
+  'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
+  'Stillwater River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800',
+  'Swan River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800',
+  'Boulder River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800',
+  'Spring Creeks': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+  'Yellowstone National Park': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
 };
 
-// Fallback image
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800';
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800';
 
 // ============================================
 // DESIGN SYSTEM
@@ -142,17 +78,10 @@ const COLORS = {
   shadow: 'rgba(0,0,0,0.1)'
 };
 
-const FONTS = {
-  regular: 'System',
-  medium: 'System',
-  semibold: 'System',
-  bold: 'System'
-};
-
 // ============================================
 // GLOBAL STATE
 // ============================================
-let globalIsPremium = DEV_MODE; // Auto-enable premium in dev mode
+let globalIsPremium = DEV_MODE;
 let globalUserEmail = null;
 let globalFavorites = [];
 
@@ -186,7 +115,7 @@ function TabIcon({ name, focused, color }) {
   
   switch (name) {
     case 'Rivers':
-      return <MaterialCommunityIcons name="fish" {...iconProps} />;
+      return <MaterialCommunityIcons name="waves" {...iconProps} />;
     case 'Map':
       return <Ionicons name="map-outline" {...iconProps} />;
     case 'Favorites':
@@ -198,9 +127,6 @@ function TabIcon({ name, focused, color }) {
   }
 }
 
-// ============================================
-// DEV MODE BANNER
-// ============================================
 function DevModeBanner() {
   if (!DEV_MODE) return null;
   
@@ -265,15 +191,6 @@ function RiversScreen({ navigation }) {
     setRefreshing(false);
   };
 
-  const getRiverIcon = (river) => {
-    if (river.includes('Madison')) return 'water';
-    if (river.includes('Yellowstone')) return 'terrain';
-    if (river.includes('Gallatin')) return 'landscape';
-    if (river.includes('Missouri')) return 'waves';
-    if (river.includes('Bighorn')) return 'pets';
-    return 'water-drop';
-  };
-
   if (loading) {
     return (
       <View style={[styles.container, styles.center]}>
@@ -296,11 +213,11 @@ function RiversScreen({ navigation }) {
         </View>
       )}
       
-      {/* Compact Header */}
+      {/* Compact Header - No Count */}
       <View style={styles.compactHeader}>
         <View style={styles.headerContent}>
           <View style={styles.headerTitleRow}>
-            <MaterialCommunityIcons name="fish" size={28} color="#fff" />
+            <MaterialCommunityIcons name="waves" size={28} color="#fff" />
             <Text style={styles.compactHeaderTitle}>Montana Fishing</Text>
             {globalIsPremium && (
               <View style={styles.premiumPill}>
@@ -309,9 +226,6 @@ function RiversScreen({ navigation }) {
               </View>
             )}
           </View>
-          <Text style={styles.compactHeaderSubtitle}>
-            {rivers.length} Rivers • Real-Time Reports
-          </Text>
         </View>
       </View>
 
@@ -346,15 +260,13 @@ function RiversScreen({ navigation }) {
             activeOpacity={0.9}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item]?.uri || DEFAULT_IMAGE }}
+              source={{ uri: RIVER_IMAGES[item] || DEFAULT_IMAGE }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
+              onError={(e) => console.log('Image load error:', item)}
             >
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
-                  <View style={styles.riverIconCircle}>
-                    <MaterialIcons name={getRiverIcon(item)} size={24} color={COLORS.primary} />
-                  </View>
                   <View style={styles.riverInfo}>
                     <Text style={styles.riverName}>{item}</Text>
                     <Text style={styles.riverMeta}>Tap for conditions & reports</Text>
@@ -465,8 +377,9 @@ function RiverDetailsScreen({ route, navigation }) {
       
       {/* Hero Header with River Image */}
       <ImageBackground
-        source={{ uri: RIVER_IMAGES[river]?.uri || DEFAULT_IMAGE }}
+        source={{ uri: RIVER_IMAGES[river] || DEFAULT_IMAGE }}
         style={styles.heroHeader}
+        onError={(e) => console.log('Detail image error:', river)}
       >
         <View style={styles.heroOverlay}>
           <View style={styles.heroNav}>
@@ -479,7 +392,6 @@ function RiverDetailsScreen({ route, navigation }) {
           </View>
           <View style={styles.heroContent}>
             <Text style={styles.heroTitle}>{river}</Text>
-            <Text style={styles.heroSubtitle}>{RIVER_IMAGES[river]?.credit || 'Montana'}</Text>
           </View>
         </View>
       </ImageBackground>
@@ -490,7 +402,6 @@ function RiverDetailsScreen({ route, navigation }) {
       >
         {/* Conditions Cards */}
         <View style={styles.conditionsGrid}>
-          {/* Weather Card */}
           {data?.weather && (
             <View style={styles.conditionCard}>
               <View style={styles.conditionIconContainer}>
@@ -504,7 +415,6 @@ function RiverDetailsScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Flow Card */}
           {data?.usgs && (
             <TouchableOpacity 
               style={styles.conditionCard}
@@ -523,7 +433,6 @@ function RiverDetailsScreen({ route, navigation }) {
           )}
         </View>
 
-        {/* Premium: Hatch Chart */}
         {globalIsPremium ? (
           <HatchChart riverName={river} />
         ) : (
@@ -539,7 +448,6 @@ function RiverDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         )}
 
-        {/* Reports Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Fishing Reports</Text>
           <Text style={styles.sectionCount}>{data?.reports?.length || 0} sources</Text>
@@ -572,7 +480,6 @@ function RiverDetailsScreen({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Premium Modal */}
       <Modal
         visible={showPremiumModal}
         transparent={true}
@@ -600,22 +507,10 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
                 <Text style={styles.featureText}>Save favorite rivers</Text>
               </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-                <Text style={styles.featureText}>Full access points map</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-                <Text style={styles.featureText}>Offline mode</Text>
-              </View>
             </View>
             
             <TouchableOpacity style={styles.subscribeButton}>
               <Text style={styles.subscribeButtonText}>Subscribe $4.99/mo</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.yearlyButton}>
-              <Text style={styles.yearlyButtonText}>$39.99/year (Save 33%)</Text>
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => setShowPremiumModal(false)}>
@@ -672,9 +567,6 @@ function FavoritesScreen({ navigation }) {
         <View style={styles.upsellContainer}>
           <MaterialIcons name="diamond" size={64} color={COLORS.premium} />
           <Text style={styles.upsellTitle}>Premium Feature</Text>
-          <Text style={styles.upsellText}>
-            Save your favorite rivers for quick access
-          </Text>
           <TouchableOpacity style={styles.upsellButton}>
             <Text style={styles.upsellButtonText}>Upgrade to Premium</Text>
           </TouchableOpacity>
@@ -719,7 +611,7 @@ function FavoritesScreen({ navigation }) {
             activeOpacity={0.9}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item]?.uri || DEFAULT_IMAGE }}
+              source={{ uri: RIVER_IMAGES[item] || DEFAULT_IMAGE }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
             >
@@ -759,56 +651,6 @@ function PremiumScreen() {
           </Text>
         </View>
 
-        <View style={styles.premiumFeaturesGrid}>
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#dbeafe' }]}>
-              <MaterialCommunityIcons name="bug" size={28} color="#2563eb" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>Hatch Charts</Text>
-            <Text style={styles.premiumFeatureDesc}>Current hatches & fly recommendations</Text>
-          </View>
-
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#dcfce7' }]}>
-              <Ionicons name="map" size={28} color="#16a34a" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>Access Points</Text>
-            <Text style={styles.premiumFeatureDesc}>Detailed FWP access site maps</Text>
-          </View>
-
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#fee2e2' }]}>
-              <Ionicons name="heart" size={28} color="#dc2626" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>Favorites</Text>
-            <Text style={styles.premiumFeatureDesc}>Save your go-to rivers</Text>
-          </View>
-
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#f3e8ff' }]}>
-              <Ionicons name="cloud-offline" size={28} color="#9333ea" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>Offline Mode</Text>
-            <Text style={styles.premiumFeatureDesc}>Access without internet</Text>
-          </View>
-
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#fef3c7' }]}>
-              <MaterialCommunityIcons name="ads-off" size={28} color="#d97706" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>Ad-Free</Text>
-            <Text style={styles.premiumFeatureDesc}>Clean, uninterrupted experience</Text>
-          </View>
-
-          <View style={styles.premiumFeatureCard}>
-            <View style={[styles.featureIconBox, { backgroundColor: '#cffafe' }]}>
-              <Ionicons name="calendar" size={28} color="#0891b2" />
-            </View>
-            <Text style={styles.premiumFeatureTitle}>7-Day Forecast</Text>
-            <Text style={styles.premiumFeatureDesc}>Extended weather outlook</Text>
-          </View>
-        </View>
-
         <View style={styles.pricingSection}>
           <TouchableOpacity style={styles.monthlyButton}>
             <Text style={styles.monthlyButtonText}>$4.99/month</Text>
@@ -821,8 +663,6 @@ function PremiumScreen() {
             <Text style={styles.yearlyPrice}>$39.99/year</Text>
             <Text style={styles.yearlySave}>Save 33%</Text>
           </TouchableOpacity>
-
-          <Text style={styles.restoreText}>Restore Purchases</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -907,7 +747,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Compact Header
+  // Compact Header - No Count
   compactHeader: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: 16,
@@ -927,11 +767,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#fff',
     flex: 1,
-  },
-  compactHeaderSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    marginLeft: 38,
   },
   premiumPill: {
     flexDirection: 'row',
@@ -981,7 +816,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
 
-  // River Cards
+  // River Cards - No Icon
   riverCard: {
     marginBottom: 12,
     borderRadius: 16,
@@ -1008,14 +843,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     gap: 12,
-  },
-  riverIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   riverInfo: {
     flex: 1,
@@ -1060,10 +887,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     color: '#fff',
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
   },
 
   // Detail Screen
@@ -1266,18 +1089,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  yearlyButton: {
-    backgroundColor: COLORS.premium,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  yearlyButtonText: {
-    color: COLORS.premiumDark,
-    fontSize: 16,
-    fontWeight: '700',
-  },
   modalClose: {
     textAlign: 'center',
     color: COLORS.textSecondary,
@@ -1346,11 +1157,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.text,
   },
-  upsellText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
   upsellButton: {
     backgroundColor: COLORS.premium,
     paddingHorizontal: 24,
@@ -1385,45 +1191,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 32,
   },
-  premiumFeaturesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 16,
-    gap: 12,
-  },
-  premiumFeatureCard: {
-    width: (SCREEN_WIDTH - 44) / 2,
-    backgroundColor: COLORS.surface,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    gap: 8,
-    elevation: 2,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  featureIconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  premiumFeatureTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  premiumFeatureDesc: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
   pricingSection: {
     paddingHorizontal: 16,
     gap: 12,
+    marginTop: 24,
   },
   monthlyButton: {
     backgroundColor: COLORS.primary,
@@ -1468,12 +1239,6 @@ const styles = StyleSheet.create({
     color: COLORS.success,
     fontWeight: '600',
     marginTop: 4,
-  },
-  restoreText: {
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    marginTop: 8,
   },
 
   // Tab Bar

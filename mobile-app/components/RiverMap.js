@@ -1,621 +1,362 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  View, StyleSheet, Text, TouchableOpacity, 
-  ActivityIndicator, ScrollView, Linking, Alert 
+  View, Text, StyleSheet, TouchableOpacity, 
+  ScrollView, Linking, Dimensions
 } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { 
-  Ionicons, MaterialCommunityIcons, FontAwesome5,
-  MaterialIcons 
-} from '@expo/vector-icons';
-import { ACCESS_POINTS } from '../data/accessPoints';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { getAllAccessPoints } from '../data/accessPoints';
 
-// River center coordinates for initial region
-const RIVER_REGIONS = {
-  'Madison River': { 
-    latitude: 45.2847, 
-    longitude: -111.4753, 
-    latitudeDelta: 0.8, 
-    longitudeDelta: 0.8 
-  },
-  'Yellowstone River': { 
-    latitude: 45.6770, 
-    longitude: -110.5631, 
-    latitudeDelta: 1.2, 
-    longitudeDelta: 1.2 
-  },
-  'Gallatin River': { 
-    latitude: 45.2602, 
-    longitude: -111.1951, 
-    latitudeDelta: 0.5, 
-    longitudeDelta: 0.5 
-  },
-  'Missouri River': { 
-    latitude: 47.0527, 
-    longitude: -111.8316, 
-    latitudeDelta: 0.8, 
-    longitudeDelta: 0.8 
-  },
-  'Bighorn River': { 
-    latitude: 45.4605, 
-    longitude: -107.8745, 
-    latitudeDelta: 0.4, 
-    longitudeDelta: 0.4 
-  },
-  'Beaverhead River': { 
-    latitude: 45.2163, 
-    longitude: -112.6381, 
-    latitudeDelta: 0.6, 
-    longitudeDelta: 0.6 
-  },
-  'Big Hole River': { 
-    latitude: 45.1847, 
-    longitude: -113.4081, 
-    latitudeDelta: 0.8, 
-    longitudeDelta: 0.8 
-  },
-  'Bitterroot River': { 
-    latitude: 46.5891, 
-    longitude: -114.0510, 
-    latitudeDelta: 0.7, 
-    longitudeDelta: 0.7 
-  },
-  'Blackfoot River': { 
-    latitude: 46.8771, 
-    longitude: -112.5560, 
-    latitudeDelta: 0.5, 
-    longitudeDelta: 0.5 
-  },
-  'Clark Fork River': { 
-    latitude: 46.8721, 
-    longitude: -113.9940, 
-    latitudeDelta: 0.6, 
-    longitudeDelta: 0.6 
-  },
-  'Jefferson River': { 
-    latitude: 45.8933, 
-    longitude: -111.5053, 
-    latitudeDelta: 0.4, 
-    longitudeDelta: 0.4 
-  },
-  'Ruby River': { 
-    latitude: 45.3295, 
-    longitude: -112.1076, 
-    latitudeDelta: 0.3, 
-    longitudeDelta: 0.3 
-  },
-  'Stillwater River': { 
-    latitude: 45.5291, 
-    longitude: -109.4229, 
-    latitudeDelta: 0.3, 
-    longitudeDelta: 0.3 
-  },
-  'Boulder River': { 
-    latitude: 45.8500, 
-    longitude: -110.1500, 
-    latitudeDelta: 0.3, 
-    longitudeDelta: 0.3 
-  },
-  'Rock Creek': { 
-    latitude: 46.5100, 
-    longitude: -113.8000, 
-    latitudeDelta: 0.2, 
-    longitudeDelta: 0.2 
-  },
-  'default': { 
-    latitude: 46.8797, 
-    longitude: -110.3626, 
-    latitudeDelta: 4, 
-    longitudeDelta: 4 
-  }
-};
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const COLORS = {
-  boat: '#dc2626',      // Red for boat launch
-  wade: '#16a34a',      // Green for wade access
-  both: '#d97706',      // Orange for both
-  fwp: '#1a5f7a',       // Primary blue
+  primary: '#1a5f7a',
+  primaryDark: '#134a5e',
+  secondary: '#159895',
+  accent: '#57c5b6',
+  background: '#f5f7fa',
+  surface: '#ffffff',
   text: '#1a1a2e',
   textSecondary: '#6b7280',
-  surface: '#ffffff',
-  border: '#e5e7eb'
+  border: '#e5e7eb',
+  wade: '#22c55e',    // Green for wade access
+  boat: '#ef4444',    // Red for boat launch
+  both: '#f97316',    // Orange for both
 };
 
-const RiverMap = ({ navigation, selectedRiver, isPremium }) => {
-  const [region, setRegion] = useState(RIVER_REGIONS['default']);
-  const [markers, setMarkers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState('all');
+// Initial region centered on Montana
+const INITIAL_REGION = {
+  latitude: 47.0,
+  longitude: -109.5,
+  latitudeDelta: 8,
+  longitudeDelta: 8,
+};
 
-  useEffect(() => {
-    loadMarkers();
-  }, [selectedRiver, selectedFilter]);
+export default function RiverMap({ isPremium }) {
+  const [selectedType, setSelectedType] = useState('all');
+  const [selectedRegion, setSelectedRegion] = useState(INITIAL_REGION);
+  const [mapType, setMapType] = useState('hybrid'); // 'hybrid' for satellite
 
-  const loadMarkers = () => {
-    setLoading(true);
-    
-    let allPoints = [];
-    
-    if (selectedRiver && ACCESS_POINTS[selectedRiver]) {
-      // Show specific river
-      setRegion(RIVER_REGIONS[selectedRiver] || RIVER_REGIONS['default']);
-      allPoints = ACCESS_POINTS[selectedRiver].map(point => ({
-        ...point,
-        river: selectedRiver
-      }));
-    } else {
-      // Show all rivers (limited for free users)
-      setRegion(RIVER_REGIONS['default']);
-      const riversToShow = isPremium 
-        ? Object.keys(ACCESS_POINTS)
-        : ['Madison River', 'Yellowstone River', 'Gallatin River', 'Missouri River'];
-      
-      riversToShow.forEach(river => {
-        if (ACCESS_POINTS[river]) {
-          const limitedPoints = isPremium 
-            ? ACCESS_POINTS[river]
-            : ACCESS_POINTS[river].slice(0, 5);
-          
-          allPoints.push(...limitedPoints.map(point => ({
-            ...point,
-            river
-          })));
-        }
-      });
-    }
+  const allPoints = useMemo(() => getAllAccessPoints(), []);
 
-    // Apply filter
-    if (selectedFilter === 'boat') {
-      allPoints = allPoints.filter(p => p.type === 'boat' || p.type === 'both');
-    } else if (selectedFilter === 'wade') {
-      allPoints = allPoints.filter(p => p.type === 'wade' || p.type === 'both');
-    } else if (selectedFilter === 'restrooms') {
-      allPoints = allPoints.filter(p => p.restrooms);
-    }
-    
-    setMarkers(allPoints);
-    setLoading(false);
-  };
+  const filteredPoints = useMemo(() => {
+    if (selectedType === 'all') return allPoints;
+    return allPoints.filter(point => {
+      if (selectedType === 'boat') return point.type === 'boat' || point.type === 'both';
+      if (selectedType === 'wade') return point.type === 'wade' || point.type === 'both';
+      if (selectedType === 'restrooms') return point.restrooms;
+      return true;
+    });
+  }, [allPoints, selectedType]);
 
   const getMarkerColor = (type) => {
     switch (type) {
       case 'boat': return COLORS.boat;
       case 'wade': return COLORS.wade;
       case 'both': return COLORS.both;
-      default: return COLORS.fwp;
+      default: return COLORS.primary;
     }
   };
 
-  const getMarkerIcon = (type) => {
-    switch (type) {
-      case 'boat': return 'ship';
-      case 'wade': return 'walk';
-      case 'both': return 'map-marker';
-      default: return 'map-marker';
-    }
-  };
-
-  const getTypeLabel = (type) => {
-    switch (type) {
-      case 'boat': return 'Boat Launch';
-      case 'wade': return 'Wade Access';
-      case 'both': return 'Boat & Wade';
-      default: return 'Access';
-    }
-  };
-
-  const openFWPLink = (url) => {
+  const openFWP = (url) => {
     if (url) {
       Linking.openURL(url).catch(() => {
-        Alert.alert('Error', 'Could not open FWP website');
+        // Silently fail if URL doesn't open
       });
     }
   };
 
-  const navigateToRiver = (riverName) => {
-    if (navigation) {
-      navigation.navigate('RiverDetails', { river: riverName });
-    }
+  // Map type toggle button
+  const toggleMapType = () => {
+    setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid');
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.fwp} />
-        <Text style={styles.loadingText}>Loading FWP access points...</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
-      {/* Filter Bar */}
+      {/* Filter Buttons */}
       <View style={styles.filterContainer}>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterContent}
+          contentContainerStyle={styles.filterScroll}
         >
           <TouchableOpacity 
-            style={[styles.filterButton, selectedFilter === 'all' && styles.filterButtonActive]}
-            onPress={() => setSelectedFilter('all')}
+            style={[styles.filterButton, selectedType === 'all' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('all')}
           >
-            <MaterialCommunityIcons 
-              name="map-marker-multiple" 
-              size={16} 
-              color={selectedFilter === 'all' ? '#fff' : COLORS.textSecondary} 
-            />
-            <Text style={[styles.filterText, selectedFilter === 'all' && styles.filterTextActive]}>
-              All ({markers.length})
+            <Text style={[styles.filterText, selectedType === 'all' && styles.filterTextActive]}>
+              All
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.filterButton, selectedFilter === 'boat' && styles.filterButtonActive]}
-            onPress={() => setSelectedFilter('boat')}
+            style={[styles.filterButton, selectedType === 'boat' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('boat')}
           >
             <MaterialCommunityIcons 
-              name="ship" 
+              name="sail-boat" 
               size={16} 
-              color={selectedFilter === 'boat' ? '#fff' : COLORS.boat} 
+              color={selectedType === 'boat' ? '#fff' : COLORS.textSecondary} 
             />
-            <Text style={[styles.filterText, selectedFilter === 'boat' && styles.filterTextActive]}>
+            <Text style={[styles.filterText, selectedType === 'boat' && styles.filterTextActive]}>
               Boat
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.filterButton, selectedFilter === 'wade' && styles.filterButtonActive]}
-            onPress={() => setSelectedFilter('wade')}
+            style={[styles.filterButton, selectedType === 'wade' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('wade')}
           >
-            <MaterialCommunityIcons 
-              name="walk" 
+            <Ionicons 
+              name="footsteps" 
               size={16} 
-              color={selectedFilter === 'wade' ? '#fff' : COLORS.wade} 
+              color={selectedType === 'wade' ? '#fff' : COLORS.textSecondary} 
             />
-            <Text style={[styles.filterText, selectedFilter === 'wade' && styles.filterTextActive]}>
+            <Text style={[styles.filterText, selectedType === 'wade' && styles.filterTextActive]}>
               Wade
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.filterButton, selectedFilter === 'restrooms' && styles.filterButtonActive]}
-            onPress={() => setSelectedFilter('restrooms')}
+            style={[styles.filterButton, selectedType === 'restrooms' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('restrooms')}
           >
-            <MaterialCommunityIcons 
-              name="toilet" 
+            <Ionicons 
+              name="business" 
               size={16} 
-              color={selectedFilter === 'restrooms' ? '#fff' : COLORS.textSecondary} 
+              color={selectedType === 'restrooms' ? '#fff' : COLORS.textSecondary} 
             />
-            <Text style={[styles.filterText, selectedFilter === 'restrooms' && styles.filterTextActive]}>
+            <Text style={[styles.filterText, selectedType === 'restrooms' && styles.filterTextActive]}>
               Restrooms
             </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
 
+      {/* Map with Satellite/Hybrid View */}
       <MapView
         style={styles.map}
-        initialRegion={region}
-        region={region}
-        onRegionChangeComplete={setRegion}
+        initialRegion={INITIAL_REGION}
+        region={selectedRegion}
+        onRegionChangeComplete={setSelectedRegion}
+        mapType={mapType}
+        showsUserLocation={true}
+        showsCompass={true}
+        showsScale={true}
       >
-        {markers.map((marker) => (
+        {filteredPoints.map((point, index) => (
           <Marker
-            key={marker.id}
-            coordinate={{ latitude: marker.lat, longitude: marker.lon }}
-            pinColor={getMarkerColor(marker.type)}
+            key={index}
+            coordinate={{ 
+              latitude: point.lat, 
+              longitude: point.lon 
+            }}
+            pinColor={getMarkerColor(point.type)}
+            title={point.name}
+            description={`${point.river} - ${point.type}`}
           >
-            <View style={[styles.markerContainer, { backgroundColor: getMarkerColor(marker.type) }]}>
-              <MaterialCommunityIcons 
-                name={getMarkerIcon(marker.type)} 
-                size={18} 
-                color="#fff" 
-              />
-            </View>
-            
-            <Callout 
-              onPress={() => navigateToRiver(marker.river)}
-              style={styles.callout}
-            >
-              <View style={styles.calloutContainer}>
-                <Text style={styles.calloutTitle}>{marker.name}</Text>
-                <Text style={styles.calloutRiver}>{marker.river}</Text>
-                
-                <View style={styles.calloutTypeBadge}>
-                  <MaterialCommunityIcons 
-                    name={getMarkerIcon(marker.type)} 
-                    size={12} 
-                    color={getMarkerColor(marker.type)} 
-                  />
-                  <Text style={[styles.calloutType, { color: getMarkerColor(marker.type) }]}>
-                    {getTypeLabel(marker.type)}
-                  </Text>
-                </View>
-
-                {/* Amenities */}
-                <View style={styles.amenitiesRow}>
-                  {marker.parking && (
-                    <View style={styles.amenityBadge}>
-                      <MaterialCommunityIcons name="parking" size={12} color="#666" />
-                      <Text style={styles.amenityText}>Parking</Text>
+            <Callout onPress={() => openFWP(point.fwpUrl)}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{point.name}</Text>
+                <Text style={styles.calloutRiver}>{point.river}</Text>
+                <View style={styles.calloutDetails}>
+                  <View style={styles.calloutRow}>
+                    <Ionicons 
+                      name={point.type === 'boat' ? "boat" : point.type === 'wade' ? "walk" : "swap-horizontal"} 
+                      size={14} 
+                      color={COLORS.textSecondary} 
+                    />
+                    <Text style={styles.calloutText}>
+                      {point.type === 'both' ? 'Boat & Wade' : point.type === 'boat' ? 'Boat Launch' : 'Wade Access'}
+                    </Text>
+                  </View>
+                  {point.parking && (
+                    <View style={styles.calloutRow}>
+                      <Ionicons name="car" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>Parking</Text>
                     </View>
                   )}
-                  {marker.restrooms && (
-                    <View style={styles.amenityBadge}>
-                      <MaterialCommunityIcons name="toilet" size={12} color="#666" />
-                      <Text style={styles.amenityText}>Restroom</Text>
+                  {point.restrooms && (
+                    <View style={styles.calloutRow}>
+                      <Ionicons name="business" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>Restrooms</Text>
                     </View>
                   )}
-                  {marker.boatRamp && (
-                    <View style={styles.amenityBadge}>
-                      <MaterialCommunityIcons name="ship" size={12} color="#666" />
-                      <Text style={styles.amenityText}>Ramp</Text>
-                    </View>
-                  )}
-                  {marker.camping && (
-                    <View style={styles.amenityBadge}>
-                      <MaterialCommunityIcons name="tent" size={12} color="#666" />
-                      <Text style={styles.amenityText}>Camp</Text>
+                  {point.boatRamp && (
+                    <View style={styles.calloutRow}>
+                      <MaterialCommunityIcons name="sail-boat" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>Boat Ramp</Text>
                     </View>
                   )}
                 </View>
-
-                {marker.fee && (
-                  <Text style={styles.feeText}>💵 Fee required</Text>
+                {point.notes && (
+                  <Text style={styles.calloutNotes}>{point.notes}</Text>
                 )}
-
-                {marker.notes && (
-                  <Text style={styles.notesText}>{marker.notes}</Text>
-                )}
-
-                <View style={styles.calloutActions}>
-                  <TouchableOpacity 
-                    style={styles.fwpButton}
-                    onPress={() => openFWPLink(marker.fwpUrl)}
-                  >
-                    <MaterialCommunityIcons name="web" size={14} color="#fff" />
-                    <Text style={styles.fwpButtonText}>FWP Website</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={styles.riverButton}
-                    onPress={() => navigateToRiver(marker.river)}
-                  >
-                    <Text style={styles.riverButtonText}>View River →</Text>
-                  </TouchableOpacity>
+                <View style={styles.calloutButton}>
+                  <Text style={styles.calloutButtonText}>View on FWP</Text>
+                  <Ionicons name="open-outline" size={14} color={COLORS.primary} />
                 </View>
               </View>
             </Callout>
           </Marker>
         ))}
       </MapView>
-      
+
+      {/* Map Type Toggle */}
+      <TouchableOpacity 
+        style={styles.mapTypeButton}
+        onPress={toggleMapType}
+      >
+        <Ionicons 
+          name={mapType === 'hybrid' ? "map" : "earth"} 
+          size={24} 
+          color={COLORS.primary} 
+        />
+      </TouchableOpacity>
+
       {/* Legend */}
       <View style={styles.legend}>
-        <Text style={styles.legendTitle}>FWP Access Types</Text>
+        <Text style={styles.legendTitle}>Legend</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: COLORS.wade }]} />
-            <MaterialCommunityIcons name="walk" size={14} color={COLORS.wade} />
-            <Text style={styles.legendText}>Wade Only</Text>
+            <Text style={styles.legendText}>Wade Access</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: COLORS.boat }]} />
-            <MaterialCommunityIcons name="ship" size={14} color={COLORS.boat} />
             <Text style={styles.legendText}>Boat Launch</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: COLORS.both }]} />
-            <MaterialCommunityIcons name="map-marker" size={14} color={COLORS.both} />
             <Text style={styles.legendText}>Both</Text>
           </View>
         </View>
-      </View>
-      
-      {/* Stats / Info */}
-      <View style={styles.statsBar}>
-        <View style={styles.statItem}>
-          <MaterialCommunityIcons name="map-marker" size={16} color={COLORS.fwp} />
-          <Text style={styles.statText}>{markers.length} Access Points</Text>
-        </View>
-        {!isPremium && (
-          <View style={styles.premiumBadge}>
-            <MaterialIcons name="lock" size={12} color="#fff" />
-            <Text style={styles.premiumBadgeText}>Premium for all</Text>
-          </View>
-        )}
+        <Text style={styles.legendCount}>
+          {filteredPoints.length} access points shown
+        </Text>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
   },
-  map: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f7fa',
-  },
-  loadingText: {
-    marginTop: 12,
-    color: '#6b7280',
-    fontSize: 14,
-  },
-
-  // Filter Bar
   filterContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    paddingVertical: 8,
+    borderBottomColor: COLORS.border,
   },
-  filterContent: {
-    paddingHorizontal: 12,
+  filterScroll: {
+    paddingHorizontal: 16,
     gap: 8,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
+    backgroundColor: COLORS.background,
     gap: 6,
   },
   filterButtonActive: {
-    backgroundColor: '#1a5f7a',
+    backgroundColor: COLORS.primary,
   },
   filterText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#6b7280',
+    color: COLORS.textSecondary,
   },
   filterTextActive: {
     color: '#fff',
   },
-
-  // Marker
-  markerContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  map: {
+    flex: 1,
+  },
+  mapTypeButton: {
+    position: 'absolute',
+    right: 16,
+    top: 70,
+    backgroundColor: COLORS.surface,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-
-  // Callout
   callout: {
-    width: 280,
-  },
-  calloutContainer: {
-    padding: 12,
-    gap: 8,
+    width: 220,
+    padding: 4,
   },
   calloutTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1a1a2e',
+    color: COLORS.text,
   },
   calloutRiver: {
     fontSize: 13,
-    color: '#1a5f7a',
+    color: COLORS.primary,
     fontWeight: '600',
-  },
-  calloutTypeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  calloutType: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  // Amenities
-  amenitiesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 4,
-  },
-  amenityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    gap: 2,
-  },
-  amenityText: {
-    fontSize: 10,
-    color: '#666',
-  },
-  feeText: {
-    fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  notesText: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontStyle: 'italic',
-  },
-
-  // Callout Actions
-  calloutActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  fwpButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1a5f7a',
-    paddingVertical: 8,
-    borderRadius: 8,
-    gap: 4,
-  },
-  fwpButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  riverButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  riverButtonText: {
-    color: '#1a5f7a',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  // Legend
-  legend: {
-    position: 'absolute',
-    bottom: 60,
-    left: 12,
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  legendTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#1a1a2e',
     marginBottom: 8,
   },
-  legendItems: {
+  calloutDetails: {
+    gap: 4,
+  },
+  calloutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
+  },
+  calloutText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+  calloutNotes: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  calloutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginTop: 4,
+    gap: 6,
+  },
+  calloutButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  legend: {
+    backgroundColor: COLORS.surface,
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  legendTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 10,
+  },
+  legendItems: {
+    flexDirection: 'row',
+    gap: 20,
   },
   legendItem: {
     flexDirection: 'row',
@@ -623,58 +364,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   legendText: {
-    fontSize: 11,
-    color: '#6b7280',
-  },
-
-  // Stats Bar
-  statsBar: {
-    position: 'absolute',
-    bottom: 12,
-    right: 12,
-    left: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  statText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1a1a2e',
+    color: COLORS.textSecondary,
   },
-  premiumBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fbbf24',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  premiumBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#92400e',
+  legendCount: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 10,
   },
 });
-
-export default RiverMap;
