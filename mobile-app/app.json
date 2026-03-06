@@ -2,7 +2,7 @@
   "expo": {
     "name": "Montana Fishing Reports",
     "slug": "montana-fishing-reports",
-    "version": "2.0.0",
+    "version": "2.3.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.montanafishing.reports",
-      "buildNumber": "2.0.0",
+      "buildNumber": "2.3.0",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Montana Fishing Reports uses your location to show nearby rivers and access points.",
         "NSLocationAlwaysUsageDescription": "Montana Fishing Reports uses your location to provide notifications about nearby fishing conditions."
@@ -29,7 +29,7 @@
         "backgroundColor": "#1a5f7a"
       },
       "package": "com.montanafishing.reports",
-      "versionCode": 20,
+      "versionCode": 23,
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
