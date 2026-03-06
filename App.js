@@ -1,15 +1,16 @@
+// Root App.js - This is the web/React Native Web entry point
+// For the mobile app, see mobile-app/App.js
+
 import React, { useState, useEffect } from 'react';
 import { 
   View, Text, FlatList, TouchableOpacity, 
   RefreshControl, StyleSheet, Linking, ActivityIndicator,
-  SafeAreaView, StatusBar, ImageBackground, ScrollView
+  SafeAreaView, StatusBar, ImageBackground, ScrollView,
+  TextInput, Platform
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
-// River background images
 const RIVER_IMAGES = {
   'Gallatin River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
   'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
@@ -34,55 +35,74 @@ const COLORS = {
   background: '#f0f4f8',
   white: '#ffffff',
   dark: '#2c3e50',
-  gray: '#7f8c8d',
-  glass: 'rgba(255,255,255,0.9)'
+  gray: '#7f8c8d'
 };
 
-// Format date to "Month Day, Year"
-function formatDate(dateString) {
+const formatDate = (dateString) => {
   if (!dateString || dateString === 'No date') return 'No date';
-  
   try {
-    // Try to parse the date
     let date;
     if (dateString.includes('/')) {
-      // Handle MM/DD/YYYY format
       const parts = dateString.split('/');
       date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
     } else if (dateString.includes('-')) {
-      // Handle YYYY-MM-DD format
       date = new Date(dateString);
     } else {
       date = new Date(dateString);
     }
-    
     if (isNaN(date.getTime())) return dateString;
-    
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
   } catch (e) {
     return dateString;
   }
-}
+};
 
-function HomeScreen({ navigation }) {
+export default function App() {
   const [rivers, setRivers] = useState([]);
+  const [filteredRivers, setFilteredRivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedRiver, setSelectedRiver] = useState(null);
+  const [riverData, setRiverData] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRivers();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = rivers.filter(r => 
+        r.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredRivers(filtered);
+    } else {
+      setFilteredRivers(rivers);
+    }
+  }, [searchQuery, rivers]);
 
   const fetchRivers = async () => {
     try {
       const response = await fetch(`${API_URL}/api/rivers`);
       const data = await response.json();
       setRivers(data.rivers || []);
+      setFilteredRivers(data.rivers || []);
     } catch (error) {
       console.error('Error fetching rivers:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRiverData = async (river) => {
+    try {
+      const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
+      const result = await response.json();
+      setRiverData(result);
+      setSelectedRiver(river);
+    } catch (error) {
+      console.error('Error fetching river data:', error);
     }
   };
 
@@ -109,12 +129,105 @@ function HomeScreen({ navigation }) {
     return '🎣';
   };
 
+  const openReport = (url) => {
+    if (url) Linking.openURL(url);
+  };
+
+  const openUSGS = (url) => {
+    if (url) Linking.openURL(url);
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color={COLORS.primary} />
         <Text style={styles.loadingText}>Loading Rivers...</Text>
       </View>
+    );
+  }
+
+  if (selectedRiver) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+        
+        <ImageBackground
+          source={{ uri: RIVER_IMAGES[selectedRiver] || RIVER_IMAGES['Gallatin River'] }}
+          style={styles.detailHeaderBackground}
+        >
+          <View style={styles.detailHeaderOverlay}>
+            <TouchableOpacity onPress={() => setSelectedRiver(null)} style={styles.backButton}>
+              <Text style={styles.backArrow}>‹ Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.detailHeaderTitle}>{selectedRiver}</Text>
+            <Text style={styles.detailHeaderSubtitle}>
+              {riverData?.reports?.length || 0} Sources • Updated Today
+            </Text>
+          </View>
+        </ImageBackground>
+
+        <ScrollView style={styles.detailScroll}>
+          {riverData?.weather && (
+            <View style={styles.dataCard}>
+              <Text style={styles.dataCardTitle}>🌤️ Today's Weather</Text>
+              <Text style={styles.weatherLocation}>{riverData.weather.location}</Text>
+              <View style={styles.weatherRow}>
+                <View style={styles.weatherItem}>
+                  <Text style={styles.weatherValue}>{riverData.weather.high}°</Text>
+                  <Text style={styles.weatherLabel}>High</Text>
+                </View>
+                <View style={styles.weatherItem}>
+                  <Text style={styles.weatherValue}>{riverData.weather.low}°</Text>
+                  <Text style={styles.weatherLabel}>Low</Text>
+                </View>
+                <View style={styles.weatherItemWide}>
+                  <Text style={styles.weatherIcon}>{riverData.weather.icon || '🌤️'}</Text>
+                  <Text style={styles.weatherCondition}>{riverData.weather.condition}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {riverData?.usgs && (
+            <TouchableOpacity 
+              style={styles.dataCard}
+              onPress={() => openUSGS(riverData.usgs.url)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.dataCardTitle}>📊 Current Conditions (USGS) →</Text>
+              <View style={styles.usgsRow}>
+                <View style={styles.usgsItem}>
+                  <Text style={styles.usgsValue}>{riverData.usgs.flow}</Text>
+                  <Text style={styles.usgsLabel}>Flow</Text>
+                </View>
+                <View style={styles.usgsItem}>
+                  <Text style={styles.usgsValue}>{riverData.usgs.temp}</Text>
+                  <Text style={styles.usgsLabel}>Water Temp</Text>
+                </View>
+              </View>
+              <Text style={styles.tapHint}>Tap to view on USGS website</Text>
+            </TouchableOpacity>
+          )}
+
+          <Text style={styles.sectionTitle}>📰 Fishing Reports</Text>
+          {riverData?.reports?.map((report) => (
+            <TouchableOpacity 
+              key={report.id}
+              style={styles.reportCard}
+              onPress={() => openReport(report.url)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.reportHeader}>
+                <View style={styles.sourceBadge}>
+                  <Text style={styles.sourceText}>{report.source}</Text>
+                </View>
+                <Text style={styles.dateText}>{formatDate(report.last_updated)}</Text>
+              </View>
+              <Text style={styles.linkButton}>Read Full Report →</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -132,8 +245,18 @@ function HomeScreen({ navigation }) {
         </View>
       </ImageBackground>
 
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search rivers..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholderTextColor={COLORS.gray}
+        />
+      </View>
+
       <FlatList
-        data={rivers}
+        data={filteredRivers}
         keyExtractor={(item) => item}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
@@ -142,7 +265,7 @@ function HomeScreen({ navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={styles.riverCard}
-            onPress={() => navigation.navigate('RiverDetails', { river: item })}
+            onPress={() => fetchRiverData(item)}
             activeOpacity={0.8}
           >
             <ImageBackground
@@ -165,156 +288,13 @@ function HomeScreen({ navigation }) {
             </ImageBackground>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>No rivers found</Text>
+          </View>
+        }
       />
     </SafeAreaView>
-  );
-}
-
-function RiverDetailsScreen({ route, navigation }) {
-  const { river } = route.params;
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    fetchRiverData();
-  }, []);
-
-  const fetchRiverData = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error('Error fetching river data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchRiverData();
-    setRefreshing(false);
-  };
-
-  const openReport = (url) => {
-    if (url) Linking.openURL(url);
-  };
-
-  const openUSGS = (url) => {
-    if (url) Linking.openURL(url);
-  };
-
-  if (loading) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>Loading River Data...</Text>
-      </View>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      
-      <ImageBackground
-        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Gallatin River'] }}
-        style={styles.detailHeaderBackground}
-      >
-        <View style={styles.detailHeaderOverlay}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backArrow}>‹</Text>
-          </TouchableOpacity>
-          <Text style={styles.detailHeaderTitle}>{river}</Text>
-          <Text style={styles.detailHeaderSubtitle}>
-            {data?.reports?.length || 0} Sources • Updated Today
-          </Text>
-        </View>
-      </ImageBackground>
-
-      <ScrollView 
-        style={styles.detailScroll}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      >
-        {/* Weather Card with Icon and Location */}
-        {data?.weather && (
-          <View style={styles.dataCard}>
-            <Text style={styles.dataCardTitle}>🌤️ Today's Weather</Text>
-            <Text style={styles.weatherLocation}>{data.weather.location}</Text>
-            <View style={styles.weatherRow}>
-              <View style={styles.weatherItem}>
-                <Text style={styles.weatherValue}>{data.weather.high}°</Text>
-                <Text style={styles.weatherLabel}>High</Text>
-              </View>
-              <View style={styles.weatherItem}>
-                <Text style={styles.weatherValue}>{data.weather.low}°</Text>
-                <Text style={styles.weatherLabel}>Low</Text>
-              </View>
-              <View style={styles.weatherItemWide}>
-                <Text style={styles.weatherIcon}>{data.weather.icon || '🌤️'}</Text>
-                <Text style={styles.weatherCondition}>{data.weather.condition}</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* USGS Data Card - Clickable to open USGS */}
-        {data?.usgs && (
-          <TouchableOpacity 
-            style={styles.dataCard}
-            onPress={() => openUSGS(data.usgs.url)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.dataCardTitle}>📊 Current Conditions (USGS) →</Text>
-            <View style={styles.usgsRow}>
-              <View style={styles.usgsItem}>
-                <Text style={styles.usgsValue}>{data.usgs.flow}</Text>
-                <Text style={styles.usgsLabel}>Flow</Text>
-              </View>
-              <View style={styles.usgsItem}>
-                <Text style={styles.usgsValue}>{data.usgs.temp}</Text>
-                <Text style={styles.usgsLabel}>Water Temp</Text>
-              </View>
-            </View>
-            <Text style={styles.tapHint}>Tap to view on USGS website</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Reports Section */}
-        <Text style={styles.sectionTitle}>📰 Fishing Reports</Text>
-        {data?.reports?.map((report) => (
-          <TouchableOpacity 
-            key={report.id}
-            style={styles.reportCard}
-            onPress={() => openReport(report.url)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.reportHeader}>
-              <View style={styles.sourceBadge}>
-                <Text style={styles.sourceText}>{report.source}</Text>
-              </View>
-              <Text style={styles.dateText}>{formatDate(report.last_updated)}</Text>
-            </View>
-            <Text style={styles.linkButton}>Read Full Report →</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const Stack = createStackNavigator();
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="RiverDetails" component={RiverDetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
   );
 }
 
@@ -334,8 +314,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: '500',
   },
-  
-  // Header with background image
   headerBackground: {
     height: 180,
     justifyContent: 'flex-end',
@@ -355,8 +333,19 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     marginTop: 4,
   },
-  
-  // River cards with images
+  searchContainer: {
+    padding: 16,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  searchInput: {
+    backgroundColor: COLORS.background,
+    padding: 12,
+    borderRadius: 10,
+    fontSize: 16,
+    color: COLORS.dark,
+  },
   listContainer: {
     padding: 12,
   },
@@ -424,8 +413,6 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '300',
   },
-  
-  // Detail screen
   detailHeaderBackground: {
     height: 200,
   },
@@ -442,9 +429,9 @@ const styles = StyleSheet.create({
     top: 50,
   },
   backArrow: {
-    fontSize: 36,
+    fontSize: 18,
     color: COLORS.white,
-    fontWeight: '300',
+    fontWeight: '500',
   },
   detailHeaderTitle: {
     fontSize: 28,
@@ -460,8 +447,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  
-  // Data cards
   dataCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
@@ -479,8 +464,6 @@ const styles = StyleSheet.create({
     color: COLORS.dark,
     marginBottom: 8,
   },
-  
-  // Weather styles
   weatherLocation: {
     fontSize: 14,
     color: COLORS.gray,
@@ -520,8 +503,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  
-  // USGS styles
   usgsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -547,8 +528,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontStyle: 'italic',
   },
-  
-  // Reports section
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -594,5 +573,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.secondary,
     fontWeight: '600',
+  },
+  emptyState: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: COLORS.gray,
+    fontSize: 16,
   },
 });

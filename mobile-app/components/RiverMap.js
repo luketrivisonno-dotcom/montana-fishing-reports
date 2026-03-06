@@ -1,226 +1,154 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
+import { ACCESS_POINTS } from '../data/accessPoints';
 
-const { width } = Dimensions.get('window');
-
-const RIVER_COORDINATES = {
-  'Madison River': { 
-    lat: 45.2847, 
-    lon: -111.4753, 
-    region: 'Southwest',
-    usgsId: '06037500',
-    location: 'Cameron Bridge'
-  },
-  'Upper Madison River': { 
-    lat: 45.2847, 
-    lon: -111.4753, 
-    region: 'Southwest',
-    usgsId: '06037500',
-    location: 'Cameron Bridge'
-  },
-  'Lower Madison River': { 
-    lat: 45.6000, 
-    lon: -111.6500, 
-    region: 'Southwest',
-    usgsId: '06041000',
-    location: 'Black\'s Ford'
-  },
-  'Yellowstone River': { 
-    lat: 45.6770, 
-    lon: -110.5631, 
-    region: 'South',
-    usgsId: '06192500',
-    location: 'Corwin Springs'
-  },
-  'Gallatin River': { 
-    lat: 45.2602, 
-    lon: -111.1951, 
-    region: 'Southwest',
-    usgsId: '06043500',
-    location: 'Gallatin Gateway'
-  },
-  'Missouri River': { 
-    lat: 47.0527, 
-    lon: -111.8316, 
-    region: 'Central',
-    usgsId: '06066500',
-    location: 'Holter Dam'
-  },
-  'Bighorn River': { 
-    lat: 45.4605, 
-    lon: -107.8745, 
-    region: 'Southeast',
-    usgsId: '06294500',
-    location: 'Bighorn'
-  },
-  'Beaverhead River': { 
-    lat: 45.2163, 
-    lon: -112.6381, 
-    region: 'Southwest',
-    usgsId: '06017000',
-    location: 'Dillon'
-  },
-  'Big Hole River': { 
-    lat: 45.1847, 
-    lon: -113.4081, 
-    region: 'Southwest',
-    usgsId: '06025500',
-    location: 'Melrose'
-  },
-  'Bitterroot River': { 
-    lat: 46.5891, 
-    lon: -114.0510, 
-    region: 'West',
-    usgsId: '12344000',
-    location: 'Darby'
-  },
-  'Blackfoot River': { 
-    lat: 47.0527, 
-    lon: -112.5560, 
-    region: 'West',
-    usgsId: '12340000',
-    location: 'Bonner'
-  },
-  'Clark Fork River': { 
-    lat: 46.8721, 
-    lon: -113.9940, 
-    region: 'West',
-    usgsId: '12331800',
-    location: 'Deer Lodge'
-  },
-  'Flathead River': { 
-    lat: 48.4733, 
-    lon: -114.0834, 
-    region: 'Northwest',
-    usgsId: '12389000',
-    location: 'Columbia Falls'
-  },
-  'Jefferson River': { 
-    lat: 45.8933, 
-    lon: -111.5053, 
-    region: 'Southwest',
-    usgsId: '06026500',
-    location: 'Twin Bridges'
-  },
-  'Ruby River': { 
-    lat: 45.3295, 
-    lon: -112.1076, 
-    region: 'Southwest',
-    usgsId: '06019500',
-    location: 'Alder'
-  },
-  'Stillwater River': { 
-    lat: 45.5291, 
-    lon: -109.4229, 
-    region: 'South',
-    usgsId: '06205000',
-    location: 'Absarokee'
-  },
-  'Swan River': { 
-    lat: 47.7458, 
-    lon: -114.0856, 
-    region: 'Northwest',
-    usgsId: '12370000',
-    location: 'Big Fork'
-  },
-  'Rock Creek': { 
-    lat: 46.5100, 
-    lon: -113.8000, 
-    region: 'West',
-    usgsId: '12334510',
-    location: 'Clinton'
-  },
-  'Boulder River': { 
-    lat: 45.8500, 
-    lon: -110.1500, 
-    region: 'South',
-    usgsId: null,
-    location: 'Boulder'
-  },
-  'Spring Creeks': { 
-    lat: 45.3000, 
-    lon: -110.4500, 
-    region: 'South (Paradise Valley)',
-    usgsId: null,
-    location: 'Pine Creek, MT',
-    note: 'Private spring creeks - DePuy, Armstrong, Nelson'
-  },
-  'Yellowstone National Park': { 
-    lat: 44.6608, 
-    lon: -111.1040, 
-    region: 'South',
-    usgsId: null,
-    location: 'West Yellowstone',
-    note: 'Multiple rivers - check regulations'
-  }
+// River coordinates for initial region
+const RIVER_REGIONS = {
+  'Madison River': { latitude: 45.2847, longitude: -111.4753, latitudeDelta: 0.5, longitudeDelta: 0.5 },
+  'Yellowstone River': { latitude: 45.6770, longitude: -110.5631, latitudeDelta: 0.8, longitudeDelta: 0.8 },
+  'Gallatin River': { latitude: 45.2602, longitude: -111.1951, latitudeDelta: 0.4, longitudeDelta: 0.4 },
+  'Missouri River': { latitude: 47.0527, longitude: -111.8316, latitudeDelta: 0.6, longitudeDelta: 0.6 },
+  'Bighorn River': { latitude: 45.4605, longitude: -107.8745, latitudeDelta: 0.3, longitudeDelta: 0.3 },
+  'default': { latitude: 46.8797, longitude: -110.3626, latitudeDelta: 3, longitudeDelta: 3 }
 };
 
-const openUSGS = (usgsId) => {
-  if (usgsId) {
-    Linking.openURL(`https://waterdata.usgs.gov/monitoring-location/${usgsId}`);
+const RiverMap = ({ navigation, selectedRiver, isPremium }) => {
+  const [region, setRegion] = useState(RIVER_REGIONS['default']);
+  const [markers, setMarkers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadMarkers();
+  }, [selectedRiver]);
+
+  const loadMarkers = () => {
+    setLoading(true);
+    
+    if (selectedRiver && ACCESS_POINTS[selectedRiver]) {
+      // Show specific river
+      const points = ACCESS_POINTS[selectedRiver];
+      setRegion(RIVER_REGIONS[selectedRiver] || RIVER_REGIONS['default']);
+      setMarkers(points.map(point => ({
+        ...point,
+        id: point.name,
+        river: selectedRiver
+      })));
+    } else {
+      // Show all rivers (limited set for free users)
+      const allPoints = [];
+      const riversToShow = isPremium 
+        ? Object.keys(ACCESS_POINTS)
+        : ['Madison River', 'Yellowstone River', 'Gallatin River'];
+      
+      riversToShow.forEach(river => {
+        if (ACCESS_POINTS[river]) {
+          const limitedPoints = isPremium 
+            ? ACCESS_POINTS[river]
+            : ACCESS_POINTS[river].slice(0, 3); // Free users see only 3 points per river
+          
+          allPoints.push(...limitedPoints.map(point => ({
+            ...point,
+            id: `${river}-${point.name}`,
+            river
+          })));
+        }
+      });
+      
+      setMarkers(allPoints);
+    }
+    
+    setLoading(false);
+  };
+
+  const getMarkerColor = (type) => {
+    switch (type) {
+      case 'boat': return '#e74c3c'; // Red for boat launch
+      case 'wade': return '#27ae60'; // Green for wade access
+      case 'both': return '#f39c12'; // Orange for both
+      default: return '#3498db';
+    }
+  };
+
+  const getMarkerIcon = (type) => {
+    switch (type) {
+      case 'boat': return '🚤';
+      case 'wade': return '🎣';
+      case 'both': return '⚓';
+      default: return '📍';
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1a5f7a" />
+        <Text style={styles.loadingText}>Loading access points...</Text>
+      </View>
+    );
   }
-};
-
-const RiverMap = ({ navigation }) => {
-  const initialRegion = {
-    latitude: 46.0,
-    longitude: -111.0,
-    latitudeDelta: 6,
-    longitudeDelta: 6,
-  };
-
-  const handleRiverPress = (riverName) => {
-    navigation.navigate('RiverDetails', { river: riverName });
-  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🗺️ Montana Rivers</Text>
-      <Text style={styles.subtitle}>Tap a marker for details and USGS data</Text>
       <MapView
         style={styles.map}
-        initialRegion={initialRegion}
-        mapType="terrain"
+        initialRegion={region}
+        region={region}
+        onRegionChangeComplete={setRegion}
       >
-        {Object.entries(RIVER_COORDINATES).map(([riverName, coords]) => (
+        {markers.map((marker) => (
           <Marker
-            key={riverName}
-            coordinate={{
-              latitude: coords.lat,
-              longitude: coords.lon,
-            }}
-            pinColor="#1a5f7a"
+            key={marker.id}
+            coordinate={{ latitude: marker.lat, longitude: marker.lon }}
+            pinColor={getMarkerColor(marker.type)}
           >
-            <Callout tooltip onPress={() => handleRiverPress(riverName)}>
-              <View style={styles.callout}>
-                <Text style={styles.riverName}>{riverName}</Text>
-                <Text style={styles.location}>📍 {coords.location}</Text>
-                <Text style={styles.region}>{coords.region}</Text>
-                {coords.note && <Text style={styles.note}>{coords.note}</Text>}
-                
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity 
-                    style={styles.reportButton}
-                    onPress={() => handleRiverPress(riverName)}
-                  >
-                    <Text style={styles.buttonText}>View Report</Text>
-                  </TouchableOpacity>
-                  
-                  {coords.usgsId && (
-                    <TouchableOpacity 
-                      style={styles.usgsButton}
-                      onPress={() => openUSGS(coords.usgsId)}
-                    >
-                      <Text style={styles.buttonText}>USGS Data</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+            <View style={[styles.markerContainer, { backgroundColor: getMarkerColor(marker.type) }]}>
+              <Text style={styles.markerIcon}>{getMarkerIcon(marker.type)}</Text>
+            </View>
+            <Callout onPress={() => navigation?.navigate('RiverDetails', { river: marker.river })}>
+              <View style={styles.calloutContainer}>
+                <Text style={styles.calloutTitle}>{marker.name}</Text>
+                <Text style={styles.calloutRiver}>{marker.river}</Text>
+                <Text style={styles.calloutType}>
+                  {marker.type === 'both' ? 'Boat & Wade' : marker.type === 'boat' ? 'Boat Launch' : 'Wade Access'}
+                </Text>
+                {marker.parking && <Text style={styles.calloutFeature}>🅿️ Parking</Text>}
+                {marker.restrooms && <Text style={styles.calloutFeature}>🚻 Restrooms</Text>}
+                <Text style={styles.calloutNote}>{marker.note}</Text>
+                <TouchableOpacity style={styles.calloutButton}>
+                  <Text style={styles.calloutButtonText}>View River Info →</Text>
+                </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
         ))}
       </MapView>
+      
+      {/* Legend */}
+      <View style={styles.legend}>
+        <Text style={styles.legendTitle}>Access Types</Text>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: '#27ae60' }]} />
+          <Text style={styles.legendText}>Wade Access</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: '#e74c3c' }]} />
+          <Text style={styles.legendText}>Boat Launch</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: '#f39c12' }]} />
+          <Text style={styles.legendText}>Both</Text>
+        </View>
+      </View>
+      
+      {/* Premium notice for free users */}
+      {!isPremium && !selectedRiver && (
+        <View style={styles.premiumNotice}>
+          <Text style={styles.premiumNoticeText}>
+            ⭐ Upgrade to see all access points
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -228,77 +156,132 @@ const RiverMap = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    padding: 16,
-    paddingBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
   },
   map: {
     flex: 1,
   },
-  callout: {
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    minWidth: 200,
-    maxWidth: 250,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  riverName: {
+  loadingText: {
+    marginTop: 12,
+    color: '#7f8c8d',
+    fontSize: 14,
+  },
+  markerContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 4,
+  },
+  markerIcon: {
+    fontSize: 16,
+  },
+  calloutContainer: {
+    width: 200,
+    padding: 8,
+  },
+  calloutTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 4,
   },
-  location: {
-    fontSize: 13,
+  calloutRiver: {
+    fontSize: 14,
     color: '#1a5f7a',
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  region: {
+  calloutType: {
     fontSize: 12,
     color: '#7f8c8d',
     marginBottom: 4,
   },
-  note: {
+  calloutFeature: {
+    fontSize: 12,
+    color: '#27ae60',
+    marginTop: 2,
+  },
+  calloutNote: {
     fontSize: 11,
-    color: '#e67e22',
+    color: '#95a5a6',
+    marginTop: 4,
     fontStyle: 'italic',
-    marginBottom: 8,
   },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  reportButton: {
+  calloutButton: {
     backgroundColor: '#1a5f7a',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    padding: 8,
     borderRadius: 6,
-    flex: 1,
+    marginTop: 8,
+    alignItems: 'center',
   },
-  usgsButton: {
-    backgroundColor: '#27ae60',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    flex: 1,
-  },
-  buttonText: {
-    color: '#fff',
+  calloutButtonText: {
+    color: 'white',
     fontSize: 12,
     fontWeight: '600',
-    textAlign: 'center',
+  },
+  legend: {
+    position: 'absolute',
+    bottom: 20,
+    left: 16,
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  legendTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendText: {
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
+  premiumNotice: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: '#ffd700',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  premiumNoticeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#2c3e50',
   },
 });
 
