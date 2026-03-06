@@ -3,71 +3,164 @@ import {
   View, Text, FlatList, TouchableOpacity, 
   RefreshControl, StyleSheet, Linking, ActivityIndicator,
   StatusBar, ImageBackground, ScrollView, Modal,
-  Alert, Platform
+  Alert, Platform, Dimensions, TextInput
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { 
+  Ionicons, MaterialCommunityIcons, FontAwesome5,
+  MaterialIcons, Entypo 
+} from '@expo/vector-icons';
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
 import RiverMap from './components/RiverMap';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ============================================
+// DEVELOPMENT MODE - Set to true to unlock all features
+// ============================================
+const DEV_MODE = true; // CHANGE THIS TO false FOR PRODUCTION
+
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
+// ============================================
+// REAL MONTANA FISHING PHOTOS
+// ============================================
 const RIVER_IMAGES = {
-  'Gallatin River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
-  'Upper Madison River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
-  'Missouri River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Clark Fork River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
-  'Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
-  'Bitterroot River': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
-  'Rock Creek': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
-  'Bighorn River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Beaverhead River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
-  'Big Hole River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
-  'Flathead River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
-  'Jefferson River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Madison River': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
-  'Ruby River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-  'Stillwater River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
-  'Swan River': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800',
-  'Boulder River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800',
-  'Spring Creeks': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-  'Yellowstone National Park': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800'
+  'Gallatin River': {
+    uri: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
+    credit: 'Gallatin River, MT'
+  },
+  'Upper Madison River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Madison-River-fly-fishing-guide.jpg',
+    credit: 'Upper Madison near Ennis'
+  },
+  'Lower Madison River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/lower-madison-fly-fishing.jpg',
+    credit: 'Lower Madison near Bozeman'
+  },
+  'Yellowstone River': {
+    uri: 'https://content.osgnetworks.tv/flyfisherman/2022/02/ffm-apr22-montanas-best-rivers-yellowstone.jpeg',
+    credit: 'Yellowstone River, Paradise Valley'
+  },
+  'Missouri River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Missouri-River-fly-fishing.jpg',
+    credit: 'Missouri River at Craig'
+  },
+  'Clark Fork River': {
+    uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Clark_Fork_River_Missoula.jpg/1200px-Clark_Fork_River_Missoula.jpg',
+    credit: 'Clark Fork near Missoula'
+  },
+  'Blackfoot River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Blackfoot-River-fly-fishing.jpg',
+    credit: 'Blackfoot River'
+  },
+  'Bitterroot River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Bitterroot-River-fly-fishing.jpg',
+    credit: 'Bitterroot River'
+  },
+  'Rock Creek': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Rock-Creek-fly-fishing.jpg',
+    credit: 'Rock Creek'
+  },
+  'Bighorn River': {
+    uri: 'https://content.osgnetworks.tv/flyfisherman/2022/02/ffm-apr22-montanas-best-rivers-bighorn.jpeg',
+    credit: 'Bighorn River, Fort Smith'
+  },
+  'Beaverhead River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Beaverhead-River-fly-fishing.jpg',
+    credit: 'Beaverhead River near Dillon'
+  },
+  'Big Hole River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Big-Hole-River-fly-fishing.jpg',
+    credit: 'Big Hole River'
+  },
+  'Flathead River': {
+    uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flathead_River_near_Coram_MT.jpg/1200px-Flathead_River_near_Coram_MT.jpg',
+    credit: 'Flathead River'
+  },
+  'Jefferson River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Jefferson-River-fly-fishing.jpg',
+    credit: 'Jefferson River'
+  },
+  'Madison River': {
+    uri: 'https://www.nps.gov/yell/planyourvisit/images/madison_river.jpg',
+    credit: 'Madison River in YNP'
+  },
+  'Ruby River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Ruby-River-fly-fishing.jpg',
+    credit: 'Ruby River'
+  },
+  'Stillwater River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Stillwater-River-fly-fishing.jpg',
+    credit: 'Stillwater River'
+  },
+  'Swan River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Swan-River-fly-fishing.jpg',
+    credit: 'Swan River'
+  },
+  'Boulder River': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Boulder-River-fly-fishing.jpg',
+    credit: 'Boulder River'
+  },
+  'Spring Creeks': {
+    uri: 'https://www.montanaangler.com/wp-content/uploads/2015/02/Depuy-Spring-Creek-fly-fishing.jpg',
+    credit: 'Paradise Valley Spring Creeks'
+  },
+  'Yellowstone National Park': {
+    uri: 'https://www.nps.gov/yell/planyourvisit/images/fishing-madison.jpg',
+    credit: 'Fishing in Yellowstone'
+  }
 };
 
+// Fallback image
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800';
+
+// ============================================
+// DESIGN SYSTEM
+// ============================================
 const COLORS = {
   primary: '#1a5f7a',
   primaryDark: '#134a5e',
+  primaryLight: '#2d7a99',
   secondary: '#159895',
   accent: '#57c5b6',
-  background: '#f0f4f8',
-  white: '#ffffff',
-  dark: '#2c3e50',
-  gray: '#7f8c8d',
-  lightGray: '#ecf0f1',
-  glass: 'rgba(255,255,255,0.95)',
-  glassDark: 'rgba(0,0,0,0.4)',
-  offline: '#ff9800',
-  success: '#27ae60',
-  premium: '#ffd700',
-  error: '#e74c3c'
+  background: '#f5f7fa',
+  surface: '#ffffff',
+  text: '#1a1a2e',
+  textSecondary: '#6b7280',
+  border: '#e5e7eb',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  premium: '#fbbf24',
+  premiumDark: '#d97706',
+  overlay: 'rgba(0,0,0,0.4)',
+  shadow: 'rgba(0,0,0,0.1)'
 };
 
-let globalIsPremium = false;
+const FONTS = {
+  regular: 'System',
+  medium: 'System',
+  semibold: 'System',
+  bold: 'System'
+};
+
+// ============================================
+// GLOBAL STATE
+// ============================================
+let globalIsPremium = DEV_MODE; // Auto-enable premium in dev mode
 let globalUserEmail = null;
 let globalFavorites = [];
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Recently updated';
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    return dateString.length > 20 ? dateString.substring(0, 20) + '...' : dateString;
-  }
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 const removeDuplicateReports = (reports) => {
@@ -82,47 +175,78 @@ const removeDuplicateReports = (reports) => {
   });
 };
 
-const TabIcon = ({ name, focused }) => {
-  const icons = {
-    Rivers: '🎣',
-    Map: '🗺️',
-    Favorites: '⭐',
-    Premium: '💎'
-  };
+// ============================================
+// TAB NAVIGATION
+// ============================================
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function TabIcon({ name, focused, color }) {
+  const iconProps = { size: 24, color };
+  
+  switch (name) {
+    case 'Rivers':
+      return <MaterialCommunityIcons name="fish" {...iconProps} />;
+    case 'Map':
+      return <Ionicons name="map-outline" {...iconProps} />;
+    case 'Favorites':
+      return <Ionicons name={focused ? "heart" : "heart-outline"} {...iconProps} />;
+    case 'Premium':
+      return <MaterialIcons name="diamond" {...iconProps} />;
+    default:
+      return <Ionicons name="ellipse" {...iconProps} />;
+  }
+}
+
+// ============================================
+// DEV MODE BANNER
+// ============================================
+function DevModeBanner() {
+  if (!DEV_MODE) return null;
+  
   return (
-    <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.5 }}>
-      {icons[name] || '🎣'}
-    </Text>
+    <View style={styles.devBanner}>
+      <MaterialIcons name="code" size={16} color="#fff" />
+      <Text style={styles.devBannerText}>DEV MODE - Premium Unlocked</Text>
+    </View>
   );
-};
+}
 
-const PremiumBadge = () => (
-  <View style={styles.premiumBadge}>
-    <Text style={styles.premiumBadgeText}>⭐ PREMIUM</Text>
-  </View>
-);
-
+// ============================================
+// RIVERS LIST SCREEN
+// ============================================
 function RiversScreen({ navigation }) {
   const [rivers, setRivers] = useState([]);
+  const [filteredRivers, setFilteredRivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => { 
     fetchRivers();
     clearOldCache();
   }, []);
 
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = rivers.filter(r => 
+        r.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredRivers(filtered);
+    } else {
+      setFilteredRivers(rivers);
+    }
+  }, [searchQuery, rivers]);
+
   const fetchRivers = async () => {
     try {
       const response = await fetch(`${API_URL}/api/rivers`);
       if (!response.ok) throw new Error('Network failed');
       const data = await response.json();
-      const sortedRivers = data.rivers.sort((a, b) => {
-        if (a.includes('Madison') && b.includes('Madison')) return a.localeCompare(b);
-        return a.localeCompare(b);
-      });
+      const sortedRivers = data.rivers.sort((a, b) => a.localeCompare(b));
       setRivers(sortedRivers);
+      setFilteredRivers(sortedRivers);
       setIsOffline(false);
       await cacheRiverData('river_list', sortedRivers);
     } catch (error) {
@@ -141,10 +265,13 @@ function RiversScreen({ navigation }) {
     setRefreshing(false);
   };
 
-  const getRiverSubtitle = (river) => {
-    if (river.includes('Upper Madison')) return 'Ennis to Quake Lake';
-    if (river.includes('Lower Madison')) return 'Three Forks to Ennis';
-    return 'Tap for flows, weather & reports';
+  const getRiverIcon = (river) => {
+    if (river.includes('Madison')) return 'water';
+    if (river.includes('Yellowstone')) return 'terrain';
+    if (river.includes('Gallatin')) return 'landscape';
+    if (river.includes('Missouri')) return 'waves';
+    if (river.includes('Bighorn')) return 'pets';
+    return 'water-drop';
   };
 
   if (loading) {
@@ -160,54 +287,98 @@ function RiversScreen({ navigation }) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
+      <DevModeBanner />
+      
       {isOffline && (
         <View style={styles.offlineBanner}>
-          <Text style={styles.offlineText}>📴 Offline Mode - Showing Cached Data</Text>
+          <Ionicons name="cloud-offline" size={16} color="#fff" />
+          <Text style={styles.offlineText}>Offline Mode</Text>
         </View>
       )}
       
-      <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800' }}
-        style={styles.headerBackground}
-      >
-        <View style={styles.headerOverlay}>
-          <Text style={styles.headerEmoji}>🏔️</Text>
-          <Text style={styles.headerTitle}>Montana Fishing</Text>
-          <Text style={styles.headerSubtitle}>{rivers.length} Rivers • Real-Time Reports</Text>
-          {globalIsPremium && <PremiumBadge />}
+      {/* Compact Header */}
+      <View style={styles.compactHeader}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTitleRow}>
+            <MaterialCommunityIcons name="fish" size={28} color="#fff" />
+            <Text style={styles.compactHeaderTitle}>Montana Fishing</Text>
+            {globalIsPremium && (
+              <View style={styles.premiumPill}>
+                <MaterialIcons name="diamond" size={12} color={COLORS.premiumDark} />
+                <Text style={styles.premiumPillText}>PRO</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.compactHeaderSubtitle}>
+            {rivers.length} Rivers • Real-Time Reports
+          </Text>
         </View>
-      </ImageBackground>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={COLORS.textSecondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search rivers..."
+          placeholderTextColor={COLORS.textSecondary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color={COLORS.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
 
       <FlatList
-        data={rivers}
+        data={filteredRivers}
         keyExtractor={(item) => item}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+        }
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={styles.riverCard}
             onPress={() => navigation.navigate('RiverDetails', { river: item })}
-            activeOpacity={0.85}
+            activeOpacity={0.9}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Madison River'] }}
+              source={{ uri: RIVER_IMAGES[item]?.uri || DEFAULT_IMAGE }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
             >
               <View style={styles.riverCardOverlay}>
-                <View style={styles.riverInfo}>
-                  <Text style={styles.riverName}>{item}</Text>
-                  <Text style={styles.riverSubtext}>{getRiverSubtitle(item)}</Text>
+                <View style={styles.riverCardContent}>
+                  <View style={styles.riverIconCircle}>
+                    <MaterialIcons name={getRiverIcon(item)} size={24} color={COLORS.primary} />
+                  </View>
+                  <View style={styles.riverInfo}>
+                    <Text style={styles.riverName}>{item}</Text>
+                    <Text style={styles.riverMeta}>Tap for conditions & reports</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={24} color="#fff" />
                 </View>
               </View>
             </ImageBackground>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Ionicons name="search-outline" size={48} color={COLORS.textSecondary} />
+            <Text style={styles.emptyText}>No rivers found</Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );
 }
 
+// ============================================
+// RIVER DETAILS SCREEN
+// ============================================
 function RiverDetailsScreen({ route, navigation }) {
   const { river } = route.params;
   const [data, setData] = useState(null);
@@ -241,7 +412,6 @@ function RiverDetailsScreen({ route, navigation }) {
       console.error('Fetch error:', error);
       if (!data) {
         setIsOffline(true);
-        Alert.alert('Connection Error', 'Showing cached data. Pull down to retry.');
       }
     } finally {
       setLoading(false);
@@ -284,28 +454,33 @@ function RiverDetailsScreen({ route, navigation }) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
+      <DevModeBanner />
+      
       {isOffline && (
         <View style={styles.offlineBanner}>
-          <Text style={styles.offlineText}>📴 Offline Mode</Text>
+          <Ionicons name="cloud-offline" size={16} color="#fff" />
+          <Text style={styles.offlineText}>Offline Mode</Text>
         </View>
       )}
       
+      {/* Hero Header with River Image */}
       <ImageBackground
-        source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Madison River'] }}
-        style={styles.detailHeaderBackground}
+        source={{ uri: RIVER_IMAGES[river]?.uri || DEFAULT_IMAGE }}
+        style={styles.heroHeader}
       >
-        <View style={styles.detailHeaderOverlay}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backArrow}>‹</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={toggleFavorite}
-            style={styles.favoriteButton}
-          >
-            <Text style={{ fontSize: 28 }}>{isFavorite ? '⭐' : '☆'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.detailHeaderTitle}>{river}</Text>
-          <Text style={styles.detailHeaderSubtitle}>{data?.reports?.length || 0} Report Sources</Text>
+        <View style={styles.heroOverlay}>
+          <View style={styles.heroNav}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.heroButton}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleFavorite} style={styles.heroButton}>
+              <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTitle}>{river}</Text>
+            <Text style={styles.heroSubtitle}>{RIVER_IMAGES[river]?.credit || 'Montana'}</Text>
+          </View>
         </View>
       </ImageBackground>
 
@@ -313,111 +488,91 @@ function RiverDetailsScreen({ route, navigation }) {
         style={styles.detailScroll}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
       >
-        {globalIsPremium && <HatchChart riverName={river} />}
-        
-        {!globalIsPremium && (
+        {/* Conditions Cards */}
+        <View style={styles.conditionsGrid}>
+          {/* Weather Card */}
+          {data?.weather && (
+            <View style={styles.conditionCard}>
+              <View style={styles.conditionIconContainer}>
+                <Text style={styles.weatherEmoji}>{data.weather.icon || '☁️'}</Text>
+              </View>
+              <View style={styles.conditionInfo}>
+                <Text style={styles.conditionLabel}>Weather</Text>
+                <Text style={styles.conditionValue}>{data.weather.high}° / {data.weather.low}°</Text>
+                <Text style={styles.conditionSubtext}>{data.weather.condition}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Flow Card */}
+          {data?.usgs && (
+            <TouchableOpacity 
+              style={styles.conditionCard}
+              onPress={() => openUSGS(data.usgs.url)}
+            >
+              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.primary + '15' }]}>
+                <MaterialCommunityIcons name="waves" size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.conditionInfo}>
+                <Text style={styles.conditionLabel}>Flow</Text>
+                <Text style={styles.conditionValue}>{data.usgs.flow}</Text>
+                <Text style={styles.conditionSubtext}>{data.usgs.temp}</Text>
+              </View>
+              <Ionicons name="open-outline" size={16} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Premium: Hatch Chart */}
+        {globalIsPremium ? (
+          <HatchChart riverName={river} />
+        ) : (
           <TouchableOpacity 
-            style={styles.upgradeBanner}
+            style={styles.premiumUpsell}
             onPress={() => setShowPremiumModal(true)}
           >
-            <Text style={styles.upgradeBannerText}>
-              ⭐ Upgrade to Premium for hatch charts & fly recommendations!
+            <MaterialIcons name="lock" size={20} color={COLORS.premiumDark} />
+            <Text style={styles.premiumUpsellText}>
+              Unlock hatch charts & fly recommendations
             </Text>
+            <Ionicons name="chevron-forward" size={20} color={COLORS.premiumDark} />
           </TouchableOpacity>
         )}
 
-        {data?.weather && (
-          <View style={styles.dataCard}>
-            <View style={styles.locationLabelContainer}>
-              <Text style={styles.locationLabel}>📍 {data.weather.station || 'Local Weather Station'}</Text>
-            </View>
-            <View style={styles.cardHeader}>
-              <Text style={styles.weatherIconLarge}>{data.weather.icon || '☁️'}</Text>
-              <View style={styles.cardTitleContainer}>
-                <Text style={styles.dataCardTitle}>Today's Weather</Text>
-                <Text style={styles.cardSubtitle}>{data.weather.condition || 'Current Conditions'}</Text>
-              </View>
-            </View>
-            <View style={styles.weatherRow}>
-              <View style={styles.weatherItem}>
-                <Text style={styles.weatherValueSmall}>{data.weather.high}°</Text>
-                <Text style={styles.weatherLabel}>High</Text>
-              </View>
-              <View style={styles.weatherDivider} />
-              <View style={styles.weatherItem}>
-                <Text style={styles.weatherValueSmall}>{data.weather.low}°</Text>
-                <Text style={styles.weatherLabel}>Low</Text>
-              </View>
-              <View style={styles.weatherDivider} />
-              <View style={styles.weatherItem}>
-                <Text style={styles.weatherValueTiny}>{data.weather.wind || '--'}</Text>
-                <Text style={styles.weatherLabel}>Wind</Text>
-              </View>
-            </View>
-          </View>
-        )}
+        {/* Reports Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Fishing Reports</Text>
+          <Text style={styles.sectionCount}>{data?.reports?.length || 0} sources</Text>
+        </View>
 
-        {data?.usgs && (
-          <TouchableOpacity 
-            style={[styles.dataCard, styles.usgsCard]} 
-            onPress={() => openUSGS(data.usgs.url)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.locationLabelContainer}>
-              <Text style={styles.locationLabel}>📍 {data.usgs.location || 'USGS Gauge Location'}</Text>
-            </View>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>📊</Text>
-              <View style={styles.cardTitleContainer}>
-                <Text style={styles.dataCardTitle}>River Conditions</Text>
-                <Text style={styles.cardSubtitle}>Live USGS Data</Text>
-              </View>
-            </View>
-            <View style={styles.usgsRow}>
-              <View style={styles.usgsItem}>
-                <Text style={styles.usgsValueSmall}>{data.usgs.flow}</Text>
-                <Text style={styles.usgsLabel}>Flow (cfs)</Text>
-              </View>
-              <View style={styles.usgsDivider} />
-              <View style={styles.usgsItem}>
-                <Text style={styles.usgsValueSmall}>{data.usgs.temp}</Text>
-                <Text style={styles.usgsLabel}>Water Temp</Text>
-              </View>
-            </View>
-            <View style={styles.tapIndicator}>
-              <Text style={styles.tapIndicatorText}>Tap to view on USGS website →</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-
-        <Text style={styles.sectionTitle}>Latest Fishing Reports</Text>
         {data?.reports?.map((report, index) => (
           <TouchableOpacity 
             key={report.id || index}
             style={styles.reportCard}
             onPress={() => openReport(report.url)}
-            activeOpacity={0.8}
+            activeOpacity={0.9}
           >
-            <View style={styles.reportHeader}>
-              <View style={styles.sourceBadge}>
-                <Text style={styles.sourceText} numberOfLines={1}>{report.source}</Text>
+            <View style={styles.reportContent}>
+              <View style={styles.reportSourceRow}>
+                <View style={styles.sourceDot} />
+                <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
               </View>
-              <Text style={styles.dateText}>{formatDate(report.last_updated)}</Text>
+              <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
             </View>
-            <View style={styles.reportFooter}>
-              <Text style={styles.linkButton}>Read Full Report →</Text>
-            </View>
+            <Ionicons name="open-outline" size={20} color={COLORS.primary} />
           </TouchableOpacity>
         ))}
+
         {(!data?.reports || data.reports.length === 0) && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🎣</Text>
+            <MaterialCommunityIcons name="fish-off" size={48} color={COLORS.textSecondary} />
             <Text style={styles.emptyTitle}>No reports available</Text>
             <Text style={styles.emptyText}>Check back later for updates</Text>
           </View>
         )}
       </ScrollView>
 
+      {/* Premium Modal */}
       <Modal
         visible={showPremiumModal}
         transparent={true}
@@ -426,23 +581,41 @@ function RiverDetailsScreen({ route, navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>⭐ Go Premium</Text>
-            <Text style={styles.modalSubtitle}>Unlock the full fishing experience</Text>
-            
-            <View style={styles.featureList}>
-              <Text style={styles.featureItem}>✓ Ad-free experience</Text>
-              <Text style={styles.featureItem}>✓ Detailed hatch charts</Text>
-              <Text style={styles.featureItem}>✓ Exclusive access points</Text>
-              <Text style={styles.featureItem}>✓ Save favorite rivers</Text>
-              <Text style={styles.featureItem}>✓ Offline mode</Text>
+            <View style={styles.modalHeader}>
+              <MaterialIcons name="diamond" size={32} color={COLORS.premium} />
+              <Text style={styles.modalTitle}>Go Premium</Text>
+              <Text style={styles.modalSubtitle}>Unlock everything</Text>
             </View>
             
-            <TouchableOpacity style={styles.premiumButton}>
-              <Text style={styles.premiumButtonText}>Monthly $4.99</Text>
+            <View style={styles.featuresList}>
+              <View style={styles.featureItem}>
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                <Text style={styles.featureText}>Detailed hatch charts</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                <Text style={styles.featureText}>Fly recommendations</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                <Text style={styles.featureText}>Save favorite rivers</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                <Text style={styles.featureText}>Full access points map</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                <Text style={styles.featureText}>Offline mode</Text>
+              </View>
+            </View>
+            
+            <TouchableOpacity style={styles.subscribeButton}>
+              <Text style={styles.subscribeButtonText}>Subscribe $4.99/mo</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={[styles.premiumButton, styles.premiumButtonYearly]}>
-              <Text style={styles.premiumButtonText}>Yearly $39.99 (Save 33%)</Text>
+            <TouchableOpacity style={styles.yearlyButton}>
+              <Text style={styles.yearlyButtonText}>$39.99/year (Save 33%)</Text>
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => setShowPremiumModal(false)}>
@@ -455,49 +628,57 @@ function RiverDetailsScreen({ route, navigation }) {
   );
 }
 
+// ============================================
+// MAP SCREEN
+// ============================================
 function MapScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      <View style={styles.mapHeader}>
-        <Text style={styles.mapHeaderTitle}>🗺️ Access Points</Text>
+      
+      <DevModeBanner />
+      
+      <View style={styles.mapHeaderCompact}>
+        <Text style={styles.mapHeaderTitle}>Access Points</Text>
         {!globalIsPremium && (
-          <Text style={styles.mapHeaderSubtitle}>⭐ Premium: Detailed access points & boat launches</Text>
+          <View style={styles.mapBadge}>
+            <MaterialIcons name="lock" size={12} color={COLORS.premiumDark} />
+            <Text style={styles.mapBadgeText}>Premium</Text>
+          </View>
         )}
       </View>
+      
       <RiverMap navigation={navigation} isPremium={globalIsPremium} />
     </SafeAreaView>
   );
 }
 
+// ============================================
+// FAVORITES SCREEN
+// ============================================
 function FavoritesScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  const loadFavorites = async () => {
-    if (!globalIsPremium) {
-      setLoading(false);
-      return;
-    }
-    
     setFavorites(globalFavorites);
-    setLoading(false);
-  };
+  }, []);
 
   if (!globalIsPremium) {
     return (
       <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
         <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-        <Text style={styles.emptyEmoji}>⭐</Text>
-        <Text style={styles.emptyTitle}>Premium Feature</Text>
-        <Text style={styles.emptyText}>Upgrade to save your favorite rivers</Text>
-        <TouchableOpacity style={styles.premiumButton}>
-          <Text style={styles.premiumButtonText}>Upgrade Now</Text>
-        </TouchableOpacity>
+        <DevModeBanner />
+        
+        <View style={styles.upsellContainer}>
+          <MaterialIcons name="diamond" size={64} color={COLORS.premium} />
+          <Text style={styles.upsellTitle}>Premium Feature</Text>
+          <Text style={styles.upsellText}>
+            Save your favorite rivers for quick access
+          </Text>
+          <TouchableOpacity style={styles.upsellButton}>
+            <Text style={styles.upsellButtonText}>Upgrade to Premium</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }
@@ -506,9 +687,13 @@ function FavoritesScreen({ navigation }) {
     return (
       <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
         <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-        <Text style={styles.emptyEmoji}>💙</Text>
-        <Text style={styles.emptyTitle}>No Favorites Yet</Text>
-        <Text style={styles.emptyText}>Tap the star on any river to save it here</Text>
+        <DevModeBanner />
+        
+        <View style={styles.emptyFavorites}>
+          <Ionicons name="heart-outline" size={64} color={COLORS.textSecondary} />
+          <Text style={styles.emptyTitle}>No Favorites Yet</Text>
+          <Text style={styles.emptyText}>Tap the heart on any river to save it here</Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -516,9 +701,13 @@ function FavoritesScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      <View style={styles.favoritesHeader}>
-        <Text style={styles.favoritesHeaderTitle}>⭐ Your Favorites</Text>
+      <DevModeBanner />
+      
+      <View style={styles.favoritesHeaderCompact}>
+        <Text style={styles.favoritesHeaderTitle}>Your Favorites</Text>
+        <Text style={styles.favoritesCount}>{favorites.length} rivers</Text>
       </View>
+      
       <FlatList
         data={favorites}
         keyExtractor={(item) => item}
@@ -527,17 +716,21 @@ function FavoritesScreen({ navigation }) {
           <TouchableOpacity 
             style={styles.riverCard}
             onPress={() => navigation.navigate('RiverDetails', { river: item })}
-            activeOpacity={0.85}
+            activeOpacity={0.9}
           >
             <ImageBackground
-              source={{ uri: RIVER_IMAGES[item] || RIVER_IMAGES['Madison River'] }}
+              source={{ uri: RIVER_IMAGES[item]?.uri || DEFAULT_IMAGE }}
               style={styles.riverCardBackground}
               imageStyle={styles.riverCardImage}
             >
               <View style={styles.riverCardOverlay}>
-                <View style={styles.riverInfo}>
-                  <Text style={styles.riverName}>{item}</Text>
-                  <Text style={styles.riverSubtext}>Tap to view conditions</Text>
+                <View style={styles.riverCardContent}>
+                  <MaterialIcons name="favorite" size={24} color={COLORS.error} />
+                  <View style={styles.riverInfo}>
+                    <Text style={styles.riverName}>{item}</Text>
+                    <Text style={styles.riverMeta}>Tap to view conditions</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={24} color="#fff" />
                 </View>
               </View>
             </ImageBackground>
@@ -548,60 +741,97 @@ function FavoritesScreen({ navigation }) {
   );
 }
 
+// ============================================
+// PREMIUM SCREEN
+// ============================================
 function PremiumScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      <ScrollView contentContainerStyle={styles.premiumContainer}>
-        <Text style={styles.premiumEmoji}>💎</Text>
-        <Text style={styles.premiumTitle}>Go Premium</Text>
-        <Text style={styles.premiumSubtitle}>Unlock the ultimate fishing experience</Text>
-        
-        <View style={styles.premiumFeatures}>
-          <View style={styles.premiumFeature}>
-            <Text style={styles.premiumFeatureIcon}>🎯</Text>
+      <DevModeBanner />
+      
+      <ScrollView contentContainerStyle={styles.premiumScroll}>
+        <View style={styles.premiumHero}>
+          <MaterialIcons name="diamond" size={80} color={COLORS.premium} />
+          <Text style={styles.premiumHeroTitle}>Go Premium</Text>
+          <Text style={styles.premiumHeroSubtitle}>
+            Unlock the ultimate Montana fishing experience
+          </Text>
+        </View>
+
+        <View style={styles.premiumFeaturesGrid}>
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#dbeafe' }]}>
+              <MaterialCommunityIcons name="bug" size={28} color="#2563eb" />
+            </View>
             <Text style={styles.premiumFeatureTitle}>Hatch Charts</Text>
             <Text style={styles.premiumFeatureDesc}>Current hatches & fly recommendations</Text>
           </View>
-          
-          <View style={styles.premiumFeature}>
-            <Text style={styles.premiumFeatureIcon}>📍</Text>
+
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#dcfce7' }]}>
+              <Ionicons name="map" size={28} color="#16a34a" />
+            </View>
             <Text style={styles.premiumFeatureTitle}>Access Points</Text>
-            <Text style={styles.premiumFeatureDesc}>Detailed maps with boat launches & wade access</Text>
+            <Text style={styles.premiumFeatureDesc}>Detailed FWP access site maps</Text>
           </View>
-          
-          <View style={styles.premiumFeature}>
-            <Text style={styles.premiumFeatureIcon}>⭐</Text>
+
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#fee2e2' }]}>
+              <Ionicons name="heart" size={28} color="#dc2626" />
+            </View>
             <Text style={styles.premiumFeatureTitle}>Favorites</Text>
-            <Text style={styles.premiumFeatureDesc}>Save your go-to rivers for quick access</Text>
+            <Text style={styles.premiumFeatureDesc}>Save your go-to rivers</Text>
           </View>
-          
-          <View style={styles.premiumFeature}>
-            <Text style={styles.premiumFeatureIcon}>📴</Text>
+
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#f3e8ff' }]}>
+              <Ionicons name="cloud-offline" size={28} color="#9333ea" />
+            </View>
             <Text style={styles.premiumFeatureTitle}>Offline Mode</Text>
-            <Text style={styles.premiumFeatureDesc}>Access reports without internet</Text>
+            <Text style={styles.premiumFeatureDesc}>Access without internet</Text>
           </View>
-          
-          <View style={styles.premiumFeature}>
-            <Text style={styles.premiumFeatureIcon}>🚫</Text>
+
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#fef3c7' }]}>
+              <MaterialCommunityIcons name="ads-off" size={28} color="#d97706" />
+            </View>
             <Text style={styles.premiumFeatureTitle}>Ad-Free</Text>
             <Text style={styles.premiumFeatureDesc}>Clean, uninterrupted experience</Text>
           </View>
+
+          <View style={styles.premiumFeatureCard}>
+            <View style={[styles.featureIconBox, { backgroundColor: '#cffafe' }]}>
+              <Ionicons name="calendar" size={28} color="#0891b2" />
+            </View>
+            <Text style={styles.premiumFeatureTitle}>7-Day Forecast</Text>
+            <Text style={styles.premiumFeatureDesc}>Extended weather outlook</Text>
+          </View>
         </View>
-        
-        <TouchableOpacity style={styles.premiumCtaButton}>
-          <Text style={styles.premiumCtaText}>Start Free Trial</Text>
-        </TouchableOpacity>
-        
-        <Text style={styles.premiumPrice}>$4.99/month or $39.99/year</Text>
+
+        <View style={styles.pricingSection}>
+          <TouchableOpacity style={styles.monthlyButton}>
+            <Text style={styles.monthlyButtonText}>$4.99/month</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.yearlyCard}>
+            <View style={styles.yearlyBadge}>
+              <Text style={styles.yearlyBadgeText}>BEST VALUE</Text>
+            </View>
+            <Text style={styles.yearlyPrice}>$39.99/year</Text>
+            <Text style={styles.yearlySave}>Save 33%</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.restoreText}>Restore Purchases</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
-
+// ============================================
+// NAVIGATION SETUP
+// ============================================
 function RiversStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -611,33 +841,31 @@ function RiversStack() {
   );
 }
 
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.gray,
-        tabBarStyle: styles.tabBar,
-      })}
-    >
-      <Tab.Screen name="Rivers" component={RiversStack} />
-      <Tab.Screen name="Map" component={MapScreen} />
-      <Tab.Screen name="Favorites" component={FavoritesScreen} />
-      <Tab.Screen name="Premium" component={PremiumScreen} />
-    </Tab.Navigator>
-  );
-}
-
 export default function App() {
   return (
     <NavigationContainer>
-      <MainTabs />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => <TabIcon name={route.name} focused={focused} color={color} />,
+          tabBarActiveTintColor: COLORS.primary,
+          tabBarInactiveTintColor: COLORS.textSecondary,
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabLabel,
+        })}
+      >
+        <Tab.Screen name="Rivers" component={RiversStack} />
+        <Tab.Screen name="Map" component={MapScreen} />
+        <Tab.Screen name="Favorites" component={FavoritesScreen} />
+        <Tab.Screen name="Premium" component={PremiumScreen} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
+// ============================================
+// STYLES
+// ============================================
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -648,508 +876,618 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: COLORS.gray,
+  
+  // Dev Mode Banner
+  devBanner: {
+    backgroundColor: '#7c3aed',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    gap: 6,
+  },
+  devBannerText: {
+    color: '#fff',
+    fontSize: 12,
     fontWeight: '600',
   },
+
+  // Offline Banner
   offlineBanner: {
-    backgroundColor: COLORS.offline,
-    padding: 8,
+    backgroundColor: COLORS.warning,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    gap: 6,
   },
   offlineText: {
-    color: COLORS.white,
+    color: '#fff',
+    fontSize: 12,
     fontWeight: '600',
-    fontSize: 12,
   },
-  headerBackground: {
-    height: 160,
-    justifyContent: 'flex-end',
+
+  // Compact Header
+  compactHeader: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
-  headerOverlay: {
-    backgroundColor: 'rgba(26, 95, 122, 0.9)',
-    padding: 16,
-    paddingTop: 40,
+  headerContent: {
+    gap: 4,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
   },
-  headerEmoji: {
-    fontSize: 32,
-    marginBottom: 4,
+  compactHeaderTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
+    flex: 1,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.white,
-    letterSpacing: 0.5,
+  compactHeaderSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.8)',
+    marginLeft: 38,
   },
-  headerSubtitle: {
-    fontSize: 12,
-    color: COLORS.accent,
-    marginTop: 4,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  premiumBadge: {
+  premiumPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: COLORS.premium,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    marginTop: 8,
+    gap: 4,
   },
-  premiumBadgeText: {
-    color: COLORS.dark,
-    fontWeight: 'bold',
+  premiumPillText: {
     fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.premiumDark,
   },
+
+  // Search
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+
+  // Lists
   listContainer: {
     padding: 16,
-    paddingTop: 8,
+    paddingTop: 4,
   },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+  },
+
+  // River Cards
   riverCard: {
-    marginVertical: 8,
-    borderRadius: 20,
+    marginBottom: 12,
+    borderRadius: 16,
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    elevation: 3,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   riverCardBackground: {
-    height: 130,
+    height: 110,
   },
   riverCardImage: {
-    borderRadius: 20,
+    borderRadius: 16,
   },
   riverCardOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
     justifyContent: 'center',
-    padding: 16,
+  },
+  riverCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  riverIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   riverInfo: {
-    paddingLeft: 8,
+    flex: 1,
   },
   riverName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.white,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
   },
-  riverSubtext: {
+  riverMeta: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
+  },
+
+  // Hero Header
+  heroHeader: {
+    height: 200,
+  },
+  heroOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  heroNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  heroButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroContent: {
+    gap: 4,
+  },
+  heroTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#fff',
+  },
+  heroSubtitle: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.9)',
-    fontWeight: '500',
   },
-  detailHeaderBackground: {
-    height: 180,
-  },
-  detailHeaderOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(26, 95, 122, 0.85)',
-    justifyContent: 'flex-end',
-    padding: 20,
-    paddingTop: 50,
-  },
-  backButton: {
-    position: 'absolute',
-    left: 16,
-    top: 40,
-    zIndex: 10,
-  },
-  favoriteButton: {
-    position: 'absolute',
-    right: 16,
-    top: 40,
-    zIndex: 10,
-  },
-  backArrow: {
-    fontSize: 32,
-    color: COLORS.white,
-    fontWeight: '300',
-  },
-  detailHeaderTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.white,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  detailHeaderSubtitle: {
-    fontSize: 13,
-    color: COLORS.accent,
-    marginTop: 4,
-    fontWeight: '500',
-  },
+
+  // Detail Screen
   detailScroll: {
     flex: 1,
     padding: 16,
   },
-  dataCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    padding: 20,
+  conditionsGrid: {
+    flexDirection: 'row',
+    gap: 12,
     marginBottom: 16,
-    elevation: 3,
-    shadowColor: '#000',
+  },
+  conditionCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    padding: 16,
+    borderRadius: 16,
+    gap: 12,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-  },
-  usgsCard: {
-    borderWidth: 2,
-    borderColor: COLORS.primary + '20',
-  },
-  locationLabelContainer: {
-    backgroundColor: COLORS.primary + '12',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    alignSelf: 'flex-start',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '20',
-  },
-  locationLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  weatherIconLarge: {
-    fontSize: 40,
-    marginRight: 12,
-  },
-  cardIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  cardTitleContainer: {
-    flex: 1,
-  },
-  dataCardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: COLORS.gray,
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  weatherRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingTop: 12,
-  },
-  weatherItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  weatherDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#e0e0e0',
-  },
-  weatherValueSmall: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  weatherValueTiny: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  weatherLabel: {
-    fontSize: 10,
-    color: COLORS.gray,
-    marginTop: 4,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  usgsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  usgsItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  usgsDivider: {
-    width: 1,
-    height: 50,
-    backgroundColor: '#e0e0e0',
-  },
-  usgsValueSmall: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  usgsLabel: {
-    fontSize: 10,
-    color: COLORS.gray,
-    marginTop: 6,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  tapIndicator: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.primary + '15',
-    alignItems: 'center',
-  },
-  tapIndicatorText: {
-    fontSize: 14,
-    color: COLORS.secondary,
-    fontWeight: '600',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    marginBottom: 16,
-    marginTop: 8,
-    paddingHorizontal: 4,
-  },
-  reportCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
     shadowRadius: 4,
   },
-  reportHeader: {
+  conditionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#fef3c7',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  weatherEmoji: {
+    fontSize: 28,
+  },
+  conditionInfo: {
+    flex: 1,
+  },
+  conditionLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  conditionValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginTop: 2,
+  },
+  conditionSubtext: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+
+  // Premium Upsell
+  premiumUpsell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fef3c7',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 12,
+  },
+  premiumUpsellText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.premiumDark,
+  },
+
+  // Section Header
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+    marginTop: 8,
   },
-  sourceBadge: {
-    backgroundColor: COLORS.primary + '12',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    flex: 1,
-    marginRight: 12,
-  },
-  sourceText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  dateText: {
-    fontSize: 12,
-    color: COLORS.gray,
-    fontWeight: '500',
-  },
-  reportFooter: {
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingTop: 14,
-    marginTop: 4,
-  },
-  linkButton: {
-    fontSize: 15,
-    color: COLORS.secondary,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: '700',
+    color: COLORS.text,
   },
+  sectionCount: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+
+  // Reports
+  reportCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    elevation: 1,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  reportContent: {
+    flex: 1,
+    gap: 4,
+  },
+  reportSourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sourceDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+  },
+  reportSource: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+    flex: 1,
+  },
+  reportDate: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginLeft: 16,
+  },
+
+  // Empty States
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    paddingVertical: 48,
+    gap: 12,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+  emptyText: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    marginBottom: 8,
-  },
-  emptyText: {
-    color: COLORS.gray,
-    fontSize: 14,
-    textAlign: 'center',
-    paddingHorizontal: 40,
-  },
-  upgradeBanner: {
-    backgroundColor: COLORS.premium,
-    padding: 16,
-    marginBottom: 16,
-    borderRadius: 16,
-  },
-  upgradeBannerText: {
-    color: COLORS.dark,
     fontWeight: '600',
-    textAlign: 'center',
+    color: COLORS.text,
   },
+
+  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 32,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+    gap: 8,
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    textAlign: 'center',
+    fontWeight: '700',
+    color: COLORS.text,
   },
   modalSubtitle: {
-    fontSize: 14,
-    color: COLORS.gray,
-    textAlign: 'center',
-    marginBottom: 20,
+    fontSize: 15,
+    color: COLORS.textSecondary,
   },
-  featureList: {
+  featuresList: {
     marginBottom: 24,
+    gap: 12,
   },
   featureItem: {
-    fontSize: 16,
-    color: COLORS.dark,
-    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  premiumButton: {
+  featureText: {
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  subscribeButton: {
     backgroundColor: COLORS.primary,
-    padding: 16,
+    paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 12,
   },
-  premiumButtonYearly: {
-    backgroundColor: COLORS.success,
-  },
-  premiumButtonText: {
-    color: COLORS.white,
-    fontWeight: 'bold',
+  subscribeButtonText: {
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '700',
+  },
+  yearlyButton: {
+    backgroundColor: COLORS.premium,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  yearlyButtonText: {
+    color: COLORS.premiumDark,
+    fontSize: 16,
+    fontWeight: '700',
   },
   modalClose: {
-    color: COLORS.gray,
     textAlign: 'center',
+    color: COLORS.textSecondary,
+    fontSize: 15,
+  },
+
+  // Map
+  mapHeaderCompact: {
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  mapHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  mapBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.premium,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
+  },
+  mapBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.premiumDark,
+  },
+
+  // Favorites
+  favoritesHeaderCompact: {
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  favoritesHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  favoritesCount: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  emptyFavorites: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    gap: 12,
+  },
+  upsellContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    gap: 16,
+  },
+  upsellTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  upsellText: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  upsellButton: {
+    backgroundColor: COLORS.premium,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
     marginTop: 8,
   },
+  upsellButtonText: {
+    color: COLORS.premiumDark,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  // Premium Screen
+  premiumScroll: {
+    paddingBottom: 32,
+  },
+  premiumHero: {
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    paddingVertical: 40,
+    gap: 12,
+  },
+  premiumHeroTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#fff',
+  },
+  premiumHeroSubtitle: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+  premiumFeaturesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 16,
+    gap: 12,
+  },
+  premiumFeatureCard: {
+    width: (SCREEN_WIDTH - 44) / 2,
+    backgroundColor: COLORS.surface,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 8,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  featureIconBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  premiumFeatureTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  premiumFeatureDesc: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  pricingSection: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  monthlyButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  monthlyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  yearlyCard: {
+    backgroundColor: COLORS.surface,
+    paddingVertical: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.premium,
+    position: 'relative',
+  },
+  yearlyBadge: {
+    position: 'absolute',
+    top: -10,
+    backgroundColor: COLORS.premium,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  yearlyBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: COLORS.premiumDark,
+  },
+  yearlyPrice: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: COLORS.text,
+  },
+  yearlySave: {
+    fontSize: 14,
+    color: COLORS.success,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  restoreText: {
+    textAlign: 'center',
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    marginTop: 8,
+  },
+
+  // Tab Bar
   tabBar: {
+    backgroundColor: COLORS.surface,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
     paddingTop: 8,
     paddingBottom: Platform.OS === 'ios' ? 24 : 12,
     height: Platform.OS === 'ios' ? 88 : 68,
   },
-  mapHeader: {
-    backgroundColor: COLORS.primary,
-    padding: 16,
-    paddingTop: 50,
-  },
-  mapHeaderTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.white,
-  },
-  mapHeaderSubtitle: {
-    fontSize: 12,
-    color: COLORS.accent,
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '500',
     marginTop: 4,
-  },
-  favoritesHeader: {
-    backgroundColor: COLORS.primary,
-    padding: 16,
-    paddingTop: 50,
-  },
-  favoritesHeaderTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.white,
-  },
-  premiumContainer: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  premiumEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  premiumTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    marginBottom: 8,
-  },
-  premiumSubtitle: {
-    fontSize: 16,
-    color: COLORS.gray,
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  premiumFeatures: {
-    width: '100%',
-    marginBottom: 32,
-  },
-  premiumFeature: {
-    backgroundColor: COLORS.white,
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  premiumFeatureIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  premiumFeatureTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    marginBottom: 4,
-  },
-  premiumFeatureDesc: {
-    fontSize: 14,
-    color: COLORS.gray,
-    textAlign: 'center',
-  },
-  premiumCtaButton: {
-    backgroundColor: COLORS.premium,
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  premiumCtaText: {
-    color: COLORS.dark,
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  premiumPrice: {
-    color: COLORS.gray,
-    fontSize: 14,
   },
 });
