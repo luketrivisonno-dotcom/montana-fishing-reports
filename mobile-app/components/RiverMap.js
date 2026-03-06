@@ -1,27 +1,31 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   View, Text, StyleSheet, TouchableOpacity, 
   ScrollView, Linking, Dimensions
 } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAllAccessPoints } from '../data/accessPoints';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Earth-toned colors matching App.js
 const COLORS = {
-  primary: '#1a5f7a',
-  primaryDark: '#134a5e',
-  secondary: '#159895',
-  accent: '#57c5b6',
-  background: '#f5f7fa',
-  surface: '#ffffff',
-  text: '#1a1a2e',
-  textSecondary: '#6b7280',
-  border: '#e5e7eb',
-  wade: '#22c55e',    // Green for wade access
-  boat: '#ef4444',    // Red for boat launch
-  both: '#f97316',    // Orange for both
+  primary: '#2d4a3e',
+  primaryDark: '#1a2f27',
+  primaryLight: '#4a6b5c',
+  secondary: '#8b7355',
+  secondaryDark: '#5c4a35',
+  accent: '#c9a227',
+  background: '#f5f1e8',
+  surface: '#faf8f3',
+  text: '#2c2416',
+  textSecondary: '#6b5d4d',
+  textLight: '#9a8b7a',
+  border: '#d4cfc3',
+  wade: '#5a7d5a',      // Sage green
+  boat: '#8b4513',      // Saddle brown  
+  both: '#cd853f',      // Peru/tan
 };
 
 // Initial region centered on Montana
@@ -35,7 +39,7 @@ const INITIAL_REGION = {
 export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState(INITIAL_REGION);
-  const [mapType, setMapType] = useState('hybrid'); // 'hybrid' for satellite
+  const [mapType, setMapType] = useState('hybrid');
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
 
@@ -60,13 +64,10 @@ export default function RiverMap({ isPremium }) {
 
   const openFWP = (url) => {
     if (url) {
-      Linking.openURL(url).catch(() => {
-        // Silently fail if URL doesn't open
-      });
+      Linking.openURL(url).catch(() => {});
     }
   };
 
-  // Map type toggle button
   const toggleMapType = () => {
     setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid');
   };
@@ -96,7 +97,7 @@ export default function RiverMap({ isPremium }) {
             <MaterialCommunityIcons 
               name="sail-boat" 
               size={16} 
-              color={selectedType === 'boat' ? '#fff' : COLORS.textSecondary} 
+              color={selectedType === 'boat' ? '#f5f1e8' : COLORS.textLight} 
             />
             <Text style={[styles.filterText, selectedType === 'boat' && styles.filterTextActive]}>
               Boat
@@ -110,7 +111,7 @@ export default function RiverMap({ isPremium }) {
             <Ionicons 
               name="footsteps" 
               size={16} 
-              color={selectedType === 'wade' ? '#fff' : COLORS.textSecondary} 
+              color={selectedType === 'wade' ? '#f5f1e8' : COLORS.textLight} 
             />
             <Text style={[styles.filterText, selectedType === 'wade' && styles.filterTextActive]}>
               Wade
@@ -124,7 +125,7 @@ export default function RiverMap({ isPremium }) {
             <Ionicons 
               name="business" 
               size={16} 
-              color={selectedType === 'restrooms' ? '#fff' : COLORS.textSecondary} 
+              color={selectedType === 'restrooms' ? '#f5f1e8' : COLORS.textLight} 
             />
             <Text style={[styles.filterText, selectedType === 'restrooms' && styles.filterTextActive]}>
               Restrooms
@@ -189,9 +190,6 @@ export default function RiverMap({ isPremium }) {
                     </View>
                   )}
                 </View>
-                {point.notes && (
-                  <Text style={styles.calloutNotes}>{point.notes}</Text>
-                )}
                 <View style={styles.calloutButton}>
                   <Text style={styles.calloutButtonText}>View on FWP</Text>
                   <Ionicons name="open-outline" size={14} color={COLORS.primary} />
@@ -209,7 +207,7 @@ export default function RiverMap({ isPremium }) {
       >
         <Ionicons 
           name={mapType === 'hybrid' ? "map" : "earth"} 
-          size={24} 
+          size={22} 
           color={COLORS.primary} 
         />
       </TouchableOpacity>
@@ -246,7 +244,7 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     backgroundColor: COLORS.surface,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -259,57 +257,62 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 18,
     backgroundColor: COLORS.background,
     gap: 6,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   filterButtonActive: {
     backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   filterText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: COLORS.textSecondary,
   },
   filterTextActive: {
-    color: '#fff',
+    color: '#f5f1e8',
   },
   map: {
     flex: 1,
   },
   mapTypeButton: {
     position: 'absolute',
-    right: 16,
-    top: 70,
+    right: 14,
+    top: 65,
     backgroundColor: COLORS.surface,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: COLORS.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   callout: {
-    width: 220,
+    width: 200,
     padding: 4,
   },
   calloutTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
   },
   calloutRiver: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.primary,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   calloutDetails: {
-    gap: 4,
+    gap: 3,
   },
   calloutRow: {
     flexDirection: 'row',
@@ -317,64 +320,57 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   calloutText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  calloutNotes: {
     fontSize: 12,
     color: COLORS.textSecondary,
-    fontStyle: 'italic',
-    marginTop: 8,
-    marginBottom: 8,
   },
   calloutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.background,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 4,
-    gap: 6,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginTop: 6,
+    gap: 4,
   },
   calloutButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: COLORS.primary,
   },
   legend: {
     backgroundColor: COLORS.surface,
-    padding: 16,
+    padding: 14,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
   legendTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   legendItems: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 18,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
   },
   legendDot: {
-    width: 12,
-    height: 12,
+    width: 11,
+    height: 11,
     borderRadius: 6,
   },
   legendText: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   legendCount: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 10,
+    fontSize: 11,
+    color: COLORS.textLight,
+    marginTop: 8,
   },
 });
