@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   View, Text, FlatList, TouchableOpacity, 
   RefreshControl, StyleSheet, Linking, ActivityIndicator,
-  StatusBar, ImageBackground, ScrollView, Dimensions,
+  SafeAreaView, StatusBar, ImageBackground, ScrollView, Dimensions,
   Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { cacheRiverData, getCachedRiverData } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
-
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 const RIVER_IMAGES = {
@@ -93,6 +91,7 @@ function HomeScreen({ navigation }) {
     } catch (error) {
       console.error('Fetch error:', error);
       setIsOffline(true);
+      // Load cached river list if available
       const cachedRivers = await getCachedRiverData('river_list');
       if (cachedRivers) setRivers(cachedRivers);
     } finally {
@@ -122,7 +121,7 @@ function HomeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       {isOffline && (
@@ -183,12 +182,14 @@ function RiverDetailsScreen({ route, navigation }) {
 
   const fetchRiverData = async () => {
     try {
+      // Try cache first for instant load
       const cached = await getCachedRiverData(river);
       if (cached) {
         setData(cached);
         setLoading(false);
       }
 
+      // Fetch fresh data
       const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
       if (!response.ok) throw new Error('Network failed');
       
@@ -203,7 +204,10 @@ function RiverDetailsScreen({ route, navigation }) {
       console.error('Fetch error:', error);
       if (!data) {
         setIsOffline(true);
-        Alert.alert('Connection Error', 'Showing cached data. Pull down to retry.');
+        Alert.alert(
+          'Connection Error',
+          'Showing cached data. Pull down to retry.'
+        );
       }
     } finally {
       setLoading(false);
@@ -229,7 +233,7 @@ function RiverDetailsScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       
       {isOffline && (
@@ -238,7 +242,6 @@ function RiverDetailsScreen({ route, navigation }) {
         </View>
       )}
       
-      <ImageBackground
         source={{ uri: RIVER_IMAGES[river] || RIVER_IMAGES['Madison River'] }}
         style={styles.detailHeaderBackground}
       >
@@ -319,6 +322,10 @@ function RiverDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         )}
 
+        {/* Hatch Chart */}
+
+        {/* Hatch Chart */}
+        <HatchChart riverName={river} />
         <Text style={styles.sectionTitle}>Latest Fishing Reports</Text>
         {data?.reports?.map((report, index) => (
           <TouchableOpacity 
