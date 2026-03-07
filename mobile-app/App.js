@@ -3,7 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity, 
   RefreshControl, StyleSheet, Linking, ActivityIndicator,
   StatusBar, ImageBackground, ScrollView, Modal,
-  Alert, Platform, Dimensions, TextInput
+  Alert, Platform, Dimensions, TextInput, Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -406,10 +406,17 @@ function RiverDetailsScreen({ route, navigation }) {
           <TouchableOpacity key={report.id || index} style={styles.reportCard} onPress={() => openReport(report.url)} activeOpacity={0.9}>
             <View style={styles.reportContent}>
               <View style={styles.reportSourceRow}>
-                <View style={styles.sourceDot} />
+                {report.icon_url ? (
+                  <Image source={{ uri: report.icon_url }} style={styles.sourceIcon} resizeMode="contain" />
+                ) : (
+                  <View style={styles.sourceDot} />
+                )}
                 <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
               </View>
               <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
+              {report.water_clarity && (
+                <Text style={styles.waterClarity}>Clarity: {report.water_clarity}</Text>
+              )}
             </View>
             <Ionicons name="open-outline" size={18} color={COLORS.primary} />
           </TouchableOpacity>
@@ -648,8 +655,10 @@ const styles = StyleSheet.create({
   reportContent: { flex: 1, gap: 3 },
   reportSourceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sourceDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COLORS.primary },
+  sourceIcon: { width: 24, height: 24, borderRadius: 4 },
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
+  waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 10 },
   emptyText: { fontSize: 15, color: COLORS.textLight },
   emptyTitle: { fontSize: 17, fontWeight: '600', color: COLORS.text },
