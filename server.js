@@ -218,7 +218,6 @@ async function runDatabaseCleanup() {
             'Bighorn Angler (Old)',
             'North Fork Anglers',
             'Yellow Dog (Bighorn River)',
-            'Grizzly Hackle',
             'Headhunters Fly Shop',
             'Montana Trout',
             'Stonefly Shop',
@@ -227,7 +226,6 @@ async function runDatabaseCleanup() {
             'Perfect Fly (Old)',
             'Big Sky Anglers',
             'Fly Fishing Bozeman (Old)',
-            'Blackfoot River Outfitters',
             'Madison River Outfitters',
             'River\'s Edge',  // Old riversedge.com domain
             'George Anderson\'s Yellowstone Angler'  // Old URL
