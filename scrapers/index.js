@@ -109,9 +109,9 @@ async function runAllScrapers() {
           
           if (existing.rows.length === 0) {
             await db.query(
-              `INSERT INTO reports (source, river, url, last_updated, scraped_at, is_active) 
-               VALUES ($1, $2, $3, $4, $5, true)`,
-              [item.source, item.river, item.url, dateString, item.scraped_at]
+              `INSERT INTO reports (source, river, url, last_updated, scraped_at, is_active, icon_url, water_clarity) 
+               VALUES ($1, $2, $3, $4, $5, true, $6, $7)`,
+              [item.source, item.river, item.url, dateString, item.scraped_at, item.icon_url || null, item.water_clarity || null]
             );
             console.log(`✓ Inserted: ${item.source} (${item.river})`);
             successCount++;
@@ -122,9 +122,9 @@ async function runAllScrapers() {
             if (newDate >= existingDate || isNaN(existingDate.getTime())) {
               await db.query(
                 `UPDATE reports 
-                 SET last_updated = $1, scraped_at = $2, url = $3, is_active = true 
-                 WHERE source = $4 AND river = $5`,
-                [dateString, item.scraped_at, item.url, item.source, item.river]
+                 SET last_updated = $1, scraped_at = $2, url = $3, is_active = true, icon_url = $4, water_clarity = $5
+                 WHERE source = $6 AND river = $7`,
+                [dateString, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
               );
               console.log(`✓ Updated: ${item.source} (${item.river})`);
               successCount++;
