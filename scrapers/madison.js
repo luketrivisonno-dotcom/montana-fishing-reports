@@ -1,53 +1,42 @@
-async function scrapeMadisonMT() {
+async function scrapeMadisonMontanaAngler() {
     return [
         {
-            source: 'Montana Trout',
+            source: 'Montana Angler',
             river: 'Upper Madison River',
-            url: 'https://montanatrout.com/upper-madison-river-fishing-report',
+            url: 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         },
         {
-            source: 'Montana Trout',
+            source: 'Montana Angler',
             river: 'Lower Madison River',
-            url: 'https://montanatrout.com/lower-madison-river-fishing-report',
+            url: 'https://www.montanaangler.com/montana-fishing-report/lower-madison-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         }
     ];
 }
 
-async function scrapeMadisonRiverOutfitters() {
+async function scrapeMadisonOrvis() {
     return [
         {
-            source: 'Madison River Outfitters',
+            source: 'Orvis',
             river: 'Upper Madison River',
-            url: 'https://madisonriveroutfitters.com/upper-madison-river-fishing-report',
+            url: 'https://fishingreports.orvis.com/west/montana/madison-river',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         },
         {
-            source: 'Madison River Outfitters',
+            source: 'Orvis',
             river: 'Lower Madison River',
-            url: 'https://madisonriveroutfitters.com/lower-madison-river-fishing-report',
+            url: 'https://fishingreports.orvis.com/west/montana/madison-river',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         }
     ];
-}
-
-async function scrapeMadisonYellowDog() {
-    return {
-        source: 'Yellow Dog Fly Fishing',
-        river: 'Upper Madison River',
-        url: 'https://www.yellowdogflyfishing.com/upper-madison-river-fishing-report/',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
 }
 
 module.exports = {
-    scrapeMadisonMT,
-    scrapeMadisonRiverOutfitters,
-    scrapeMadisonYellowDog
+    scrapeMadisonMontanaAngler,
+    scrapeMadisonOrvis
 };

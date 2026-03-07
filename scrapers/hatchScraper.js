@@ -9,11 +9,9 @@ const HATCH_SOURCES = {
     'Yellowstone River': 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
     'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
     'Missouri River': 'https://www.montanaangler.com/montana-fishing-report/missouri-river-fishing-report',
-    'Bighorn River': 'https://www.montanaangler.com/montana-fishing-report/bighorn-river-fishing-report',
     'Jefferson River': 'https://www.montanaangler.com/montana-fishing-report/jefferson-river-fishing-report',
     'Ruby River': 'https://www.montanaangler.com/montana-fishing-report/ruby-river-fishing-report',
     'Stillwater River': 'https://www.montanaangler.com/montana-fishing-report/stillwater-river-fishing-report',
-    'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-fishing-report',
     'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
   },
   'Blue Ribbon Flies': {

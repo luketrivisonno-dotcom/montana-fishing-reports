@@ -3,19 +3,20 @@ const cheerio = require('cheerio');
 const { saveReports } = require('../utils/scraperHelpers');
 
 const ORVIS_URLS = {
-  'Gallatin River': 'https://www.orvis.com/fishing-report/gallatin-river',
-  'Upper Madison River': 'https://www.orvis.com/fishing-report/upper-madison-river',
-  'Lower Madison River': 'https://www.orvis.com/fishing-report/lower-madison-river',
-  'Yellowstone River': 'https://www.orvis.com/fishing-report/yellowstone-river',
-  'Missouri River': 'https://www.orvis.com/fishing-report/missouri-river',
-  'Big Hole River': 'https://www.orvis.com/fishing-report/big-hole-river',
-  'Beaverhead River': 'https://www.orvis.com/fishing-report/beaverhead-river',
-  'Bighorn River': 'https://www.orvis.com/fishing-report/bighorn-river',
-  'Rock Creek': 'https://www.orvis.com/fishing-report/rock-creek',
-  'Clark Fork River': 'https://www.orvis.com/fishing-report/clark-fork-river',
-  'Blackfoot River': 'https://www.orvis.com/fishing-report/blackfoot-river',
-  'Flathead River': 'https://www.orvis.com/fishing-report/flathead-river',
-  'Jefferson River': 'https://www.orvis.com/fishing-report/jefferson-river',
+  'Gallatin River': 'https://fishingreports.orvis.com/west/montana/gallatin-river',
+  'Upper Madison River': 'https://fishingreports.orvis.com/west/montana/madison-river',
+  'Lower Madison River': 'https://fishingreports.orvis.com/west/montana/madison-river',
+  'Yellowstone River': 'https://fishingreports.orvis.com/west/montana/yellowstone-river',
+  'Missouri River': 'https://fishingreports.orvis.com/west/montana/missouri-river',
+  'Big Hole River': 'https://fishingreports.orvis.com/west/montana/big-hole-river',
+  'Beaverhead River': 'https://fishingreports.orvis.com/west/montana/beaverhead-river',
+  'Bighorn River': 'https://fishingreports.orvis.com/west/montana/bighorn-river',
+  'Rock Creek': 'https://fishingreports.orvis.com/west/montana/rock-creek',
+  'Clark Fork River': 'https://fishingreports.orvis.com/west/montana/clark-fork-river',
+  'Blackfoot River': 'https://fishingreports.orvis.com/west/montana/blackfoot-river',
+  'Bitterroot River': 'https://fishingreports.orvis.com/west/montana/bitterroot-river',
+  'Flathead River': 'https://fishingreports.orvis.com/west/montana/flathead-river',
+  'Jefferson River': 'https://fishingreports.orvis.com/west/montana/jefferson-river',
 };
 
 async function scrapeOrvis() {

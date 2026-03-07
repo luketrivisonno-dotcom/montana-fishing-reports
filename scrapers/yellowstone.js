@@ -2,7 +2,7 @@ async function scrapeYellowstoneMontanaAngler() {
     return {
         source: 'Montana Angler',
         river: 'Yellowstone River',
-        url: 'https://www.montanaangler.com/yellowstone-river-fishing-report',
+        url: 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
@@ -12,17 +12,17 @@ async function scrapeYellowstoneRiversEdge() {
     return {
         source: 'River\'s Edge',
         river: 'Yellowstone River',
-        url: 'https://riversedge.com/yellowstone-river-fishing-report',
+        url: 'https://theriversedge.com/fishing-report/',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
 }
 
-async function scrapeYellowstoneYellowDog() {
+async function scrapeYellowstoneSweetwater() {
     return {
-        source: 'Yellow Dog Fly Fishing',
+        source: 'Sweetwater Fly Shop',
         river: 'Yellowstone River',
-        url: 'https://www.yellowdogflyfishing.com/yellowstone-river-fishing-report/',
+        url: 'https://www.sweetwaterflyshop.com/fishing-report',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
@@ -31,5 +31,5 @@ async function scrapeYellowstoneYellowDog() {
 module.exports = {
     scrapeYellowstoneMontanaAngler,
     scrapeYellowstoneRiversEdge,
-    scrapeYellowstoneYellowDog
+    scrapeYellowstoneSweetwater
 };

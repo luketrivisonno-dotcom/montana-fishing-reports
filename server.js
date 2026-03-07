@@ -203,11 +203,49 @@ async function initDatabase() {
 async function runDatabaseCleanup() {
     try {
         console.log('Running database cleanup...');
+        
+        // Remove reports with invalid URLs
         const brokenResult = await db.query(`
             DELETE FROM reports
             WHERE url IS NULL OR url = '' OR url = 'undefined' OR url = 'null' OR url NOT LIKE 'http%'
             RETURNING id
         `);
+        
+        // Remove reports from defunct/broken sources
+        const defunctSources = [
+            'Bighorn Angler',
+            'North Fork Anglers',
+            'Yellow Dog Fly Fishing',
+            'Yellow Dog (Bighorn River)',
+            'Yellow Dog',
+            'Grizzly Hackle',
+            'Headhunters Fly Shop',
+            'Bozeman Fly Supply',
+            'Montana Trout',
+            'Stonefly Shop',
+            'Dan Bailey\'s',
+            'Troutfitters',
+            'Fins & Feathers',
+            'Fly Fish Food',
+            'Perfect Fly'
+        ];
+        
+        const defunctResult = await db.query(`
+            DELETE FROM reports
+            WHERE source = ANY($1)
+            RETURNING id
+        `, [defunctSources]);
+        
+        // Deactivate very old reports (older than 90 days)
+        const oldResult = await db.query(`
+            UPDATE reports
+            SET is_active = false
+            WHERE scraped_at < NOW() - INTERVAL '90 days'
+            AND is_active = true
+            RETURNING id
+        `);
+        
+        // Remove duplicates keeping only the most recent
         const dupResult = await db.query(`
             DELETE FROM reports
             WHERE id IN (
@@ -217,8 +255,14 @@ async function runDatabaseCleanup() {
                 ) t WHERE t.rn > 1
             ) RETURNING id
         `);
-        console.log(`Cleanup complete: Removed ${brokenResult.rowCount} broken links and ${dupResult.rowCount} duplicates`);
-        return { broken: brokenResult.rowCount, duplicates: dupResult.rowCount };
+        
+        console.log(`Cleanup complete: Removed ${brokenResult.rowCount} broken links, ${defunctResult.rowCount} defunct sources, ${oldResult.rowCount} old reports, and ${dupResult.rowCount} duplicates`);
+        return { 
+            broken: brokenResult.rowCount, 
+            defunct: defunctResult.rowCount,
+            old: oldResult.rowCount,
+            duplicates: dupResult.rowCount 
+        };
     } catch (error) {
         console.error('Cleanup error:', error.message);
         return { error: error.message };
@@ -333,9 +377,43 @@ app.post('/api/scrape', scrapeLimiter, async (req, res) => {
 // Cleanup endpoint
 app.post('/api/cleanup', async (req, res) => {
     try {
+        // First, remove known bad URL patterns
+        const badPatterns = [
+            '%bighornangler.com%',
+            '%northforkanglers.com%',
+            '%yellowdogflyfishing.com%',
+            '%bozemanflysupply.com%',
+            '%grizzlyhackle.com%',
+            '%headhuntersflyshop.com/fishing-report%',
+            '%montanatrout.com%',
+            '%madisonriveroutfitters.com/fishing-report%',
+            '%danbaileys.com/fishing-report%',
+            '%beaverhead-river-fishing-report%',
+            '%big-hole-river-fishing-report%',
+            '%flathead-river-fishing-report%',
+            '%boulder-river-fishing-report%',
+            '%thestonefly.com%'
+        ];
+        
+        let badUrlCount = 0;
+        for (const pattern of badPatterns) {
+            const result = await db.query(`
+                DELETE FROM reports
+                WHERE url LIKE $1
+                RETURNING id
+            `, [pattern]);
+            badUrlCount += result.rowCount;
+        }
+        
+        // Run regular cleanup
         const cleanup = await runDatabaseCleanup();
+        
         const counts = await db.query(`SELECT COUNT(*) as total_reports, COUNT(DISTINCT river) as unique_rivers, COUNT(DISTINCT source) as unique_sources FROM reports WHERE is_active = true`);
-        res.json({ message: 'Cleanup completed successfully', removed: cleanup, stats: counts.rows[0] });
+        res.json({ 
+            message: 'Cleanup completed successfully', 
+            removed: { ...cleanup, badUrls: badUrlCount }, 
+            stats: counts.rows[0] 
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -664,6 +742,75 @@ app.get('/api/admin/analytics', async (req, res) => {
             topEndpoints: endpointStats.rows,
             premiumUsers: premiumStats.rows,
             timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin endpoint to purge bad URLs
+app.post('/api/admin/purge-bad-urls', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        // Delete by exact source names
+        const badSources = [
+            'Bighorn Angler',
+            'North Fork Anglers', 
+            'Yellow Dog (Bighorn River)',
+            'Yellow Dog Fly Fishing',
+            'Troutfitters',
+            'Stonefly Shop',
+            'Dan Bailey\'s',
+            'Fins & Feathers',
+            'Fly Fish Food',
+            'Perfect Fly',
+            'Bozeman Fly Supply',
+            'Montana Trout',
+            'Madison River Outfitters',
+            'Headhunters Fly Shop',
+            'Grizzly Hackle',
+            'Yellow Dog'
+        ];
+        
+        const sourceResult = await db.query(`
+            DELETE FROM reports 
+            WHERE source = ANY($1)
+            RETURNING id, source, river, url
+        `, [badSources]);
+        
+        // Delete by URL patterns
+        const badUrlPatterns = [
+            'bighornangler.com',
+            'northforkanglers.com',
+            'yellowdogflyfishing.com',
+            'bozemanflysupply.com',
+            'grizzlyhackle.com',
+            'headhuntersflyshop.com/fishing-report',
+            'montanatrout.com',
+            'madisonriveroutfitters.com/fishing-report',
+            'danbaileys.com/fishing-report',
+            'thestonefly.com'
+        ];
+        
+        let urlResultCount = 0;
+        for (const pattern of badUrlPatterns) {
+            const result = await db.query(`
+                DELETE FROM reports 
+                WHERE url LIKE $1
+                RETURNING id
+            `, [`%${pattern}%`]);
+            urlResultCount += result.rowCount;
+        }
+        
+        res.json({
+            message: 'Bad URLs purged successfully',
+            deletedBySource: sourceResult.rowCount,
+            deletedByUrl: urlResultCount,
+            deletedDetails: sourceResult.rows
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

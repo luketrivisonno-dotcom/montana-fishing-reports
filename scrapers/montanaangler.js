@@ -8,7 +8,6 @@ const MONTANA_ANGLER_URLS = {
   'Yellowstone River': 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
   'Missouri River': 'https://www.montanaangler.com/montana-fishing-report/missouri-river-fishing-report',
   'Jefferson River': 'https://www.montanaangler.com/montana-fishing-report/jefferson-river-fishing-report',
-  'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-fishing-report',
   'Stillwater River': 'https://www.montanaangler.com/montana-fishing-report/stillwater-river-fishing-report',
   'Ruby River': 'https://www.montanaangler.com/montana-fishing-report/ruby-river-fishing-report',
   'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',

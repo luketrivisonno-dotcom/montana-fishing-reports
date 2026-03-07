@@ -1,35 +1,24 @@
-async function scrapeClarkForkOrvis() {
+async function scrapeClarkForkMissoulian() {
     return {
-        source: 'Orvis',
+        source: 'The Missoulian Angler',
         river: 'Clark Fork River',
-        url: 'https://www.orvis.com/fishing-report/clark-fork-river',
+        url: 'https://www.missoulianangler.com/fishing-reports',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
 }
 
-async function scrapeClarkForkGrizzly() {
+async function scrapeClarkForkBigfork() {
     return {
-        source: 'Grizzly Hackle',
+        source: 'Bigfork Anglers',
         river: 'Clark Fork River',
-        url: 'https://grizzlyhackle.com/clark-fork-river-fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
-}
-
-async function scrapeClarkForkBlackfoot() {
-    return {
-        source: 'Blackfoot River Outfitters',
-        river: 'Clark Fork River',
-        url: 'https://www.blackfootriver.com/clark-fork-river-fishing-report',
+        url: 'https://bigforkanglers.com/fishing-report',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
 }
 
 module.exports = {
-    scrapeClarkForkOrvis,
-    scrapeClarkForkGrizzly,
-    scrapeClarkForkBlackfoot
+    scrapeClarkForkMissoulian,
+    scrapeClarkForkBigfork
 };

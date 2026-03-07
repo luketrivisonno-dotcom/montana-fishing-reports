@@ -1,35 +1,24 @@
-async function scrapeBlackfootOrvis() {
+async function scrapeBlackfootMissoulian() {
     return {
-        source: 'Orvis',
+        source: 'The Missoulian Angler',
         river: 'Blackfoot River',
-        url: 'https://www.orvis.com/fishing-report/blackfoot-river',
+        url: 'https://www.missoulianangler.com/fishing-reports',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
 }
 
-async function scrapeBlackfootGrizzly() {
+async function scrapeBlackfootBigfork() {
     return {
-        source: 'Grizzly Hackle',
+        source: 'Bigfork Anglers',
         river: 'Blackfoot River',
-        url: 'https://grizzlyhackle.com/blackfoot-river-fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
-}
-
-async function scrapeBlackfootBRO() {
-    return {
-        source: 'Blackfoot River Outfitters',
-        river: 'Blackfoot River',
-        url: 'https://www.blackfootriver.com/blackfoot-river-fishing-report',
+        url: 'https://bigforkanglers.com/fishing-report',
         last_updated: new Date().toLocaleDateString(),
         scraped_at: new Date().toISOString()
     };
 }
 
 module.exports = {
-    scrapeBlackfootOrvis,
-    scrapeBlackfootGrizzly,
-    scrapeBlackfootBRO
+    scrapeBlackfootMissoulian,
+    scrapeBlackfootBigfork
 };

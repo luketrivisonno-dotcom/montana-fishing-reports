@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 async function scrapeSunriseFlyShop() {
-  const url = 'https://www.sunriseflyshop.com/category/fishing-report/';
+  const url = 'https://www.sunriseflyshop.com/fishing-report/';
   
   try {
     const { data } = await axios.get(url, {

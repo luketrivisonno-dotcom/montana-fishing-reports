@@ -54,17 +54,20 @@ async function runAllScrapers() {
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
+    { name: 'Orvis (Madison)', fn: madison.scrapeMadisonOrvis },
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
+    { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
+    { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
-    { name: 'Headhunters (Missouri)', fn: missouri.scrapeMissouriHeadhunters },
+    { name: 'Trout Shop (Missouri)', fn: missouri.scrapeMissouriTroutShop },
     { name: 'Montana Angler (Gallatin)', fn: gallatin.scrapeMontanaAngler },
-    { name: 'Grizzly Hackle (Clark Fork)', fn: clarkfork.scrapeClarkForkGrizzly },
-    { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
-    { name: 'Grizzly Hackle (Blackfoot)', fn: blackfoot.scrapeBlackfootGrizzly },
-    { name: 'North Fork Anglers (Bighorn)', fn: bighorn.scrapeBighornNorthFork },
-    { name: 'Bighorn Angler', fn: bighorn.scrapeBighornAngler },
-    { name: 'Montana Angler (Bitterroot)', fn: bitterroot.scrapeBitterrootMontanaAngler },
-    { name: 'Montana Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMontanaAngler },
+    { name: 'Missoulian Angler (Clark Fork)', fn: clarkfork.scrapeClarkForkMissoulian },
+    { name: 'Bigfork Anglers (Clark Fork)', fn: clarkfork.scrapeClarkForkBigfork },
+    { name: 'Missoulian Angler (Blackfoot)', fn: blackfoot.scrapeBlackfootMissoulian },
+    { name: 'Bigfork Anglers (Blackfoot)', fn: blackfoot.scrapeBlackfootBigfork },
+    { name: 'Trout Shop (Bighorn)', fn: bighorn.scrapeBighornTroutShop },
+    { name: 'Orvis (Bitterroot)', fn: bitterroot.scrapeBitterrootOrvis },
+    { name: 'Orvis (Rock Creek)', fn: rockcreek.scrapeRockCreekOrvis },
   ];
   
   let successCount = 0;
