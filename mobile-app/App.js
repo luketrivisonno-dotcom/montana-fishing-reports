@@ -28,44 +28,44 @@ const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 // ============================================
 // REAL MONTANA FLY FISHING PHOTOS
-// Sources: NPS.gov, USFS, Wikimedia Commons, MT Tourism
+// Using Unsplash - reliable, high-quality river/fishing images
 // ============================================
 const RIVER_IMAGES = {
-  'Gallatin River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Gallatin_River_near_Taylor_Fork.jpg/800px-Gallatin_River_near_Taylor_Fork.jpg',
-  'Upper Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Madison_River_near_Ennis_MT.jpg/800px-Madison_River_near_Ennis_MT.jpg',
-  'Lower Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Madison_River_Bear_Trap_Canyon.jpg/800px-Madison_River_Bear_Trap_Canyon.jpg',
-  'Yellowstone River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Yellowstone_River_in_Hayden_Valley.jpg/800px-Yellowstone_River_in_Hayden_Valley.jpg',
-  'Missouri River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Missouri_River_near_Craig_Montana.jpg/800px-Missouri_River_near_Craig_Montana.jpg',
-  'Clark Fork River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Clark_Fork_River_Missoula.jpg/800px-Clark_Fork_River_Missoula.jpg',
-  'Blackfoot River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Blackfoot_River_Montana.jpg/800px-Blackfoot_River_Montana.jpg',
-  'Bitterroot River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Bitterroot_River_near_Victor_Montana.jpg/800px-Bitterroot_River_near_Victor_Montana.jpg',
-  'Rock Creek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Rock_Creek_Montana_fishing.jpg/800px-Rock_Creek_Montana_fishing.jpg',
-  'Bighorn River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Bighorn_River_near_Fort_Smith.jpg/800px-Bighorn_River_near_Fort_Smith.jpg',
-  'Beaverhead River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Beaverhead_River_Montana.jpg/800px-Beaverhead_River_Montana.jpg',
-  'Big Hole River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Big_Hole_River_Montana.jpg/800px-Big_Hole_River_Montana.jpg',
-  'Flathead River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Flathead_River_Near_Columbia_Falls.jpg/800px-Flathead_River_Near_Columbia_Falls.jpg',
-  'Jefferson River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Jefferson_River_near_Three_Forks.jpg/800px-Jefferson_River_near_Three_Forks.jpg',
-  'Madison River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Madison_River_near_Ennis_MT.jpg/800px-Madison_River_near_Ennis_MT.jpg',
-  'Ruby River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Ruby_River_Montana.jpg/800px-Ruby_River_Montana.jpg',
-  'Stillwater River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Stillwater_River_Montana.jpg/800px-Stillwater_River_Montana.jpg',
-  'Swan River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Swan_River_Montana.jpg/800px-Swan_River_Montana.jpg',
-  'Boulder River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Boulder_River_Montana.jpg/800px-Boulder_River_Montana.jpg',
-  'Spring Creeks': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Montana_Spring_Creek.jpg/800px-Montana_Spring_Creek.jpg',
-  'Yellowstone National Park': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Madison_River_YNP.jpg/800px-Madison_River_YNP.jpg',
-  'Smith River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Smith_River_Montana.jpg/800px-Smith_River_Montana.jpg',
-  'Belt Creek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Belt_Creek_Montana.jpg/800px-Belt_Creek_Montana.jpg',
-  'Little Blackfoot River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Little_Blackfoot_River.jpg/800px-Little_Blackfoot_River.jpg',
-  'Judith River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Judith_River_Montana.jpg/800px-Judith_River_Montana.jpg',
-  'Musselshell River': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Musselshell_River_Montana.jpg/800px-Musselshell_River_Montana.jpg',
-  'Other Montana Waters': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Montana_fly_fishing.jpg/800px-Montana_fly_fishing.jpg',
-  'Prairie': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Montana_prairie_fishing.jpg/800px-Montana_prairie_fishing.jpg',
-  'Hi-Line': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Montana_Hi_Line.jpg/800px-Montana_Hi_Line.jpg',
-  'Fort Peck': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Fort_Peck_Lake.jpg/800px-Fort_Peck_Lake.jpg',
-  'Western': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Montana_mountain_stream.jpg/800px-Montana_mountain_stream.jpg',
+  'Gallatin River': 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?w=800&q=80',
+  'Upper Madison River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
+  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Missouri River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
+  'Clark Fork River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+  'Blackfoot River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
+  'Bitterroot River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+  'Rock Creek': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
+  'Bighorn River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Beaverhead River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
+  'Big Hole River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Flathead River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+  'Jefferson River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
+  'Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Stillwater River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+  'Swan River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
+  'Boulder River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
+  'Spring Creeks': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+  'Yellowstone National Park': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Smith River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
+  'Belt Creek': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
+  'Little Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+  'Judith River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'Musselshell River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
+  'Other Montana Waters': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  'Prairie': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
+  'Hi-Line': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+  'Fort Peck': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
+  'Western': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
 };
 
-// Fallback to Montana landscape
-const DEFAULT_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Montana_fly_fishing.jpg/800px-Montana_fly_fishing.jpg';
+// Fallback to mountain river landscape
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80';
 
 // ============================================
 // EARTH-TONED COLOR SCHEME
