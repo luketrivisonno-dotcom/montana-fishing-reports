@@ -7,6 +7,11 @@ const scrapeOrvis = require('./orvis');
 const scrapeBighornAngler = require('./bighornangler');
 const scrapeBozemanFlySupply = require('./bozemanflysupply');
 const scrapeFlyFishFood = require('./flyfishfood');
+const scrapeYellowDog = require('./yellowdog');
+const scrapeFlyFishingBozeman = require('./flyfishingbozeman');
+const scrapeTroutfitters = require('./troutfitters');
+const scrapeGallatinRiverGuides = require('./gallatinriverguides');
+const scrapeRisingTrout = require('./risingtrout');
 
 // River-specific scrapers
 const madison = require('./madison');
@@ -57,6 +62,11 @@ async function runAllScrapers() {
     { name: 'Bighorn Angler', fn: scrapeBighornAngler },
     { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },
     { name: 'Fly Fish Food', fn: scrapeFlyFishFood },
+    { name: 'Yellow Dog Fly Fishing', fn: scrapeYellowDog },
+    { name: 'Fly Fishing Bozeman', fn: scrapeFlyFishingBozeman },
+    { name: 'Troutfitters', fn: scrapeTroutfitters },
+    { name: 'Gallatin River Guides', fn: scrapeGallatinRiverGuides },
+    { name: 'Rising Trout Fly Fishing', fn: scrapeRisingTrout },
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },

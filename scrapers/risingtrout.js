@@ -1,14 +1,16 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const YELLOWDOG_URLS = {
-  'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report'
+const RISING_TROUT_URLS = {
+  'Gallatin River': 'https://www.risingtroutflyfishing.com/gallatin-river-fly-fishing-report',
+  'Lower Madison River': 'https://www.risingtroutflyfishing.com/lower-madison-river-fly-fishing-report',
+  'Yellowstone River': 'https://www.risingtroutflyfishing.com/yellowstone-river-fly-fishing-report'
 };
 
-async function scrapeYellowDog() {
+async function scrapeRisingTrout() {
   let reports = [];
   
-  for (const [river, url] of Object.entries(YELLOWDOG_URLS)) {
+  for (const [river, url] of Object.entries(RISING_TROUT_URLS)) {
     try {
       const { data } = await axios.get(url, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -24,20 +26,20 @@ async function scrapeYellowDog() {
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
       reports.push({
-        source: 'Yellow Dog Fly Fishing',
+        source: 'Rising Trout Fly Fishing',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://cdn.shopify.com/s/files/1/0052/7820/3311/files/YellowDog_Logo_Horizontal_White_400x.png'
+        icon_url: 'https://www.risingtroutflyfishing.com/wp-content/uploads/2021/03/rising-trout-logo.png'
       });
       
     } catch (error) {
-      console.error(`Yellow Dog error for ${river}:`, error.message);
+      console.error(`Rising Trout error for ${river}:`, error.message);
     }
   }
   
   return reports.length > 0 ? reports : null;
 }
 
-module.exports = scrapeYellowDog;
+module.exports = scrapeRisingTrout;

@@ -1,14 +1,10 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// Troutfitters only has reports for these 7 rivers
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
-  'Upper Madison River': 'https://troutfitters.com/reports/upper-madison-river',
-  'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
-  'Missouri River': 'https://troutfitters.com/reports/missouri-river',
-  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river'
+  'Missouri River': 'https://troutfitters.com/reports/missouri-river'
 };
 
 async function scrapeTroutfitters() {
@@ -34,7 +30,8 @@ async function scrapeTroutfitters() {
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        icon_url: 'https://troutfitters.com/wp-content/uploads/2021/03/troutfitters-logo.png'
       });
       
     } catch (error) {

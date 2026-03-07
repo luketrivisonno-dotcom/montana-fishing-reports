@@ -1,14 +1,15 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const YELLOWDOG_URLS = {
-  'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report'
+const GALLATIN_RIVER_GUIDES_URLS = {
+  'Gallatin River': 'https://www.montanaflyfishing.com/gallatin-river-fishing-report',
+  'Yellowstone River': 'https://www.montanaflyfishing.com/yellowstone-river-fishing-report'
 };
 
-async function scrapeYellowDog() {
+async function scrapeGallatinRiverGuides() {
   let reports = [];
   
-  for (const [river, url] of Object.entries(YELLOWDOG_URLS)) {
+  for (const [river, url] of Object.entries(GALLATIN_RIVER_GUIDES_URLS)) {
     try {
       const { data } = await axios.get(url, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -24,20 +25,20 @@ async function scrapeYellowDog() {
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
       reports.push({
-        source: 'Yellow Dog Fly Fishing',
+        source: 'Gallatin River Guides',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://cdn.shopify.com/s/files/1/0052/7820/3311/files/YellowDog_Logo_Horizontal_White_400x.png'
+        icon_url: 'https://www.montanaflyfishing.com/wp-content/uploads/2021/03/grg-logo.png'
       });
       
     } catch (error) {
-      console.error(`Yellow Dog error for ${river}:`, error.message);
+      console.error(`Gallatin River Guides error for ${river}:`, error.message);
     }
   }
   
   return reports.length > 0 ? reports : null;
 }
 
-module.exports = scrapeYellowDog;
+module.exports = scrapeGallatinRiverGuides;
