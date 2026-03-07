@@ -819,7 +819,7 @@ app.post('/api/admin/purge-bad-urls', async (req, res) => {
     }
 });
 
-// Admin endpoint to fix missing icons
+// Admin endpoint to clear broken icons
 app.post('/api/admin/fix-icons', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     if (adminKey !== process.env.ADMIN_KEY) {
@@ -827,29 +827,14 @@ app.post('/api/admin/fix-icons', async (req, res) => {
     }
     
     try {
-        const iconUpdates = [
-            {
-                source: 'Montana Angler',
-                icon_url: 'https://www.montanaangler.com/wp-content/uploads/2021/03/Montana-Angler-Logo.png'
-            },
-            {
-                source: 'Orvis',
-                icon_url: 'https://www.orvis.com/orvis_assets/images/orvis-logo.png'
-            }
-        ];
-        
-        let updatedCount = 0;
-        for (const update of iconUpdates) {
-            const result = await db.query(
-                `UPDATE reports SET icon_url = $1 WHERE source = $2 AND (icon_url IS NULL OR icon_url = '')`,
-                [update.icon_url, update.source]
-            );
-            updatedCount += result.rowCount;
-        }
+        // Clear all broken icon URLs (they 404)
+        const result = await db.query(
+            `UPDATE reports SET icon_url = NULL WHERE icon_url IS NOT NULL`
+        );
         
         res.json({
-            message: 'Icons updated successfully',
-            updatedCount: updatedCount
+            message: 'Broken icons cleared - app will show dots instead',
+            updatedCount: result.rowCount
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

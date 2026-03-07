@@ -61,7 +61,7 @@ async function scrapeOrvis() {
         title: `${river} - Orvis Fishing Report`,
         last_updated: finalDate || new Date().toLocaleDateString(),
         author: 'Orvis',
-        icon_url: 'https://www.orvis.com/orvis_assets/images/orvis-logo.png'
+        icon_url: null
       });
       
     } catch (error) {

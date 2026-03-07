@@ -36,7 +36,7 @@ async function scrapeYellowDog() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://cdn.shopify.com/s/files/1/0052/7820/3311/files/YellowDog_Logo_Horizontal_White_400x.png'
+        icon_url: null
       });
       
     } catch (error) {
