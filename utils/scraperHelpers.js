@@ -103,8 +103,8 @@ async function saveReport(report) {
         
         const query = `
             INSERT INTO reports 
-            (source, source_normalized, river, url, title, last_updated, last_updated_text, author, scraped_at, is_active)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, true)
+            (source, source_normalized, river, url, title, last_updated, last_updated_text, author, scraped_at, is_active, icon_url, water_clarity)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, true, $9, $10)
             ON CONFLICT (river, source_normalized) 
             DO UPDATE SET
                 url = EXCLUDED.url,
@@ -113,7 +113,9 @@ async function saveReport(report) {
                 last_updated_text = EXCLUDED.last_updated_text,
                 author = EXCLUDED.author,
                 scraped_at = CURRENT_TIMESTAMP,
-                is_active = true
+                is_active = true,
+                icon_url = EXCLUDED.icon_url,
+                water_clarity = EXCLUDED.water_clarity
             RETURNING id
         `;
         
@@ -125,7 +127,9 @@ async function saveReport(report) {
             report.title || null,
             standardizedDate,
             report.last_updated || null,
-            report.author || null
+            report.author || null,
+            report.icon_url || null,
+            report.water_clarity || null
         ];
         
         const result = await db.query(query, values);
@@ -145,8 +149,10 @@ async function saveReport(report) {
                         last_updated_text = $6,
                         author = $7,
                         scraped_at = CURRENT_TIMESTAMP,
-                        is_active = true
-                    WHERE url = $8
+                        is_active = true,
+                        icon_url = $8,
+                        water_clarity = $9
+                    WHERE url = $10
                     RETURNING id
                 `;
                 
@@ -158,6 +164,8 @@ async function saveReport(report) {
                     standardizeDate(report.last_updated),
                     report.last_updated || null,
                     report.author || null,
+                    report.icon_url || null,
+                    report.water_clarity || null,
                     report.url
                 ]);
                 

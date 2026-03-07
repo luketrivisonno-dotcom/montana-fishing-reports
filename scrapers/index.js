@@ -4,6 +4,9 @@ const db = require('../db');
 const scrapeMontanaAngler = require('./montanaangler');
 const scrapeBlueRibbonFlies = require('./blueribbonflies');
 const scrapeOrvis = require('./orvis');
+const scrapeBighornAngler = require('./bighornangler');
+const scrapeBozemanFlySupply = require('./bozemanflysupply');
+const scrapeFlyFishFood = require('./flyfishfood');
 
 // River-specific scrapers
 const madison = require('./madison');
@@ -51,6 +54,9 @@ async function runAllScrapers() {
     { name: 'Montana Angler', fn: scrapeMontanaAngler },
     { name: 'Blue Ribbon Flies', fn: scrapeBlueRibbonFlies },
     { name: 'Orvis', fn: scrapeOrvis },
+    { name: 'Bighorn Angler', fn: scrapeBighornAngler },
+    { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },
+    { name: 'Fly Fish Food', fn: scrapeFlyFishFood },
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },

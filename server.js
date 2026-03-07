@@ -189,6 +189,8 @@ async function initDatabase() {
         
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS source_normalized VARCHAR(100)`);
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS last_updated_text VARCHAR(50)`);
+        await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS icon_url TEXT`);
+        await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS water_clarity VARCHAR(50)`);
         
         await db.query(`UPDATE reports SET source_normalized = LOWER(REGEXP_REPLACE(REGEXP_REPLACE(source, '\\([^)]*\\)', '', 'g'), '[^a-zA-Z0-9]', '', 'g')) WHERE source_normalized IS NULL OR source_normalized = ''`);
         await db.query(`UPDATE reports SET last_updated_text = last_updated::text WHERE last_updated_text IS NULL AND last_updated IS NOT NULL`);
@@ -453,7 +455,7 @@ app.get('/api/reports/:river',
         try {
             const { river } = req.params;
             const result = await db.query(
-                `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at 
+                `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
                  FROM reports WHERE river = $1 AND is_active = true ORDER BY scraped_at DESC`, 
                 [river]
             );
@@ -509,7 +511,7 @@ app.get('/api/river-details/:river',
             const [weather, usgs, reportsResult] = await Promise.all([
                 getWeatherForRiver(river),
                 getUSGSData(river),
-                db.query(`SELECT id, source, river, url, last_updated, last_updated_text, scraped_at 
+                db.query(`SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
                           FROM reports WHERE river = $1 AND is_active = true 
                           AND source NOT LIKE '%USGS%' AND url IS NOT NULL 
                           AND url != '' AND url LIKE 'http%' ORDER BY scraped_at DESC`, 

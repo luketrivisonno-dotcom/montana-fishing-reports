@@ -1,17 +1,18 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const BOZEMAN_URLS = {
+const BOZEMAN_FLY_SUPPLY_URLS = {
   'Gallatin River': 'https://www.bozemanflysupply.com/fishing-reports/gallatin-river',
   'Upper Madison River': 'https://www.bozemanflysupply.com/fishing-reports/upper-madison',
   'Lower Madison River': 'https://www.bozemanflysupply.com/fishing-reports/lower-madison',
-  'Yellowstone River': 'https://www.bozemanflysupply.com/fishing-reports/yellowstone-river'
+  'Yellowstone River': 'https://www.bozemanflysupply.com/fishing-reports/yellowstone-river',
+  'Missouri River': 'https://www.bozemanflysupply.com/fishing-reports/missouri-river'
 };
 
 async function scrapeBozemanFlySupply() {
   let reports = [];
   
-  for (const [river, url] of Object.entries(BOZEMAN_URLS)) {
+  for (const [river, url] of Object.entries(BOZEMAN_FLY_SUPPLY_URLS)) {
     try {
       const { data } = await axios.get(url, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -31,7 +32,8 @@ async function scrapeBozemanFlySupply() {
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        icon_url: 'https://cdn.shopify.com/s/files/1/0251/2575/files/bfs-logo_400x.png'
       });
       
     } catch (error) {

@@ -36,7 +36,8 @@ async function scrapeMontanaAngler() {
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        icon_url: 'https://www.montanaangler.com/wp-content/uploads/2021/03/Montana-Angler-Logo.png'
       });
       
     } catch (error) {

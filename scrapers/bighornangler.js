@@ -1,8 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-async function scrapeFlyFishFood() {
-  const url = 'https://flyfishfood.com/blog';
+async function scrapeBighornAngler() {
+  const url = 'https://bighornangler.com/fishing';
   
   try {
     const { data } = await axios.get(url, {
@@ -19,21 +19,19 @@ async function scrapeFlyFishFood() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    // Fly Fish Food is based in Utah but has general fly fishing info
-    // They don't have specific Montana river reports, so we'll link to their blog
     return [{
-      source: 'Fly Fish Food',
-      river: 'General Montana',
+      source: 'Bighorn Angler',
+      river: 'Bighorn River',
       url: url,
       last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
       scraped_at: new Date(),
-      icon_url: 'https://cdn.shopify.com/s/files/1/0273/6813/files/fff-logo_400x.png'
+      icon_url: 'https://bighornangler.com/wp-content/uploads/2022/01/BighornAnglerLogoTransparent.png'
     }];
     
   } catch (error) {
-    console.error('Fly Fish Food error:', error.message);
+    console.error('Bighorn Angler error:', error.message);
     return null;
   }
 }
 
-module.exports = scrapeFlyFishFood;
+module.exports = scrapeBighornAngler;
