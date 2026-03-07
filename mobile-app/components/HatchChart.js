@@ -3,38 +3,149 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-nat
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
-// Earth-toned colors matching App.js
+// Earth-toned colors
 const COLORS = {
   primary: '#2d4a3e',
-  primaryDark: '#1a2f27',
   accent: '#c9a227',
-  background: '#f5f1e8',
   surface: '#faf8f3',
   text: '#2c2416',
   textSecondary: '#6b5d4d',
   textLight: '#9a8b7a',
-  success: '#5a7d5a',
   wade: '#5a7d5a',
-  boat: '#8b4513',
-  both: '#cd853f',
 };
 
-// Fallback static fly recommendations
+// Static hatch charts by river and month
+const STATIC_HATCHES = {
+  'Madison River': {
+    'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+    'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Salmonflies'],
+    'Jun': ['Salmonflies', 'PMDs'], 'Jul': ['PMDs', 'Caddis'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+    'Oct': ['Baetis'], 'Nov': ['Baetis', 'Midges'], 'Dec': ['Midges']
+  },
+  'Upper Madison River': {
+    'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+    'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Salmonflies'],
+    'Jun': ['Salmonflies', 'PMDs'], 'Jul': ['PMDs', 'Caddis'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+    'Oct': ['Baetis'], 'Nov': ['Baetis', 'Midges'], 'Dec': ['Midges']
+  },
+  'Lower Madison River': {
+    'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+    'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Caddis'],
+    'Jun': ['PMDs', 'Caddis'], 'Jul': ['PMDs', 'Caddis', 'Hoppers'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+    'Oct': ['Baetis'], 'Nov': ['Baetis', 'Midges'], 'Dec': ['Midges']
+  },
+  'Yellowstone River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
+    'May': ['March Browns', 'Salmonflies'], 'Jun': ['Salmonflies', 'PMDs'],
+    'Jul': ['PMDs', 'Caddis'], 'Aug': ['Hoppers', 'Tricos'],
+    'Sep': ['Tricos'], 'Oct': ['Baetis'], 'Nov': ['Midges']
+  },
+  'Gallatin River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
+    'May': ['BWO', 'March Browns'], 'Jun': ['March Browns', 'Salmonflies'],
+    'Jul': ['PMDs', 'Caddis'], 'Aug': ['Hoppers', 'Tricos'],
+    'Sep': ['Tricos'], 'Oct': ['Baetis'], 'Nov': ['Midges']
+  },
+  'Missouri River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO', 'Caddis'],
+    'May': ['Caddis', 'PMDs'], 'Jun': ['PMDs', 'Caddis'],
+    'Jul': ['PMDs', 'Tricos'], 'Aug': ['Tricos', 'Hoppers'],
+    'Sep': ['Tricos', 'Baetis'], 'Oct': ['Baetis'], 'Nov': ['Midges']
+  },
+  'Bighorn River': {
+    'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+    'Apr': ['BWO', 'Caddis'], 'May': ['Caddis', 'PMDs'],
+    'Jun': ['PMDs', 'Caddis'], 'Jul': ['PMDs', 'Tricos'],
+    'Aug': ['Tricos'], 'Sep': ['Tricos', 'Pseudos'],
+    'Oct': ['Baetis'], 'Nov': ['Midges'], 'Dec': ['Midges']
+  },
+  'Bitterroot River': {
+    'Mar': ['Midges'], 'Apr': ['BWO', 'March Browns'],
+    'May': ['March Browns', 'Salmonflies'], 'Jun': ['Salmonflies', 'PMDs'],
+    'Jul': ['PMDs', 'Caddis'], 'Aug': ['Caddis', 'Hoppers'],
+    'Sep': ['Tricos', 'Mahogany Duns'], 'Oct': ['Baetis'], 'Nov': ['Midges']
+  },
+  'Blackfoot River': {
+    'Apr': ['Midges', 'BWO'], 'May': ['BWO', 'March Browns', 'Skwalas'],
+    'Jun': ['March Browns', 'Golden Stones', 'Salmonflies'],
+    'Jul': ['Golden Stones', 'PMDs'], 'Aug': ['Hoppers', 'Tricos'],
+    'Sep': ['Tricos', 'Mahogany Duns'], 'Oct': ['October Caddis']
+  },
+  'Rock Creek': {
+    'Apr': ['Midges', 'BWO'], 'May': ['BWO', 'March Browns'],
+    'Jun': ['March Browns', 'Salmonflies', 'PMDs'],
+    'Jul': ['PMDs', 'Caddis'], 'Aug': ['Caddis', 'Hoppers'],
+    'Sep': ['Tricos', 'Baetis'], 'Oct': ['Baetis']
+  },
+  'Beaverhead River': {
+    'Mar': ['Midges'], 'Apr': ['BWO', 'March Browns'],
+    'May': ['March Browns', 'Caddis'], 'Jun': ['PMDs', 'Caddis'],
+    'Jul': ['PMDs', 'Caddis'], 'Aug': ['Tricos'],
+    'Sep': ['Tricos', 'Baetis'], 'Oct': ['Baetis'], 'Nov': ['Midges']
+  },
+  'Big Hole River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
+    'May': ['BWO', 'March Browns'], 'Jun': ['Salmonflies', 'Golden Stones'],
+    'Jul': ['PMDs', 'Yellow Sallies'], 'Aug': ['Hoppers', 'Tricos'],
+    'Sep': ['Tricos', 'Baetis'], 'Oct': ['Baetis']
+  },
+  'Clark Fork River': {
+    'Apr': ['Midges', 'BWO'], 'May': ['BWO', 'March Browns'],
+    'Jun': ['Salmonflies', 'PMDs'], 'Jul': ['Golden Stones', 'PMDs'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+    'Oct': ['October Caddis', 'Baetis']
+  },
+  'Flathead River': {
+    'Apr': ['Midges'], 'May': ['BWO', 'March Browns'],
+    'Jun': ['Salmonflies', 'Golden Stones'], 'Jul': ['Golden Stones', 'PMDs'],
+    'Aug': ['Hoppers'], 'Sep': ['October Caddis'], 'Oct': ['October Caddis']
+  },
+  'Jefferson River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
+    'May': ['BWO', 'March Browns'], 'Jun': ['PMDs'],
+    'Jul': ['PMDs', 'Hoppers'], 'Aug': ['Hoppers', 'Tricos'],
+    'Sep': ['Tricos', 'Baetis']
+  },
+  'Ruby River': {
+    'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
+    'May': ['BWO', 'March Browns'], 'Jun': ['PMDs', 'Yellow Sallies'],
+    'Jul': ['PMDs', 'Yellow Sallies'], 'Aug': ['Hoppers'],
+    'Sep': ['Tricos'], 'Oct': ['Baetis']
+  },
+  'Stillwater River': {
+    'Apr': ['Midges'], 'May': ['BWO', 'March Browns'],
+    'Jun': ['PMDs'], 'Jul': ['PMDs', 'Caddis'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos'],
+    'Oct': ['October Caddis']
+  },
+  'Spring Creeks': {
+    'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+    'Apr': ['BWO', 'Baetis'], 'May': ['Baetis', 'PMDs'],
+    'Jun': ['PMDs', 'Yellow Sallies'], 'Jul': ['PMDs', 'Tricos'],
+    'Aug': ['Tricos', 'Hoppers'], 'Sep': ['Tricos', 'Mahogany Duns'],
+    'Oct': ['Baetis'], 'Nov': ['Midges', 'Baetis'], 'Dec': ['Midges']
+  }
+};
+
+// Fly recommendations
 const FLY_RECOMMENDATIONS = {
-  'Midges': ['Zebra Midge #18-22', 'Top Secret Midge #20-22'],
-  'Blue Winged Olives': ['Parachute BWO #18-20', 'RS2 #20-22'],
-  'BWO': ['Parachute BWO #18-20', 'RS2 #20-22'],
-  'Baetis': ['BWO Comparadun #20-22', 'Barr Emerger #20-22'],
-  'March Browns': ['March Brown Dry #12-14', 'Hare\'s Ear #12-14'],
-  'Salmonflies': ['Chubby Chernobyl #6-8', 'Pats Rubber Legs #6-8'],
-  'Golden Stones': ['Golden Stone Dry #8-10', 'Chubby Chernobyl Tan #8-10'],
-  'PMDs': ['Parachute PMD #16-18', 'Sparkle Dun #16-18'],
+  'Midges': ['Zebra Midge #18-22', 'Top Secret Midge #20-22', 'Griffiths Gnat #18-20'],
+  'Blue Winged Olives': ['Parachute BWO #18-20', 'RS2 #20-22', 'Pheasant Tail #16-18'],
+  'BWO': ['Parachute BWO #18-20', 'RS2 #20-22', 'Barr Emerger #18-20'],
+  'Baetis': ['BWO Comparadun #20-22', 'Barr Emerger #20-22', 'Sparkle Dun #18-20'],
+  'March Browns': ['March Brown Dry #12-14', 'Hare\'s Ear #12-14', 'Parachute Adams #12-14'],
+  'Salmonflies': ['Salmonfly Dry #4-6', 'Chubby Chernobyl #6-8', 'Pats Rubber Legs #6-8'],
+  'Golden Stones': ['Golden Stone Dry #8-10', 'Chubby Chernobyl Tan #8-10', 'Kaufmann Stone #8-10'],
+  'PMDs': ['Parachute PMD #16-18', 'Sparkle Dun #16-18', 'Split Case PMD #16-18'],
   'Yellow Sallies': ['Yellow Sally Dry #14-16', 'Stimulator Yellow #14-16'],
-  'Caddis': ['Elk Hair Caddis #14-16', 'X-Caddis #16-18'],
-  'Hoppers': ['Chubby Chernobyl #8-10', 'Morrish Hopper #10-12'],
+  'Caddis': ['Elk Hair Caddis #14-16', 'X-Caddis #16-18', 'CDC Caddis #14-16'],
+  'Hoppers': ['Chubby Chernobyl #8-10', 'Morrish Hopper #10-12', 'Dave\'s Hopper #10-12'],
   'Tricos': ['Trico Spinner #20-22', 'Trico Dun #20-22'],
   'Mahogany Duns': ['Parachute Adams #14-16', 'Sparkle Dun #14-16'],
-  'October Caddis': ['Orange Stimulator #10-12'],
+  'October Caddis': ['Orange Stimulator #10-12', 'Elk Hair Caddis Orange #12-14'],
   'Skwalas': ['Skwala Dry #10-12', 'Chubby Chernobyl Olive #10-12'],
   'Pseudos': ['Pseudo Spinner #16-18', 'Sparkle Dun #16-18'],
 };
@@ -42,100 +153,26 @@ const FLY_RECOMMENDATIONS = {
 const HatchChart = ({ riverName, isPremium = false }) => {
   const [hatchData, setHatchData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchHatchData();
   }, [riverName, isPremium]);
 
-  const fetchHatchData = async () => {
-    try {
-      setLoading(true);
-      
-      // Use premium endpoint if available, otherwise public
-      const endpoint = isPremium 
-        ? `${API_URL}/api/premium/hatch-charts/${encodeURIComponent(riverName)}`
-        : `${API_URL}/api/hatches/${encodeURIComponent(riverName)}`;
-      
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      
-      if (isPremium) {
-        // Add premium credentials if available
-        headers['x-api-key'] = 'dev-mode';
-        headers['x-user-email'] = 'dev@example.com';
-      }
-      
-      const response = await fetch(endpoint, { headers });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setHatchData(data);
-      } else {
-        // Fall back to static data on error
-        console.log('Using static hatch data');
-        const staticHatches = getStaticHatches(riverName);
-        setHatchData({
-          currentHatches: staticHatches,
-          recommendedFlies: getFlyRecommendations(staticHatches),
-          source: 'seasonal forecast'
-        });
-      }
-    } catch (err) {
-      console.error('Error fetching hatch data:', err);
-      // Fall back to static data
-      const staticHatches = getStaticHatches(riverName);
-      setHatchData({
-        currentHatches: staticHatches,
-        recommendedFlies: getFlyRecommendations(staticHatches),
-        source: 'seasonal forecast'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Static fallback data
   const getStaticHatches = (river) => {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
-    
-    const staticCharts = {
-      'Madison River': {
-        'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
-        'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Salmonflies'],
-        'Jun': ['Salmonflies', 'PMDs'], 'Jul': ['PMDs', 'Caddis'],
-        'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
-        'Oct': ['Baetis'], 'Nov': ['Baetis', 'Midges'], 'Dec': ['Midges']
-      },
-      'Yellowstone River': {
-        'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
-        'May': ['March Browns', 'Salmonflies'], 'Jun': ['Salmonflies', 'PMDs'],
-        'Jul': ['PMDs', 'Caddis'], 'Aug': ['Hoppers', 'Tricos'],
-        'Sep': ['Tricos'], 'Oct': ['Baetis'], 'Nov': ['Midges']
-      },
-      'Gallatin River': {
-        'Mar': ['Midges'], 'Apr': ['Midges', 'BWO'],
-        'May': ['BWO', 'March Browns'], 'Jun': ['PMDs', 'Caddis'],
-        'Jul': ['PMDs', 'Caddis'], 'Aug': ['Hoppers', 'Tricos'],
-        'Sep': ['Tricos'], 'Oct': ['Baetis'], 'Nov': ['Midges']
-      },
-      'Missouri River': {
-        'Mar': ['Midges'], 'Apr': ['Midges', 'BWO', 'Caddis'],
-        'May': ['Caddis', 'PMDs'], 'Jun': ['PMDs', 'Caddis'],
-        'Jul': ['PMDs', 'Tricos'], 'Aug': ['Tricos', 'Hoppers'],
-        'Sep': ['Tricos', 'Baetis'], 'Oct': ['Baetis'], 'Nov': ['Midges']
-      },
-      'Bighorn River': {
-        'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
-        'Apr': ['BWO', 'Caddis'], 'May': ['Caddis', 'PMDs'],
-        'Jun': ['PMDs', 'Caddis'], 'Jul': ['PMDs', 'Tricos'],
-        'Aug': ['Tricos'], 'Sep': ['Tricos', 'Pseudos'],
-        'Oct': ['Baetis'], 'Nov': ['Midges'], 'Dec': ['Midges']
-      }
+    const riverData = STATIC_HATCHES[river];
+    if (riverData && riverData[month]) {
+      return riverData[month];
+    }
+    // Default hatches for any river
+    const defaults = {
+      'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+      'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Caddis'],
+      'Jun': ['PMDs', 'Caddis'], 'Jul': ['PMDs', 'Caddis'],
+      'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+      'Oct': ['Baetis'], 'Nov': ['Midges', 'Baetis'], 'Dec': ['Midges']
     };
-    
-    return staticCharts[river]?.[month] || ['Midges', 'BWO'];
+    return defaults[month] || ['Midges', 'BWO'];
   };
 
   const getFlyRecommendations = (hatches) => {
@@ -145,7 +182,55 @@ const HatchChart = ({ riverName, isPremium = false }) => {
         recommendations.push(...FLY_RECOMMENDATIONS[hatch]);
       }
     }
-    return [...new Set(recommendations)].slice(0, isPremium ? 6 : 3);
+    return [...new Set(recommendations)].slice(0, isPremium ? 6 : 4);
+  };
+
+  const fetchHatchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Try API first
+      const endpoint = isPremium 
+        ? `${API_URL}/api/premium/hatch-charts/${encodeURIComponent(riverName)}`
+        : `${API_URL}/api/hatches/${encodeURIComponent(riverName)}`;
+      
+      const headers = { 'Content-Type': 'application/json' };
+      if (isPremium) {
+        headers['x-api-key'] = 'dev-mode';
+        headers['x-user-email'] = 'dev@example.com';
+      }
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(endpoint, { headers, signal: controller.signal });
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.currentHatches && data.currentHatches.length > 0) {
+          setHatchData({
+            hatches: data.currentHatches,
+            flies: data.recommendedFlies || getFlyRecommendations(data.currentHatches),
+            source: data.source || 'report',
+            waterTemp: data.waterTemp,
+            waterConditions: data.waterConditions
+          });
+          return;
+        }
+      }
+    } catch (err) {
+      console.log('API failed, using static data');
+    }
+    
+    // Fall back to static data
+    const staticHatches = getStaticHatches(riverName);
+    setHatchData({
+      hatches: staticHatches,
+      flies: getFlyRecommendations(staticHatches),
+      source: 'seasonal forecast'
+    });
+    setLoading(false);
   };
 
   if (loading) {
@@ -156,38 +241,34 @@ const HatchChart = ({ riverName, isPremium = false }) => {
     );
   }
 
-  const currentHatches = hatchData?.currentHatches || [];
-  const recommendedFlies = hatchData?.recommendedFlies || getFlyRecommendations(currentHatches);
-  const source = hatchData?.source || 'seasonal forecast';
-  const waterTemp = hatchData?.waterTemp;
-  const waterConditions = hatchData?.waterConditions;
-
-  if (currentHatches.length === 0) return null;
+  if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🦟 Current Hatches</Text>
       
-      {waterTemp && (
-        <Text style={styles.waterTemp}>Water: {waterTemp}</Text>
+      {hatchData.waterTemp && (
+        <Text style={styles.waterInfo}>Water: {hatchData.waterTemp}</Text>
       )}
-      {waterConditions && (
-        <Text style={styles.waterConditions}>{waterConditions}</Text>
+      {hatchData.waterConditions && (
+        <Text style={styles.waterInfo}>{hatchData.waterConditions}</Text>
       )}
       
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
-        {currentHatches.map((hatch, index) => (
+        {hatchData.hatches.map((hatch, index) => (
           <View key={index} style={styles.hatchBadge}>
             <Text style={styles.hatchText}>{hatch}</Text>
           </View>
         ))}
       </ScrollView>
       
-      {recommendedFlies.length > 0 && (
+      {hatchData.flies && hatchData.flies.length > 0 && (
         <>
           <Text style={styles.subtitle}>🎣 Recommended Flies</Text>
           <View style={styles.flyContainer}>
-            {recommendedFlies.map((fly, index) => (
+            {hatchData.flies.map((fly, index) => (
               <View key={index} style={styles.flyBadge}>
                 <Text style={styles.flyText}>{fly}</Text>
               </View>
@@ -196,13 +277,7 @@ const HatchChart = ({ riverName, isPremium = false }) => {
         </>
       )}
       
-      <Text style={styles.sourceText}>
-        Source: {source} {hatchData?.isForecast && '(forecast)'}
-      </Text>
-      
-      {!isPremium && hatchData?.upgradeMessage && (
-        <Text style={styles.upgradeText}>{hatchData.upgradeMessage}</Text>
-      )}
+      <Text style={styles.sourceText}>Source: {hatchData.source}</Text>
     </View>
   );
 };
@@ -214,7 +289,7 @@ const styles = StyleSheet.create({
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: COLORS.background,
+    borderColor: '#e8e4da',
   },
   title: {
     fontSize: 17,
@@ -229,16 +304,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 10,
   },
-  waterTemp: {
+  waterInfo: {
     fontSize: 13,
     color: COLORS.primary,
     marginBottom: 4,
-  },
-  waterConditions: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 10,
-    fontStyle: 'italic',
   },
   hatchScroll: {
     flexDirection: 'row',
@@ -280,12 +349,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textLight,
     marginTop: 10,
-    fontStyle: 'italic',
-  },
-  upgradeText: {
-    fontSize: 11,
-    color: COLORS.accent,
-    marginTop: 8,
     fontStyle: 'italic',
   },
 });

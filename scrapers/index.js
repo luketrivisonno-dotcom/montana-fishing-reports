@@ -1,15 +1,11 @@
 const db = require('../db');
-const { getWeatherForRiver } = require('../utils/weather');
-const { getUSGSData } = require('../utils/usgs');
 
-// Import all scrapers
-const scrapeYellowDog = require('./yellowdog');
+// Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
-const scrapeFinsFeathers = require('./finsfeathers');
+const scrapeBlueRibbonFlies = require('./blueribbonflies');
 const scrapeOrvis = require('./orvis');
-const scrapeBozemanFlySupply = require('./bozemanflysupply');
-const scrapePerfectFly = require('./perfectfly');
 
+// River-specific scrapers
 const madison = require('./madison');
 const yellowstone = require('./yellowstone');
 const missouri = require('./missouri');
@@ -18,20 +14,7 @@ const blackfoot = require('./blackfoot');
 const bighorn = require('./bighorn');
 const bitterroot = require('./bitterroot');
 const rockcreek = require('./rockcreek');
-const scrapeYellowstoneCountry = require('./yellowstonecountry');
-const scrapeBlueRibbonFlies = require('./blueribbonflies');
-const scrapeJacklins = require('./jacklins');
-
-// New scrapers
-const scrapeFlyFishingBozeman = require('./flyfishingbozeman');
-const scrapeDanBaileys = require('./danbaileys');
-const scrapeBigSkyAnglers = require('./bigskyanglers');
-const scrapeFlyFishFood = require('./flyfishfood');
-const scrapeTroutfitters = require('./troutfitters');
-const scrapeBigforkAnglers = require('./bigforkanglers');
-const scrapeSunriseFlyShop = require('./sunriseflyshop');
-const scrapeStoneflyShop = require('./stoneflyshop');
-const scrapeGeorgeAnderson = require('./georgeanderson');
+const gallatin = require('./gallatin');
 
 // Helper function to parse date strings
 function parseDate(dateString) {
@@ -64,61 +47,24 @@ async function runAllScrapers() {
   console.log('========================================\n');
   
   const allScrapers = [
-    // Multi-river scrapers
-    { name: 'Yellow Dog', fn: scrapeYellowDog },
-    { name: 'Fins & Feathers', fn: scrapeFinsFeathers },
-    { name: 'Orvis', fn: scrapeOrvis },
-    { name: 'Troutfitters', fn: scrapeTroutfitters },
-    { name: 'Bigfork Anglers', fn: scrapeBigforkAnglers },
-    { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },
+    // Main multi-river scrapers (with working implementations)
     { name: 'Montana Angler', fn: scrapeMontanaAngler },
-    { name: 'Dan Bailey\'s', fn: scrapeDanBaileys },
-    { name: 'George Anderson\'s', fn: scrapeGeorgeAnderson },
-    { name: 'Sunrise Fly Shop', fn: scrapeSunriseFlyShop },
-    { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
-    { name: 'Yellowstone Country Fly Fishing', fn: scrapeYellowstoneCountry },
     { name: 'Blue Ribbon Flies', fn: scrapeBlueRibbonFlies },
-    { name: 'Jacklin\'s Fly Shop', fn: scrapeJacklins },
-    { name: 'Perfect Fly Store', fn: scrapePerfectFly },
+    { name: 'Orvis', fn: scrapeOrvis },
     
-    // River-specific scrapers
-    { name: 'Fly Fishing Bozeman', fn: scrapeFlyFishingBozeman },
-    { name: 'Big Sky Anglers', fn: scrapeBigSkyAnglers },
-    { name: 'Fly Fish Food', fn: scrapeFlyFishFood },
-    
-    // Madison River
-    { name: 'Montana Trout (Madison)', fn: madison.scrapeMadisonMT },
-    { name: 'Madison River Outfitters', fn: madison.scrapeMadisonRiverOutfitters },
-    
-    // Yellowstone River
-    { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
-    
-    // Missouri River
-    { name: 'Headhunters Fly Shop', fn: missouri.scrapeMissouriHeadhunters },
-    { name: 'River\'s Edge (Missouri)', fn: missouri.scrapeMissouriRiversEdge },
-    
-    // Clark Fork River
+    // River-specific scrapers (with hardcoded URLs)
+    { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
+    { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
+    { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
+    { name: 'Headhunters (Missouri)', fn: missouri.scrapeMissouriHeadhunters },
+    { name: 'Montana Angler (Gallatin)', fn: gallatin.scrapeMontanaAngler },
     { name: 'Grizzly Hackle (Clark Fork)', fn: clarkfork.scrapeClarkForkGrizzly },
-    { name: 'Blackfoot River Outfitters (Clark Fork)', fn: clarkfork.scrapeClarkForkBlackfoot },
-    
-    // Blackfoot River
-    { name: 'Grizzly Hackle (Blackfoot)', fn: blackfoot.scrapeBlackfootGrizzly },
     { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
-    
-    // Bighorn River
-    { name: 'North Fork Anglers', fn: bighorn.scrapeBighornNorthFork },
+    { name: 'Grizzly Hackle (Blackfoot)', fn: blackfoot.scrapeBlackfootGrizzly },
+    { name: 'North Fork Anglers (Bighorn)', fn: bighorn.scrapeBighornNorthFork },
     { name: 'Bighorn Angler', fn: bighorn.scrapeBighornAngler },
-    
-    // Bitterroot River
     { name: 'Montana Angler (Bitterroot)', fn: bitterroot.scrapeBitterrootMontanaAngler },
-    
-    // Rock Creek
-    { name: 'Grizzly Hackle (Rock Creek)', fn: rockcreek.scrapeRockCreekGrizzly },
     { name: 'Montana Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMontanaAngler },
-    
-    // New rivers
-    { name: 'Spring Creeks', fn: require('./springcreeks') },
-    { name: 'Boulder River', fn: require('./boulder') },
   ];
   
   let successCount = 0;
@@ -133,7 +79,7 @@ async function runAllScrapers() {
       const results = Array.isArray(result) ? result : [result];
       
       for (const item of results) {
-        if (item && item.last_updated) {
+        if (item && item.url) {
           const parsedDate = parseDate(item.last_updated);
           const dateString = parsedDate.toISOString().split('T')[0];
           
@@ -148,7 +94,7 @@ async function runAllScrapers() {
                VALUES ($1, $2, $3, $4, $5, true)`,
               [item.source, item.river, item.url, dateString, item.scraped_at]
             );
-            console.log(`✓ Inserted: ${item.source} (${item.river}) - ${dateString}`);
+            console.log(`✓ Inserted: ${item.source} (${item.river})`);
             successCount++;
           } else {
             const existingDate = new Date(existing.rows[0].last_updated);
@@ -161,7 +107,7 @@ async function runAllScrapers() {
                  WHERE source = $4 AND river = $5`,
                 [dateString, item.scraped_at, item.url, item.source, item.river]
               );
-              console.log(`✓ Updated: ${item.source} (${item.river}) - ${dateString}`);
+              console.log(`✓ Updated: ${item.source} (${item.river})`);
               successCount++;
             } else {
               console.log(`⊘ Skipped (older): ${item.source} (${item.river})`);
@@ -174,7 +120,7 @@ async function runAllScrapers() {
       console.error(`✗ Error: ${scraper.name}`, error.message);
     }
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
   
   // Deactivate old duplicates

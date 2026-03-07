@@ -17,10 +17,10 @@ const HATCH_SOURCES = {
     'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
   },
   'Blue Ribbon Flies': {
-    'Madison River': 'https://www.blueribbonflies.net/fishing-report',
-    'Firehole River': 'https://www.blueribbonflies.net/fishing-report',
-    'Gibbon River': 'https://www.blueribbonflies.net/fishing-report',
-    'Yellowstone National Park': 'https://www.blueribbonflies.net/fishing-report',
+    'Madison River': 'https://www.blueribbonflies.com/fishing-report/',
+    'Firehole River': 'https://www.blueribbonflies.com/fishing-report/',
+    'Gibbon River': 'https://www.blueribbonflies.com/fishing-report/',
+    'Yellowstone National Park': 'https://www.blueribbonflies.com/fishing-report/',
   }
 };
 
