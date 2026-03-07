@@ -162,6 +162,25 @@ async function initDatabase() {
             UNIQUE(river, month)
         )`);
         
+        // Create hatch_reports table for dynamic hatch data
+        await db.query(`CREATE TABLE IF NOT EXISTS hatch_reports (
+            id SERIAL PRIMARY KEY,
+            river VARCHAR(100) NOT NULL,
+            source VARCHAR(100) NOT NULL,
+            hatches TEXT[],
+            fly_recommendations TEXT[],
+            hatch_details JSONB,
+            water_temp VARCHAR(20),
+            water_conditions TEXT,
+            report_date DATE NOT NULL,
+            scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_current BOOLEAN DEFAULT true
+        )`);
+        
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_river ON hatch_reports(river)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_current ON hatch_reports(is_current)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_date ON hatch_reports(report_date)`);
+        
         await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_source_normalized ON reports(source_normalized)`);
