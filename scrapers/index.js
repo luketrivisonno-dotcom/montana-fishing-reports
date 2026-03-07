@@ -70,7 +70,6 @@ async function runAllScrapers() {
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
-    { name: 'Orvis (Madison)', fn: madison.scrapeMadisonOrvis },
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
     { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
     { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
@@ -82,8 +81,6 @@ async function runAllScrapers() {
     { name: 'Missoulian Angler (Blackfoot)', fn: blackfoot.scrapeBlackfootMissoulian },
     { name: 'Bigfork Anglers (Blackfoot)', fn: blackfoot.scrapeBlackfootBigfork },
     { name: 'Trout Shop (Bighorn)', fn: bighorn.scrapeBighornTroutShop },
-    { name: 'Orvis (Bitterroot)', fn: bitterroot.scrapeBitterrootOrvis },
-    { name: 'Orvis (Rock Creek)', fn: rockcreek.scrapeRockCreekOrvis },
   ];
   
   let successCount = 0;

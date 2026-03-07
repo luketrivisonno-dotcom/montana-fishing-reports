@@ -76,9 +76,7 @@ async function scrapeOrvis() {
   
   if (reports.length > 0) {
     console.log(`\nOrvis: Found ${reports.length} reports`);
-    const saved = await saveReports(reports);
-    console.log(`Orvis: Saved ${saved.length} reports\n`);
-    return saved;
+    return reports;
   }
   
   return [];
