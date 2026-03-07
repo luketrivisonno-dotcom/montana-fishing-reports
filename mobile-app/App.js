@@ -16,6 +16,7 @@ import {
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
 import RiverMap from './components/RiverMap';
+import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,46 +26,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DEV_MODE = true;
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
-
-// ============================================
-// MONTANA RIVER PHOTOS
-// Using Unsplash/Pexels - free for commercial use
-// ============================================
-const RIVER_IMAGES = {
-  'Gallatin River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Upper Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Yellowstone River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Missouri River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Clark Fork River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Blackfoot River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
-  'Bitterroot River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Rock Creek': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Bighorn River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
-  'Beaverhead River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Big Hole River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
-  'Flathead River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Jefferson River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Stillwater River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Swan River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Boulder River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Spring Creeks': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Yellowstone National Park': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Smith River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Belt Creek': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Little Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Judith River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Musselshell River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Other Montana Waters': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Prairie': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Hi-Line': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Fort Peck': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Western': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-};
-
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80';
 
 // ============================================
 // EARTH-TONED COLOR SCHEME
@@ -253,7 +214,7 @@ function RiversScreen({ navigation }) {
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('RiverDetails', { river: item })} activeOpacity={0.9}>
-            <ImageBackground source={{ uri: RIVER_IMAGES[item] || DEFAULT_IMAGE }} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
+            <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
                   <View style={styles.riverInfo}>
@@ -348,7 +309,7 @@ function RiverDetailsScreen({ route, navigation }) {
         </View>
       )}
       
-      <ImageBackground source={{ uri: RIVER_IMAGES[river] || DEFAULT_IMAGE }} style={styles.heroHeader}>
+      <ImageBackground source={getRiverImage(river)} style={styles.heroHeader}>
         <View style={styles.heroOverlay}>
           <View style={styles.heroNav}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.heroButton}>
@@ -524,7 +485,7 @@ function FavoritesScreen({ navigation }) {
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('RiverDetails', { river: item })} activeOpacity={0.9}>
-            <ImageBackground source={{ uri: RIVER_IMAGES[item] || DEFAULT_IMAGE }} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
+            <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
                   <MaterialIcons name="favorite" size={22} color={COLORS.error} />
