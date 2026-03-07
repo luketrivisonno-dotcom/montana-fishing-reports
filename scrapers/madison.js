@@ -13,6 +13,13 @@ async function scrapeMadisonMontanaAngler() {
             url: 'https://www.montanaangler.com/montana-fishing-report/lower-madison-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
+        },
+        {
+            source: 'Montana Angler',
+            river: 'Madison River',
+            url: 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
         }
     ];
 }
@@ -29,6 +36,13 @@ async function scrapeMadisonOrvis() {
         {
             source: 'Orvis',
             river: 'Lower Madison River',
+            url: 'https://fishingreports.orvis.com/west/montana/madison-river',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        },
+        {
+            source: 'Orvis',
+            river: 'Madison River',
             url: 'https://fishingreports.orvis.com/west/montana/madison-river',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
