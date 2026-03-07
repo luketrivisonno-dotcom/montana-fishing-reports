@@ -181,10 +181,10 @@ export const ACCESS_POINTS = {
     { name: 'Horsethief Station', lat: 45.2374, lon: -109.2318, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753848' },
     { name: 'Arapooish', lat: 45.75382, lon: -107.56795, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753824' },
     { name: 'Two Leggins', lat: 45.64534, lon: -107.65865, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753876' },
-    { name: 'Mallard\'s Landing', lat: 45.52148, lon: -107.72427, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753860' },
     { name: 'Pelican', lat: 45.75276, lon: -109.76764, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753866' },
     { name: 'Castle Rock', lat: 45.47303, lon: -109.74104, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753838' },
     { name: 'Mallard\'s Rest', lat: 45.48482, lon: -110.62163, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753566' },
+    { name: 'Mallard\'s Landing', lat: 45.52148, lon: -107.72427, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753860' },
   ],
   'Clark Fork River': [
     { name: 'Paradise Crossing', lat: 47.38347, lon: -114.79906, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754634' },
@@ -250,7 +250,6 @@ export const ACCESS_POINTS = {
     { name: 'Milwaukee', lat: 45.8986, lon: -111.52628, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753570' },
   ],
   'Blackfoot River': [
-    { name: 'Gold Creek', lat: 337531.27049743, lon: 265801.88135636, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/47251882' },
     { name: 'Sportsman\'s Park', lat: 45.88535, lon: -113.16614, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753482' },
     { name: 'Clearwater Crossing', lat: 47.00106, lon: -113.38001, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754449' },
     { name: 'Upsata Lake', lat: 47.07304, lon: -113.2298, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754103' },
