@@ -18,9 +18,9 @@ const HATCH_SOURCES = {
   },
   'Blue Ribbon Flies': {
     'Madison River': 'https://www.blueribbonflies.net/fishing-report',
-  },
-  'Gallatin River Guides': {
-    'Gallatin River': 'https://gallatinrivertguides.com/fishing-report/',
+    'Firehole River': 'https://www.blueribbonflies.net/fishing-report',
+    'Gibbon River': 'https://www.blueribbonflies.net/fishing-report',
+    'Yellowstone National Park': 'https://www.blueribbonflies.net/fishing-report',
   }
 };
 
@@ -165,6 +165,77 @@ async function scrapeMontanaAnglerHatches() {
   return results;
 }
 
+async function scrapeBlueRibbonFliesHatches() {
+  const results = [];
+  const url = 'https://www.blueribbonflies.net/fishing-report';
+  
+  try {
+    console.log(`Scraping Blue Ribbon Flies hatch data...`);
+    
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 15000
+    });
+    
+    const $ = cheerio.load(data);
+    const contentText = $('body').text();
+    
+    // Extract date - Blue Ribbon Flies usually has date in header
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
+    
+    // Extract hatches from text
+    const hatches = extractHatches(contentText);
+    
+    // Extract water temp
+    const tempMatch = contentText.match(/(\d{2,3})\s*°?\s*[Ff]/);
+    const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
+    
+    // Blue Ribbon Flies focuses on West Yellowstone area rivers
+    // The report covers Madison, Firehole, Gibbon, and YNP
+    const rivers = [
+      { name: 'Madison River', keywords: ['madison', 'madison river'] },
+      { name: 'Firehole River', keywords: ['firehole', 'firehole river'] },
+      { name: 'Gibbon River', keywords: ['gibbon', 'gibbon river'] },
+      { name: 'Yellowstone National Park', keywords: ['ynp', 'yellowstone park', 'the park'] }
+    ];
+    
+    // Try to assign hatches to specific rivers based on text context
+    for (const river of rivers) {
+      // Look for river-specific sections
+      const riverPattern = new RegExp(`(${river.keywords.join('|')})[^.]*([^.]*hatch[^.]*|[^.]*fly[^.]*|[^.]*pattern[^.]*)`, 'gi');
+      const matches = contentText.match(riverPattern);
+      
+      if (matches || hatches.length > 0) {
+        results.push({
+          river: river.name,
+          source: 'Blue Ribbon Flies',
+          hatches: hatches,
+          fly_recommendations: getFlyRecommendations(hatches),
+          hatch_details: {
+            extracted_from: 'Blue Ribbon Flies fishing report',
+            confidence: 'medium',
+            note: 'West Yellowstone area report'
+          },
+          water_temp: waterTemp,
+          water_conditions: null,
+          report_date: reportDate,
+          url
+        });
+        
+        console.log(`  Found data for ${river.name}: ${hatches.length} hatches`);
+      }
+    }
+    
+  } catch (error) {
+    console.error(`  Error scraping Blue Ribbon Flies:`, error.message);
+  }
+  
+  return results;
+}
+
 async function saveHatchReports(reports) {
   const saved = [];
   
@@ -206,16 +277,30 @@ async function saveHatchReports(reports) {
 async function runHatchScraper() {
   console.log('\n=== Starting Hatch Scraper ===\n');
   
+  let totalSaved = 0;
+  
   try {
     // Scrape from Montana Angler
+    console.log('--- Montana Angler ---');
     const montanaAnglerHatches = await scrapeMontanaAnglerHatches();
     
     if (montanaAnglerHatches.length > 0) {
       const saved = await saveHatchReports(montanaAnglerHatches);
-      console.log(`\n✓ Saved ${saved.length} hatch reports`);
-    } else {
-      console.log('\n⚠ No hatch data found');
+      console.log(`✓ Saved ${saved.length} Montana Angler reports`);
+      totalSaved += saved.length;
     }
+    
+    // Scrape from Blue Ribbon Flies
+    console.log('\n--- Blue Ribbon Flies ---');
+    const blueRibbonHatches = await scrapeBlueRibbonFliesHatches();
+    
+    if (blueRibbonHatches.length > 0) {
+      const saved = await saveHatchReports(blueRibbonHatches);
+      console.log(`✓ Saved ${saved.length} Blue Ribbon Flies reports`);
+      totalSaved += saved.length;
+    }
+    
+    console.log(`\n✓ Total: ${totalSaved} hatch reports saved`);
     
   } catch (error) {
     console.error('Hatch scraper error:', error);
