@@ -35,23 +35,31 @@ async function scrapeOrvis() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      const dateMatch = 
-        pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        pageText.match(/Report\s+Date[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
-        pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+      // Try to get date from HTML element first (Orvis specific)
+      const lastUpdatedEl = $('.last-updated span').text();
       
-      const metaDate = $('meta[property="article:modified_time"]').attr('content') ||
-                       $('meta[property="article:published_time"]').attr('content');
+      let finalDate = lastUpdatedEl || null;
       
-      let finalDate = dateMatch ? dateMatch[1] : null;
-      
-      if (!finalDate && metaDate) {
-        finalDate = new Date(metaDate).toLocaleDateString('en-US', { 
-          month: 'long', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
+      if (!finalDate) {
+        const dateMatch = 
+          pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
+          pageText.match(/Report\s+Date[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
+          pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
+          pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) ||
+          pageText.match(/(\d{1,2}\/\d{1,2}\/\d{2})/);
+        
+        if (dateMatch) {
+          // Convert short year format (3/4/26) to full date
+          if (dateMatch[1].match(/^\d{1,2}\/\d{1,2}\/\d{2}$/)) {
+            const [m, d, y] = dateMatch[1].split('/');
+            const fullYear = parseInt(y) > 50 ? '19' + y : '20' + y;
+            finalDate = new Date(`${fullYear}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`).toLocaleDateString('en-US', {
+              month: 'long', day: 'numeric', year: 'numeric'
+            });
+          } else {
+            finalDate = dateMatch[1];
+          }
+        }
       }
       
       reports.push({

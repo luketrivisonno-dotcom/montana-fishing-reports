@@ -4,7 +4,8 @@ const cheerio = require('cheerio');
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
-  'Missouri River': 'https://troutfitters.com/reports/missouri-river'
+  'Missouri River': 'https://troutfitters.com/reports/missouri-river',
+  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river'
 };
 
 async function scrapeTroutfitters() {
