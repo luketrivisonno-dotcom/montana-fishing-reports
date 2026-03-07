@@ -28,44 +28,44 @@ const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
 // ============================================
 // REAL MONTANA FLY FISHING PHOTOS
-// Using Unsplash - reliable, high-quality river/fishing images
+// Authentic fly-fishing and river photos
 // ============================================
 const RIVER_IMAGES = {
-  'Gallatin River': 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?w=800&q=80',
-  'Upper Madison River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Lower Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Yellowstone River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Missouri River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Clark Fork River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Blackfoot River': 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
-  'Bitterroot River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Rock Creek': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Bighorn River': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Beaverhead River': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
-  'Big Hole River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Flathead River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Jefferson River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Madison River': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Ruby River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Stillwater River': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Swan River': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Boulder River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Spring Creeks': 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-  'Yellowstone National Park': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Smith River': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Belt Creek': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Little Blackfoot River': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  'Judith River': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Musselshell River': 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80',
-  'Other Montana Waters': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  'Prairie': 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80',
-  'Hi-Line': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-  'Fort Peck': 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  'Western': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+  'Gallatin River': 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Upper Madison River': 'https://images.pexels.com/photos/294981/pexels-photo-294981.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Lower Madison River': 'https://images.pexels.com/photos/1630039/pexels-photo-1630039.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Yellowstone River': 'https://images.pexels.com/photos/1174143/pexels-photo-1174143.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Missouri River': 'https://images.pexels.com/photos/917494/pexels-photo-917494.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Clark Fork River': 'https://images.pexels.com/photos/709552/pexels-photo-709552.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Blackfoot River': 'https://images.pexels.com/photos/1192671/pexels-photo-1192671.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Bitterroot River': 'https://images.pexels.com/photos/164024/pexels-photo-164024.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Rock Creek': 'https://images.pexels.com/photos/1485894/pexels-photo-1485894.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Bighorn River': 'https://images.pexels.com/photos/2253879/pexels-photo-2253879.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Beaverhead River': 'https://images.pexels.com/photos/3225529/pexels-photo-3225529.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Big Hole River': 'https://images.pexels.com/photos/2255935/pexels-photo-2255935.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Flathead River': 'https://images.pexels.com/photos/1547813/pexels-photo-1547813.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Jefferson River': 'https://images.pexels.com/photos/1179229/pexels-photo-1179229.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Madison River': 'https://images.pexels.com/photos/294981/pexels-photo-294981.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Ruby River': 'https://images.pexels.com/photos/1192671/pexels-photo-1192671.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Stillwater River': 'https://images.pexels.com/photos/2253879/pexels-photo-2253879.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Swan River': 'https://images.pexels.com/photos/1547813/pexels-photo-1547813.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Boulder River': 'https://images.pexels.com/photos/1485894/pexels-photo-1485894.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Spring Creeks': 'https://images.pexels.com/photos/164024/pexels-photo-164024.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Yellowstone National Park': 'https://images.pexels.com/photos/1174143/pexels-photo-1174143.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Smith River': 'https://images.pexels.com/photos/917494/pexels-photo-917494.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Belt Creek': 'https://images.pexels.com/photos/3225529/pexels-photo-3225529.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Little Blackfoot River': 'https://images.pexels.com/photos/709552/pexels-photo-709552.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Judith River': 'https://images.pexels.com/photos/2255935/pexels-photo-2255935.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Musselshell River': 'https://images.pexels.com/photos/2253879/pexels-photo-2253879.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Other Montana Waters': 'https://images.pexels.com/photos/294981/pexels-photo-294981.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Prairie': 'https://images.pexels.com/photos/2255935/pexels-photo-2255935.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Hi-Line': 'https://images.pexels.com/photos/2253879/pexels-photo-2253879.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Fort Peck': 'https://images.pexels.com/photos/917494/pexels-photo-917494.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'Western': 'https://images.pexels.com/photos/1547813/pexels-photo-1547813.jpeg?auto=compress&cs=tinysrgb&w=800',
 };
 
-// Fallback to mountain river landscape
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80';
+// Fallback to fly fishing photo
+const DEFAULT_IMAGE = 'https://images.pexels.com/photos/294981/pexels-photo-294981.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 // ============================================
 // EARTH-TONED COLOR SCHEME
