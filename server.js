@@ -501,14 +501,15 @@ app.get('/api/river-details/:river',
     async (req, res) => {
         try {
             const { river } = req.params;
-            const [weather, usgs, reportsResult] = await Promise.all([
+            const [weather, usgs, reportsResult, hatchData] = await Promise.all([
                 getWeatherForRiver(river),
                 getUSGSData(river),
                 db.query(`SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
                           FROM reports WHERE river = $1 AND is_active = true 
                           AND source NOT LIKE '%USGS%' AND url IS NOT NULL 
                           AND url != '' AND url LIKE 'http%' ORDER BY scraped_at DESC`, 
-                         [river])
+                         [river]),
+                getDynamicHatchData(river)
             ]);
             
             const seenSources = new Set();
@@ -521,8 +522,23 @@ app.get('/api/river-details/:river',
                 seenSources.add(normalized);
                 return true;
             });
+
+            // Aggregate water clarity from reports
+            let clarity = null;
+            const clarityReports = reports.filter(r => r.water_clarity);
+            if (clarityReports.length > 0) {
+                // Use the most recent clarity report
+                clarity = clarityReports[0].water_clarity;
+            }
             
-            res.json({ river, weather, usgs, reports: reports });
+            res.json({ 
+                river, 
+                weather, 
+                usgs, 
+                reports: reports,
+                clarity,
+                hatchData
+            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Failed to fetch river details' });
@@ -884,6 +900,88 @@ function generateFishingTips(river, month) {
     
     return tips.slice(0, 3);
 }
+
+// DYNAMIC HATCH DATA - combines seasonal patterns with real-time conditions
+async function getDynamicHatchData(riverName) {
+    const month = new Date().toLocaleString('en-US', { month: 'short' });
+    const monthNum = new Date().getMonth();
+    
+    // Get seasonal hatches
+    const seasonalHatches = getStaticHatches(riverName) || getDefaultHatches(month);
+    
+    // Get real water temperature if available
+    const usgsData = await getUSGSData(riverName);
+    let waterTemp = null;
+    if (usgsData && usgsData.temp) {
+        const tempMatch = usgsData.temp.match(/(\d+)/);
+        if (tempMatch) waterTemp = parseInt(tempMatch[1]);
+    }
+    
+    // Adjust recommendations based on conditions
+    let adjustedHatches = [...seasonalHatches];
+    let conditions = [];
+    
+    if (waterTemp) {
+        if (waterTemp < 40) {
+            conditions.push('Cold water - fish deep and slow');
+            adjustedHatches = ['Midges', 'Baetis'];
+        } else if (waterTemp > 65) {
+            conditions.push('Warm water - fish early/late');
+            adjustedHatches.push('Hoppers');
+        } else if (waterTemp >= 50 && waterTemp <= 60) {
+            conditions.push('Prime temperature - active feeding');
+        }
+    }
+    
+    // Get wind data for recommendations
+    const weather = await getWeatherForRiver(riverName);
+    if (weather && weather.windSpeed > 15) {
+        conditions.push('Windy - use heavier flies, fish lee side');
+    }
+    
+    return {
+        hatches: adjustedHatches,
+        flies: generateFlyRecommendations(adjustedHatches),
+        waterTemp: waterTemp ? `${waterTemp}°F` : null,
+        waterConditions: conditions.length > 0 ? conditions.join('. ') : null,
+        source: waterTemp ? 'Live conditions + seasonal forecast' : 'Seasonal forecast',
+        seasonalForecast: seasonalHatches
+    };
+}
+
+function getDefaultHatches(month) {
+    const defaults = {
+        'Jan': ['Midges'], 'Feb': ['Midges'], 'Mar': ['Midges', 'BWO'],
+        'Apr': ['BWO', 'March Browns'], 'May': ['March Browns', 'Caddis'],
+        'Jun': ['PMDs', 'Caddis', 'Salmonflies'], 'Jul': ['PMDs', 'Caddis', 'Hoppers'],
+        'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+        'Oct': ['Baetis', 'October Caddis'], 'Nov': ['Midges', 'Baetis'], 'Dec': ['Midges']
+    };
+    return defaults[month] || ['Midges', 'BWO'];
+}
+
+// Public hatch endpoint (limited version)
+app.get('/api/hatches/:river',
+    apiLimiter,
+    param('river').trim().escape(),
+    async (req, res) => {
+        try {
+            const { river } = req.params;
+            const hatchData = await getDynamicHatchData(river);
+            
+            res.json({
+                river,
+                currentHatches: hatchData.hatches.slice(0, 2), // Limited for free tier
+                recommendedFlies: hatchData.flies.slice(0, 3), // Limited for free tier
+                waterTemp: hatchData.waterTemp,
+                waterConditions: hatchData.waterConditions,
+                source: hatchData.source
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
 
 // 404 handler
 app.use((req, res) => {

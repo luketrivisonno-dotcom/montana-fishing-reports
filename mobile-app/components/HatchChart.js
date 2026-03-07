@@ -150,13 +150,25 @@ const FLY_RECOMMENDATIONS = {
   'Pseudos': ['Pseudo Spinner #16-18', 'Sparkle Dun #16-18'],
 };
 
-const HatchChart = ({ riverName, isPremium = false }) => {
+const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) => {
   const [hatchData, setHatchData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If hatchData is passed from parent (API), use it directly
+    if (propHatchData && propHatchData.hatches) {
+      setHatchData({
+        hatches: propHatchData.hatches,
+        flies: propHatchData.flies || getFlyRecommendations(propHatchData.hatches),
+        waterTemp: propHatchData.waterTemp,
+        waterConditions: propHatchData.waterConditions,
+        source: propHatchData.source
+      });
+      setLoading(false);
+      return;
+    }
     fetchHatchData();
-  }, [riverName, isPremium]);
+  }, [riverName, isPremium, propHatchData]);
 
   const getStaticHatches = (river) => {
     const month = new Date().toLocaleString('en-US', { month: 'short' });

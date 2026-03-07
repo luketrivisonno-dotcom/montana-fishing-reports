@@ -336,7 +336,15 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.conditionLabel}>Weather</Text>
                 <Text style={styles.conditionValue}>{data.weather.high}° / {data.weather.low}°</Text>
                 <Text style={styles.conditionSubtext}>{data.weather.condition}</Text>
+                {data.weather.wind && (
+                  <Text style={styles.conditionSubtext}>💨 {data.weather.wind}</Text>
+                )}
               </View>
+              {data.weather.station && (
+                <View style={styles.locationBadge}>
+                  <Text style={styles.locationText}>{data.weather.station}</Text>
+                </View>
+              )}
             </View>
           )}
 
@@ -350,13 +358,32 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.conditionValue}>{data.usgs.flow}</Text>
                 <Text style={styles.conditionSubtext}>{data.usgs.temp}</Text>
               </View>
-              <Ionicons name="open-outline" size={16} color={COLORS.textLight} />
+              <View style={styles.locationContainer}>
+                {data.usgs.location && (
+                  <Text style={styles.locationText}>{data.usgs.location}</Text>
+                )}
+                <Ionicons name="open-outline" size={16} color={COLORS.textLight} />
+              </View>
             </TouchableOpacity>
+          )}
+
+          {/* Water Clarity Card */}
+          {data?.clarity && (
+            <View style={styles.conditionCard}>
+              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
+                <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
+              </View>
+              <View style={styles.conditionInfo}>
+                <Text style={styles.conditionLabel}>Water Clarity</Text>
+                <Text style={styles.conditionValue}>{data.clarity}</Text>
+                <Text style={styles.conditionSubtext}>From recent reports</Text>
+              </View>
+            </View>
           )}
         </View>
 
-        {/* ALWAYS SHOW HATCH CHART - even without premium for now */}
-        <HatchChart riverName={river} isPremium={globalIsPremium} />
+        {/* DYNAMIC HATCH CHART with live conditions */}
+        <HatchChart riverName={river} isPremium={globalIsPremium} hatchData={data?.hatchData} />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Fishing Reports</Text>
@@ -620,6 +647,9 @@ const styles = StyleSheet.create({
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
   waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },
+  locationBadge: { position: 'absolute', top: 8, right: 8, backgroundColor: COLORS.primary + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  locationContainer: { alignItems: 'flex-end', marginLeft: 'auto' },
+  locationText: { fontSize: 10, color: COLORS.textLight, fontWeight: '500' },
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 10 },
   emptyText: { fontSize: 15, color: COLORS.textLight },
   emptyTitle: { fontSize: 17, fontWeight: '600', color: COLORS.text },
