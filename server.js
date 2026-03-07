@@ -227,7 +227,12 @@ async function runDatabaseCleanup() {
             'Troutfitters',
             'Fins & Feathers',
             'Fly Fish Food',
-            'Perfect Fly'
+            'Perfect Fly',
+            'Big Sky Anglers',
+            'Fly Fishing Bozeman',
+            'Blackfoot River Outfitters',
+            'Madison River Outfitters',
+            'River\'s Edge'  // Old riversedge.com domain
         ];
         
         const defunctResult = await db.query(`
@@ -392,7 +397,13 @@ app.post('/api/cleanup', async (req, res) => {
             '%big-hole-river-fishing-report%',
             '%flathead-river-fishing-report%',
             '%boulder-river-fishing-report%',
-            '%thestonefly.com%'
+            '%thestonefly.com%',
+            '%bigskyanglers.com%',
+            '%flyfishingbozeman.com%',
+            '%riversedge.com%',  // Old domain (not theriversedge.com)
+            '%www.orvis.com/fishing-report%',  // Old Orvis domain
+            '%blackfootriver.com%',  // 404s
+            '%montanaangler.com/bitterroot-river-fishing-report%'  // Wrong path
         ];
         
         let badUrlCount = 0;
