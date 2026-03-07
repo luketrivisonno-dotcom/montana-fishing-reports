@@ -767,22 +767,15 @@ app.post('/api/admin/purge-bad-urls', async (req, res) => {
     try {
         // Delete by exact source names
         const badSources = [
-            'Bighorn Angler',
             'North Fork Anglers', 
             'Yellow Dog (Bighorn River)',
-            'Yellow Dog Fly Fishing',
-            'Troutfitters',
             'Stonefly Shop',
             'Dan Bailey\'s',
             'Fins & Feathers',
-            'Fly Fish Food',
-            'Perfect Fly',
-            'Bozeman Fly Supply',
             'Montana Trout',
             'Madison River Outfitters',
             'Headhunters Fly Shop',
-            'Grizzly Hackle',
-            'Yellow Dog'
+            'Grizzly Hackle'
         ];
         
         const sourceResult = await db.query(`
@@ -820,6 +813,43 @@ app.post('/api/admin/purge-bad-urls', async (req, res) => {
             deletedBySource: sourceResult.rowCount,
             deletedByUrl: urlResultCount,
             deletedDetails: sourceResult.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin endpoint to fix missing icons
+app.post('/api/admin/fix-icons', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        const iconUpdates = [
+            {
+                source: 'Montana Angler',
+                icon_url: 'https://www.montanaangler.com/wp-content/uploads/2021/03/Montana-Angler-Logo.png'
+            },
+            {
+                source: 'Orvis',
+                icon_url: 'https://www.orvis.com/orvis_assets/images/orvis-logo.png'
+            }
+        ];
+        
+        let updatedCount = 0;
+        for (const update of iconUpdates) {
+            const result = await db.query(
+                `UPDATE reports SET icon_url = $1 WHERE source = $2 AND (icon_url IS NULL OR icon_url = '')`,
+                [update.icon_url, update.source]
+            );
+            updatedCount += result.rowCount;
+        }
+        
+        res.json({
+            message: 'Icons updated successfully',
+            updatedCount: updatedCount
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
