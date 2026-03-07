@@ -470,7 +470,7 @@ function RiverDetailsScreen({ route, navigation }) {
         </View>
 
         {globalIsPremium ? (
-          <HatchChart riverName={river} />
+          <HatchChart riverName={river} isPremium={globalIsPremium} />
         ) : (
           <TouchableOpacity 
             style={styles.premiumUpsell}

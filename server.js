@@ -6,6 +6,7 @@ const db = require('./db');
 const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
 const { getUSGSData } = require('./utils/usgs');
+const { runHatchScraper, getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
 
 // Security and rate limiting
 const rateLimit = require('express-rate-limit');
@@ -252,6 +253,7 @@ initDatabase();
 cron.schedule('0 */6 * * *', () => {
     console.log('Running scheduled scrape...');
     runAllScrapers();
+    runHatchScraper(); // Also scrape hatch data
 });
 
 // Health check endpoint
@@ -457,7 +459,7 @@ app.get('/api/premium/status', checkPremium, async (req, res) => {
     });
 });
 
-// Get hatch charts (premium)
+// Get hatch charts (premium) - DYNAMIC from fly shop reports
 app.get('/api/premium/hatch-charts/:river', 
     checkPremium,
     param('river').trim().escape(),
@@ -473,26 +475,30 @@ app.get('/api/premium/hatch-charts/:river',
             const { river } = req.params;
             const month = new Date().toLocaleString('en-US', { month: 'short' });
             
-            const result = await db.query(
-                `SELECT * FROM hatch_charts WHERE river = $1 AND month = $2`,
-                [river, month]
-            );
+            // Try to get dynamic hatch data from database
+            let hatchData = await getCurrentHatches(river);
             
-            const defaultHatches = {
-                'Madison River': ['Midges', 'BWO', 'March Browns', 'Salmonflies', 'PMDs'],
-                'Yellowstone River': ['Midges', 'BWO', 'March Browns', 'Salmonflies', 'PMDs'],
-                'Gallatin River': ['Midges', 'BWO', 'March Browns', 'PMDs', 'Caddis'],
-                'Missouri River': ['Midges', 'BWO', 'Caddis', 'PMDs', 'Tricos'],
-                'Bighorn River': ['Midges', 'BWO', 'Caddis', 'PMDs', 'Tricos']
-            };
-            
-            const hatches = result.rows[0]?.hatches || defaultHatches[river] || ['Midges', 'BWO'];
+            // If no dynamic data, fall back to static seasonal data
+            if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
+                const staticHatches = getStaticHatches(river);
+                hatchData = {
+                    hatches: staticHatches,
+                    fly_recommendations: generateFlyRecommendations(staticHatches),
+                    source: 'seasonal forecast',
+                    is_forecast: true
+                };
+            }
             
             res.json({
                 river,
                 month,
-                currentHatches: hatches,
-                recommendedFlies: generateFlyRecommendations(hatches),
+                currentHatches: hatchData.hatches,
+                recommendedFlies: hatchData.fly_recommendations || generateFlyRecommendations(hatchData.hatches),
+                waterTemp: hatchData.water_temp,
+                waterConditions: hatchData.water_conditions,
+                source: hatchData.source,
+                reportDate: hatchData.report_date,
+                isForecast: hatchData.is_forecast || false,
                 tips: generateFishingTips(river, month)
             });
         } catch (error) {
@@ -500,6 +506,54 @@ app.get('/api/premium/hatch-charts/:river',
         }
     }
 );
+
+// Public hatch API (limited data)
+app.get('/api/hatches/:river',
+    apiLimiter,
+    param('river').trim().escape(),
+    async (req, res) => {
+        try {
+            const { river } = req.params;
+            
+            // Get dynamic hatch data
+            let hatchData = await getCurrentHatches(river);
+            
+            // If no dynamic data, use static
+            if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
+                const staticHatches = getStaticHatches(river);
+                hatchData = {
+                    hatches: staticHatches.slice(0, 3), // Limit to 3 for non-premium
+                    source: 'seasonal forecast'
+                };
+            } else {
+                // Limit data for non-premium users
+                hatchData = {
+                    hatches: hatchData.hatches.slice(0, 3),
+                    source: hatchData.source
+                };
+            }
+            
+            res.json({
+                river,
+                currentHatches: hatchData.hatches,
+                source: hatchData.source,
+                upgradeMessage: 'Upgrade to Premium for detailed fly recommendations and full hatch charts'
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
+// Trigger hatch scrape manually
+app.post('/api/scrape-hatches', scrapeLimiter, async (req, res) => {
+    try {
+        await runHatchScraper();
+        res.json({ message: 'Hatch scrape completed' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // User favorites (premium)
 app.get('/api/premium/favorites', checkPremium, async (req, res) => {
