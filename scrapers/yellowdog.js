@@ -2,7 +2,14 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const YELLOWDOG_URLS = {
-  'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report'
+  'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report',
+  'Upper Madison River': 'https://www.yellowdogflyfishing.com/pages/upper-madison-fishing-reports',
+  'Lower Madison River': 'https://www.yellowdogflyfishing.com/pages/lower-madison-fishing-reports',
+  'Yellowstone River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-river-fishing-reports',
+  'Spring Creeks': 'https://www.yellowdogflyfishing.com/pages/spring-creeks-fishing-reports',
+  'Missouri River': 'https://www.yellowdogflyfishing.com/pages/missouri-river-fishing-reports',
+  'Yellowstone National Park': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Bighorn River': 'https://www.yellowdogflyfishing.com/pages/bighorn-river-fishing-reports'
 };
 
 async function scrapeYellowDog() {
