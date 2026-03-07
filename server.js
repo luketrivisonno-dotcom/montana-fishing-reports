@@ -215,23 +215,18 @@ async function runDatabaseCleanup() {
         
         // Remove reports from defunct/broken sources
         const defunctSources = [
-            'Bighorn Angler',
+            'Bighorn Angler (Old)',
             'North Fork Anglers',
-            'Yellow Dog Fly Fishing',
             'Yellow Dog (Bighorn River)',
-            'Yellow Dog',
             'Grizzly Hackle',
             'Headhunters Fly Shop',
-            'Bozeman Fly Supply',
             'Montana Trout',
             'Stonefly Shop',
             'Dan Bailey\'s',
-            'Troutfitters',
             'Fins & Feathers',
-            'Fly Fish Food',
-            'Perfect Fly',
+            'Perfect Fly (Old)',
             'Big Sky Anglers',
-            'Fly Fishing Bozeman',
+            'Fly Fishing Bozeman (Old)',
             'Blackfoot River Outfitters',
             'Madison River Outfitters',
             'River\'s Edge',  // Old riversedge.com domain
