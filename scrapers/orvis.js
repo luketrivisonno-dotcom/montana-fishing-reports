@@ -9,14 +9,11 @@ const ORVIS_URLS = {
   'Yellowstone River': 'https://fishingreports.orvis.com/west/montana/yellowstone-river',
   'Missouri River': 'https://fishingreports.orvis.com/west/montana/missouri-river',
   'Big Hole River': 'https://fishingreports.orvis.com/west/montana/big-hole-river',
-  'Beaverhead River': 'https://fishingreports.orvis.com/west/montana/beaverhead-river',
   'Bighorn River': 'https://fishingreports.orvis.com/west/montana/bighorn-river',
   'Rock Creek': 'https://fishingreports.orvis.com/west/montana/rock-creek',
   'Clark Fork River': 'https://fishingreports.orvis.com/west/montana/clark-fork-river',
   'Blackfoot River': 'https://fishingreports.orvis.com/west/montana/blackfoot-river',
   'Bitterroot River': 'https://fishingreports.orvis.com/west/montana/bitterroot-river',
-  'Flathead River': 'https://fishingreports.orvis.com/west/montana/flathead-river',
-  'Jefferson River': 'https://fishingreports.orvis.com/west/montana/jefferson-river',
 };
 
 async function scrapeOrvis() {
