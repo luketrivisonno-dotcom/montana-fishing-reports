@@ -281,21 +281,19 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
     <View style={styles.container}>
       <Text style={styles.title}>🦟 Current Hatches</Text>
       
-      {/* Dynamic conditions section */}
-      {(hatchData.waterTemp || hatchData.waterConditions) && (
-        <View style={styles.conditionsBox}>
-          {hatchData.waterTemp && (
-            <Text style={styles.waterTempText}>
-              💧 Water Temp: {hatchData.waterTemp}
-              {hatchData.tempSource && (
-                <Text style={styles.tempSourceText}> ({hatchData.tempSource})</Text>
-              )}
-            </Text>
+      {/* Water temp - subtle inline display */}
+      {hatchData.waterTemp && (
+        <Text style={styles.waterTempSubtle}>
+          Water: {hatchData.waterTemp}
+          {hatchData.tempSource && hatchData.tempSource !== 'USGS Live' && (
+            <Text style={styles.tempSourceSubtle}> • {hatchData.tempSource}</Text>
           )}
-          {hatchData.waterConditions && (
-            <Text style={styles.conditionsText}>🎯 {hatchData.waterConditions}</Text>
-          )}
-        </View>
+        </Text>
+      )}
+      
+      {/* Water conditions - only if meaningful */}
+      {hatchData.waterConditions && (
+        <Text style={styles.conditionsSubtle}>{hatchData.waterConditions}</Text>
       )}
       
       {/* Primary hatches */}
@@ -370,28 +368,22 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     marginBottom: 4,
   },
-  conditionsBox: {
-    backgroundColor: COLORS.primary + '10',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
+  waterTempSubtle: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+    marginBottom: 10,
   },
-  waterTempText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
-  tempSourceText: {
+  tempSourceSubtle: {
     fontSize: 11,
     fontWeight: '400',
     color: COLORS.textLight,
-    marginBottom: 4,
   },
-  conditionsText: {
-    fontSize: 13,
-    color: COLORS.text,
+  conditionsSubtle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 10,
   },
   seasonalLabel: {
     fontSize: 12,
