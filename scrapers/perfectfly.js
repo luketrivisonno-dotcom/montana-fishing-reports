@@ -54,7 +54,7 @@ async function scrapePerfectFly() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdated,
         scraped_at: new Date(),
-        icon_url: 'https://perfectflystore.com/favicon.ico',
+        icon_url: null,
         water_clarity: waterClarity
       });
       

@@ -6,7 +6,7 @@ async function scrapeKingfisher() {
         last_updated: new Date().toLocaleDateString(),
         last_updated_text: new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://kingfisherflyshop.com/favicon.ico',
+        icon_url: null,
         water_clarity: null
     };
 }

@@ -417,30 +417,23 @@ function RiverDetailsScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Water Clarity Card */}
-          <View style={styles.conditionCard}>
-            <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
-              <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
+          {/* Water Clarity Card - Only show if data exists */}
+          {data?.reports?.filter(r => r.water_clarity).length > 0 && (
+            <View style={styles.conditionCard}>
+              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
+                <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
+              </View>
+              <View style={styles.conditionInfo}>
+                <Text style={styles.conditionLabel}>Water Clarity</Text>
+                <Text style={styles.conditionValue}>
+                  {data.reports.filter(r => r.water_clarity)[0]?.water_clarity}
+                </Text>
+                <Text style={styles.conditionSubtext}>
+                  {data.reports.filter(r => r.water_clarity).length} report{data.reports.filter(r => r.water_clarity).length !== 1 ? 's' : ''} with clarity data
+                </Text>
+              </View>
             </View>
-            <View style={styles.conditionInfo}>
-              <Text style={styles.conditionLabel}>Water Clarity</Text>
-              {data?.reports?.filter(r => r.water_clarity).length > 0 ? (
-                <>
-                  <Text style={styles.conditionValue}>
-                    {data.reports.filter(r => r.water_clarity)[0]?.water_clarity}
-                  </Text>
-                  <Text style={styles.conditionSubtext}>
-                    {data.reports.filter(r => r.water_clarity).length} report{data.reports.filter(r => r.water_clarity).length !== 1 ? 's' : ''} with clarity data
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text style={[styles.conditionValue, { color: COLORS.textLight }]}>No clarity data</Text>
-                  <Text style={styles.conditionSubtext}>Check individual reports below</Text>
-                </>
-              )}
-            </View>
-          </View>
+          )}
         </View>
 
         {/* DYNAMIC HATCH CHART with live conditions */}
@@ -688,9 +681,9 @@ const styles = StyleSheet.create({
   reportContent: { flex: 1, gap: 3 },
   reportSourceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sourceDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.primary },
-  sourceIcon: { width: 32, height: 32, borderRadius: 6, backgroundColor: '#fff' },
-  sourceIconFallback: { width: 32, height: 32, borderRadius: 6, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
-  sourceIconText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  sourceIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: '#fff' },
+  sourceIconFallback: { width: 36, height: 36, borderRadius: 8, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  sourceIconText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
   waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },

@@ -54,7 +54,7 @@ async function scrapeYellowDog() {
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         last_updated_text: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://www.yellowdogflyfishing.com/favicon.ico',
+        icon_url: null,
         water_clarity: waterClarity
       });
       

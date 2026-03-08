@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const ICON_URL = 'https://fishingreports.orvis.com/favicon.ico';
+const ICON_URL = null;
 
 const ORVIS_URLS = {
   'Gallatin River': 'https://fishingreports.orvis.com/west/montana/gallatin-river',

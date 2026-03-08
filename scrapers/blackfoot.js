@@ -6,7 +6,7 @@ async function scrapeBlackfootMissoulian() {
         last_updated: new Date().toLocaleDateString(),
         last_updated_text: new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://www.missoulianangler.com/favicon.ico',
+        icon_url: null,
         water_clarity: null
     };
 }
@@ -19,7 +19,7 @@ async function scrapeBlackfootBigfork() {
         last_updated: new Date().toLocaleDateString(),
         last_updated_text: new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://bigforkanglers.com/favicon.ico',
+        icon_url: null,
         water_clarity: null
     };
 }
@@ -34,7 +34,7 @@ async function scrapeBlackfootBRO() {
             last_updated: new Date().toLocaleDateString(),
             last_updated_text: new Date().toLocaleDateString(),
             scraped_at: new Date(),
-            icon_url: baseUrl + '/favicon.ico',
+            icon_url: null,
             water_clarity: null
         },
         {
@@ -44,7 +44,7 @@ async function scrapeBlackfootBRO() {
             last_updated: new Date().toLocaleDateString(),
             last_updated_text: new Date().toLocaleDateString(),
             scraped_at: new Date(),
-            icon_url: baseUrl + '/favicon.ico',
+            icon_url: null,
             water_clarity: null
         },
         {
@@ -54,7 +54,7 @@ async function scrapeBlackfootBRO() {
             last_updated: new Date().toLocaleDateString(),
             last_updated_text: new Date().toLocaleDateString(),
             scraped_at: new Date(),
-            icon_url: baseUrl + '/favicon.ico',
+            icon_url: null,
             water_clarity: null
         },
         {
@@ -64,7 +64,7 @@ async function scrapeBlackfootBRO() {
             last_updated: new Date().toLocaleDateString(),
             last_updated_text: new Date().toLocaleDateString(),
             scraped_at: new Date(),
-            icon_url: baseUrl + '/favicon.ico',
+            icon_url: null,
             water_clarity: null
         }
     ];
