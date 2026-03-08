@@ -47,12 +47,15 @@ export default function RiverMap({ isPremium }) {
   const usgsStations = useMemo(() => getUSGSStations(), []);
 
   const filteredPoints = useMemo(() => {
+    console.log('Filtering by type:', selectedType, 'Total points:', allPoints.length);
     if (selectedType === 'all') return allPoints;
-    return allPoints.filter(point => {
+    const filtered = allPoints.filter(point => {
       if (selectedType === 'boat') return point.type === 'boat' || point.type === 'both';
       if (selectedType === 'wade') return point.type === 'wade' || point.type === 'both';
       return true;
     });
+    console.log('Filtered count:', filtered.length);
+    return filtered;
   }, [allPoints, selectedType]);
 
   const getMarkerColor = (type) => {
@@ -178,7 +181,7 @@ export default function RiverMap({ isPremium }) {
 
         {filteredPoints.map((point, index) => (
           <Marker
-            key={index}
+            key={`${selectedType}-${index}-${point.name}`}
             coordinate={{ 
               latitude: point.lat, 
               longitude: point.lon 
