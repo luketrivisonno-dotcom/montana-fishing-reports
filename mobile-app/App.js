@@ -239,6 +239,40 @@ function RiversScreen({ navigation }) {
 }
 
 // ============================================
+// REPORT CARD COMPONENT (with icon error handling)
+// ============================================
+function ReportCard({ report }) {
+  const [iconError, setIconError] = useState(false);
+  
+  return (
+    <TouchableOpacity style={styles.reportCard} onPress={() => openReport(report.url)} activeOpacity={0.9}>
+      <View style={styles.reportContent}>
+        <View style={styles.reportSourceRow}>
+          {report.icon_url && !iconError ? (
+            <Image 
+              source={{ uri: report.icon_url }} 
+              style={styles.sourceIcon} 
+              resizeMode="contain"
+              onError={() => setIconError(true)}
+            />
+          ) : (
+            <View style={styles.sourceIconFallback}>
+              <Text style={styles.sourceIconText}>{report.source.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
+          <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
+        </View>
+        <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
+        {report.water_clarity && (
+          <Text style={styles.waterClarity}>Clarity: {report.water_clarity}</Text>
+        )}
+      </View>
+      <Ionicons name="open-outline" size={18} color={COLORS.primary} />
+    </TouchableOpacity>
+  );
+}
+
+// ============================================
 // RIVER DETAILS SCREEN
 // ============================================
 function RiverDetailsScreen({ route, navigation }) {
@@ -400,23 +434,7 @@ function RiverDetailsScreen({ route, navigation }) {
         </View>
 
         {data?.reports?.map((report, index) => (
-          <TouchableOpacity key={report.id || index} style={styles.reportCard} onPress={() => openReport(report.url)} activeOpacity={0.9}>
-            <View style={styles.reportContent}>
-              <View style={styles.reportSourceRow}>
-                {report.icon_url ? (
-                  <Image source={{ uri: report.icon_url }} style={styles.sourceIcon} resizeMode="contain" />
-                ) : (
-                  <View style={styles.sourceDot} />
-                )}
-                <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
-              </View>
-              <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
-              {report.water_clarity && (
-                <Text style={styles.waterClarity}>Clarity: {report.water_clarity}</Text>
-              )}
-            </View>
-            <Ionicons name="open-outline" size={18} color={COLORS.primary} />
-          </TouchableOpacity>
+          <ReportCard key={report.id || index} report={report} />
         ))}
 
         {(!data?.reports || data.reports.length === 0) && (
@@ -653,6 +671,8 @@ const styles = StyleSheet.create({
   reportSourceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sourceDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.primary },
   sourceIcon: { width: 32, height: 32, borderRadius: 6, backgroundColor: '#fff' },
+  sourceIconFallback: { width: 32, height: 32, borderRadius: 6, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  sourceIconText: { color: '#fff', fontSize: 14, fontWeight: '700' },
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
   waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },

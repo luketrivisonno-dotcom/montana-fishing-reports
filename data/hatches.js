@@ -13,6 +13,34 @@ const HATCH_CHARTS = {
     { month: 'Nov', hatches: ['Baetis', 'Midges'] },
     { month: 'Dec', hatches: ['Midges'] }
   ],
+  'Upper Madison River': [
+    { month: 'Jan', hatches: ['Midges'] },
+    { month: 'Feb', hatches: ['Midges'] },
+    { month: 'Mar', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'Apr', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'May', hatches: ['March Browns', 'Salmonflies'] },
+    { month: 'Jun', hatches: ['Salmonflies', 'PMDs'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['Baetis'] },
+    { month: 'Nov', hatches: ['Baetis', 'Midges'] },
+    { month: 'Dec', hatches: ['Midges'] }
+  ],
+  'Lower Madison River': [
+    { month: 'Jan', hatches: ['Midges'] },
+    { month: 'Feb', hatches: ['Midges'] },
+    { month: 'Mar', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'Apr', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'May', hatches: ['March Browns', 'Caddis'] },
+    { month: 'Jun', hatches: ['PMDs', 'Caddis'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis', 'Hoppers'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['Baetis'] },
+    { month: 'Nov', hatches: ['Baetis', 'Midges'] },
+    { month: 'Dec', hatches: ['Midges'] }
+  ],
   'Yellowstone River': [
     { month: 'Mar', hatches: ['Midges'] },
     { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
@@ -62,6 +90,124 @@ const HATCH_CHARTS = {
     { month: 'Oct', hatches: ['Baetis', 'Midges'] },
     { month: 'Nov', hatches: ['Midges', 'Baetis'] },
     { month: 'Dec', hatches: ['Midges'] }
+  ],
+  'Bitterroot River': [
+    { month: 'Mar', hatches: ['Midges'] },
+    { month: 'Apr', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'May', hatches: ['March Browns', 'Salmonflies'] },
+    { month: 'Jun', hatches: ['Salmonflies', 'Golden Stones', 'PMDs'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Caddis', 'Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Mahogany Duns'] },
+    { month: 'Oct', hatches: ['Baetis'] },
+    { month: 'Nov', hatches: ['Midges'] }
+  ],
+  'Blackfoot River': [
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns', 'Skwalas'] },
+    { month: 'Jun', hatches: ['March Browns', 'Golden Stones', 'Salmonflies'] },
+    { month: 'Jul', hatches: ['Golden Stones', 'PMDs', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Mahogany Duns'] },
+    { month: 'Oct', hatches: ['October Caddis'] }
+  ],
+  'Rock Creek': [
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['March Browns', 'Salmonflies', 'PMDs'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Caddis', 'Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['Baetis'] }
+  ],
+  'Beaverhead River': [
+    { month: 'Mar', hatches: ['Midges'] },
+    { month: 'Apr', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'May', hatches: ['March Browns', 'Caddis'] },
+    { month: 'Jun', hatches: ['PMDs', 'Caddis'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Tricos', 'Hoppers'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['Baetis'] },
+    { month: 'Nov', hatches: ['Midges'] }
+  ],
+  'Big Hole River': [
+    { month: 'Mar', hatches: ['Midges'] },
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['Salmonflies', 'Golden Stones', 'PMDs'] },
+    { month: 'Jul', hatches: ['PMDs', 'Yellow Sallies', 'Caddis'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['Baetis'] }
+  ],
+  'Clark Fork River': [
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['Salmonflies', 'Golden Stones', 'PMDs'] },
+    { month: 'Jul', hatches: ['Golden Stones', 'PMDs', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] },
+    { month: 'Oct', hatches: ['October Caddis', 'Baetis'] }
+  ],
+  'Flathead River': [
+    { month: 'Apr', hatches: ['Midges'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['Salmonflies', 'Golden Stones', 'PMDs'] },
+    { month: 'Jul', hatches: ['Golden Stones', 'PMDs'] },
+    { month: 'Aug', hatches: ['Hoppers'] },
+    { month: 'Sep', hatches: ['October Caddis'] },
+    { month: 'Oct', hatches: ['October Caddis'] }
+  ],
+  'Jefferson River': [
+    { month: 'Mar', hatches: ['Midges'] },
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['PMDs', 'Caddis'] },
+    { month: 'Jul', hatches: ['PMDs', 'Yellow Sallies', 'Hoppers'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos', 'Baetis'] }
+  ],
+  'Ruby River': [
+    { month: 'Mar', hatches: ['Midges'] },
+    { month: 'Apr', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['PMDs', 'Yellow Sallies'] },
+    { month: 'Jul', hatches: ['PMDs', 'Yellow Sallies', 'Caddis'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos'] },
+    { month: 'Oct', hatches: ['Baetis'] }
+  ],
+  'Stillwater River': [
+    { month: 'Apr', hatches: ['Midges'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['PMDs', 'Golden Stones'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis', 'Yellow Sallies'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos'] },
+    { month: 'Oct', hatches: ['October Caddis'] }
+  ],
+  'Spring Creeks': [
+    { month: 'Jan', hatches: ['Midges'] },
+    { month: 'Feb', hatches: ['Midges'] },
+    { month: 'Mar', hatches: ['Midges', 'Blue Winged Olives'] },
+    { month: 'Apr', hatches: ['Blue Winged Olives', 'Baetis'] },
+    { month: 'May', hatches: ['Baetis', 'PMDs'] },
+    { month: 'Jun', hatches: ['PMDs', 'Yellow Sallies'] },
+    { month: 'Jul', hatches: ['PMDs', 'Tricos'] },
+    { month: 'Aug', hatches: ['Tricos', 'Hoppers'] },
+    { month: 'Sep', hatches: ['Tricos', 'Mahogany Duns'] },
+    { month: 'Oct', hatches: ['Baetis'] },
+    { month: 'Nov', hatches: ['Midges', 'Baetis'] },
+    { month: 'Dec', hatches: ['Midges'] }
+  ],
+  'Swan River': [
+    { month: 'Apr', hatches: ['Midges'] },
+    { month: 'May', hatches: ['Blue Winged Olives', 'March Browns'] },
+    { month: 'Jun', hatches: ['March Browns', 'PMDs'] },
+    { month: 'Jul', hatches: ['PMDs', 'Caddis'] },
+    { month: 'Aug', hatches: ['Hoppers', 'Tricos'] },
+    { month: 'Sep', hatches: ['Tricos'] }
   ]
 };
 
@@ -69,7 +215,8 @@ function getCurrentHatches(riverName) {
   const month = new Date().toLocaleString('en-US', { month: 'short' });
   const river = HATCH_CHARTS[riverName];
   if (!river) return [];
-  return river.find(h => h.month === month)?.hatches || [];
+  const monthData = river.find(h => h.month === month);
+  return monthData ? monthData.hatches : [];
 }
 
 function getHatchChart(riverName) {
