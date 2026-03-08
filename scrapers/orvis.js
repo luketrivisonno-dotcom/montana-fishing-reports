@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { saveReports } = require('../utils/scraperHelpers');
+const ICON_URL = 'https://fishingreports.orvis.com/favicon.ico';
 
 const ORVIS_URLS = {
   'Gallatin River': 'https://fishingreports.orvis.com/west/montana/gallatin-river',
@@ -59,14 +59,34 @@ async function scrapeOrvis() {
         }
       }
       
+      // Extract water clarity
+      let waterClarity = null;
+      const clarityPatterns = [
+        /clarity[:\s]+([^.]+)/i,
+        /visibility[:\s]+([^.]+)/i,
+        /water\s+is\s+([^.]*(?:clear|off|muddy|stained|gin|excellent|good)[^.]*)/i,
+        /(?:clear|off\s*color|muddy|stained|gin\s*clear)\s+water/i
+      ];
+      
+      for (const pattern of clarityPatterns) {
+        const match = pageText.match(pattern);
+        if (match) {
+          waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
+          break;
+        }
+      }
+      
       reports.push({
         source: 'Orvis',
         river: river,
         url: url,
         title: `${river} - Orvis Fishing Report`,
         last_updated: finalDate || new Date().toLocaleDateString(),
+        last_updated_text: finalDate || new Date().toLocaleDateString(),
         author: 'Orvis',
-        icon_url: null
+        icon_url: ICON_URL,
+        water_clarity: waterClarity,
+        scraped_at: new Date()
       });
       
     } catch (error) {

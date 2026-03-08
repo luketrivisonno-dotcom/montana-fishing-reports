@@ -26,13 +26,32 @@ async function scrapeTroutfitters() {
         pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
+      // Extract water clarity
+      let waterClarity = null;
+      const clarityPatterns = [
+        /clarity[:\s]+([^.]+)/i,
+        /visibility[:\s]+([^.]+)/i,
+        /water\s+is\s+([^.]*(?:clear|off|muddy|stained|gin|excellent|good)[^.]*)/i,
+        /(?:clear|off\s*color|muddy|stained|gin\s*clear)\s+water/i
+      ];
+      
+      for (const pattern of clarityPatterns) {
+        const match = pageText.match(pattern);
+        if (match) {
+          waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
+          break;
+        }
+      }
+      
       reports.push({
         source: 'Troutfitters',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
+        last_updated_text: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://troutfitters.com/wp-content/uploads/2021/03/troutfitters-logo.png'
+        icon_url: 'https://troutfitters.com/wp-content/uploads/2021/03/troutfitters-logo.png',
+        water_clarity: waterClarity
       });
       
     } catch (error) {

@@ -4,8 +4,10 @@ async function scrapeKingfisher() {
         river: 'Bitterroot River',
         url: 'https://kingfisherflyshop.com/blog/',
         last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString(),
-        icon_url: null
+        last_updated_text: new Date().toLocaleDateString(),
+        scraped_at: new Date(),
+        icon_url: 'https://kingfisherflyshop.com/favicon.ico',
+        water_clarity: null
     };
 }
 

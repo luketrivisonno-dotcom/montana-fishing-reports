@@ -31,13 +31,31 @@ async function scrapePerfectFly() {
         });
       }
       
+      // Extract water clarity
+      let waterClarity = null;
+      const clarityPatterns = [
+        /clarity[:\s]+([^.]+)/i,
+        /visibility[:\s]+([^.]+)/i,
+        /water\s+is\s+([^.]*(?:clear|off|muddy|stained|gin|excellent|good)[^.]*)/i
+      ];
+      
+      for (const pattern of clarityPatterns) {
+        const match = data.match(pattern);
+        if (match) {
+          waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
+          break;
+        }
+      }
+      
       reports.push({
         source: 'Perfect Fly Store',
         river: river,
         url: url,
         last_updated: lastUpdated,
+        last_updated_text: lastUpdated,
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: 'https://perfectflystore.com/favicon.ico',
+        water_clarity: waterClarity
       });
       
     } catch (error) {

@@ -412,15 +412,28 @@ function RiverDetailsScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Water Clarity Card - Show even if null for debugging */}
+          {/* Water Clarity Card */}
           <View style={styles.conditionCard}>
             <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
               <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
             </View>
             <View style={styles.conditionInfo}>
               <Text style={styles.conditionLabel}>Water Clarity</Text>
-              <Text style={styles.conditionValue}>{data?.clarity || 'No data available'}</Text>
-              <Text style={styles.conditionSubtext}>{data?.clarity ? 'From recent reports' : 'Check individual reports below'}</Text>
+              {data?.reports?.filter(r => r.water_clarity).length > 0 ? (
+                <>
+                  <Text style={styles.conditionValue}>
+                    {data.reports.filter(r => r.water_clarity)[0]?.water_clarity}
+                  </Text>
+                  <Text style={styles.conditionSubtext}>
+                    {data.reports.filter(r => r.water_clarity).length} report{data.reports.filter(r => r.water_clarity).length !== 1 ? 's' : ''} with clarity data
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.conditionValue, { color: COLORS.textLight }]}>No clarity data</Text>
+                  <Text style={styles.conditionSubtext}>Check individual reports below</Text>
+                </>
+              )}
             </View>
           </View>
         </View>

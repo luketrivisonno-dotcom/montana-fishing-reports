@@ -14,6 +14,8 @@ const MONTANA_ANGLER_URLS = {
   'Yellowstone National Park': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
 };
 
+const ICON_URL = 'https://www.montanaangler.com/wp-content/uploads/2021/03/montana-angler-logo.png';
+
 async function scrapeMontanaAngler() {
   let reports = [];
   
@@ -31,13 +33,32 @@ async function scrapeMontanaAngler() {
       
       const dateMatch = pageText.match(/([A-Za-z]+,\s+)?[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
       
+      // Extract water clarity
+      let waterClarity = null;
+      const clarityPatterns = [
+        /clarity[:\s]+([^.]+)/i,
+        /visibility[:\s]+([^.]+)/i,
+        /water\s+is\s+([^.]*(?:clear|off|muddy|stained|gin|excellent|good)[^.]*)/i,
+        /(?:clear|off\s*color|muddy|stained|gin\s*clear)\s+water/i
+      ];
+      
+      for (const pattern of clarityPatterns) {
+        const match = pageText.match(pattern);
+        if (match) {
+          waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
+          break;
+        }
+      }
+      
       reports.push({
         source: 'Montana Angler',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
+        last_updated_text: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: ICON_URL,
+        water_clarity: waterClarity
       });
       
     } catch (error) {

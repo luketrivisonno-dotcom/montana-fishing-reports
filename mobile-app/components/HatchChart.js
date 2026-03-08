@@ -273,25 +273,53 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
     return null;
   }
 
+  // Combine dynamic hatches with seasonal forecast if different
+  const displayHatches = hatchData.hatches || [];
+  const seasonalHatches = hatchData.seasonalForecast || [];
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🦟 Current Hatches</Text>
       
-      {hatchData.waterTemp && (
-        <Text style={styles.waterInfo}>Water: {hatchData.waterTemp}</Text>
-      )}
-      {hatchData.waterConditions && (
-        <Text style={styles.waterInfo}>{hatchData.waterConditions}</Text>
+      {/* Dynamic conditions section */}
+      {(hatchData.waterTemp || hatchData.waterConditions) && (
+        <View style={styles.conditionsBox}>
+          {hatchData.waterTemp && (
+            <Text style={styles.waterTempText}>💧 Water Temp: {hatchData.waterTemp}</Text>
+          )}
+          {hatchData.waterConditions && (
+            <Text style={styles.conditionsText}>🎯 {hatchData.waterConditions}</Text>
+          )}
+        </View>
       )}
       
+      {/* Primary hatches */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
-        {hatchData.hatches.map((hatch, index) => (
-          <View key={index} style={styles.hatchBadge}>
+        {displayHatches.map((hatch, index) => (
+          <View key={index} style={[styles.hatchBadge, styles.primaryHatch]}>
             <Text style={styles.hatchText}>{hatch}</Text>
           </View>
         ))}
       </ScrollView>
       
+      {/* Show seasonal forecast if different from current */}
+      {seasonalHatches.length > 0 && 
+       JSON.stringify(seasonalHatches.sort()) !== JSON.stringify(displayHatches.sort()) && (
+        <>
+          <Text style={styles.seasonalLabel}>📅 Seasonal Hatches Also Expected:</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
+            {seasonalHatches
+              .filter(h => !displayHatches.includes(h))
+              .map((hatch, index) => (
+              <View key={index} style={[styles.hatchBadge, styles.seasonalHatch]}>
+                <Text style={styles.seasonalHatchText}>{hatch}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </>
+      )}
+      
+      {/* Fly recommendations */}
       {hatchData.flies && hatchData.flies.length > 0 && (
         <>
           <Text style={styles.subtitle}>🎣 Recommended Flies</Text>
@@ -305,7 +333,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
         </>
       )}
       
-      <Text style={styles.sourceText}>Source: {hatchData.source}</Text>
+      <Text style={styles.sourceText}>{hatchData.source}</Text>
     </View>
   );
 };
@@ -336,6 +364,43 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.primary,
     marginBottom: 4,
+  },
+  conditionsBox: {
+    backgroundColor: COLORS.primary + '10',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORS.primary,
+  },
+  waterTempText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
+    marginBottom: 4,
+  },
+  conditionsText: {
+    fontSize: 13,
+    color: COLORS.text,
+  },
+  seasonalLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  primaryHatch: {
+    backgroundColor: COLORS.wade + '25',
+    borderColor: COLORS.wade,
+  },
+  seasonalHatch: {
+    backgroundColor: COLORS.textLight + '15',
+    borderColor: COLORS.textLight + '40',
+  },
+  seasonalHatchText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
   },
   hatchScroll: {
     flexDirection: 'row',

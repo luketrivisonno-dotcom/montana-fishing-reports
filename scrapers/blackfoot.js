@@ -4,8 +4,10 @@ async function scrapeBlackfootMissoulian() {
         river: 'Blackfoot River',
         url: 'https://www.missoulianangler.com/fishing-reports',
         last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString(),
-        icon_url: null
+        last_updated_text: new Date().toLocaleDateString(),
+        scraped_at: new Date(),
+        icon_url: 'https://www.missoulianangler.com/favicon.ico',
+        water_clarity: null
     };
 }
 
@@ -15,44 +17,55 @@ async function scrapeBlackfootBigfork() {
         river: 'Blackfoot River',
         url: 'https://bigforkanglers.com/fishing-report',
         last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString(),
-        icon_url: null
+        last_updated_text: new Date().toLocaleDateString(),
+        scraped_at: new Date(),
+        icon_url: 'https://bigforkanglers.com/favicon.ico',
+        water_clarity: null
     };
 }
 
 async function scrapeBlackfootBRO() {
+    const baseUrl = 'https://blackfootriver.com';
     return [
         {
             source: 'Blackfoot River Outfitters',
             river: 'Blackfoot River',
-            url: 'https://blackfootriver.com/blogs/fishing-reports/the-blackfoot-river-fishing-report',
+            url: baseUrl + '/blogs/fishing-reports/the-blackfoot-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString(),
-            icon_url: null
+            last_updated_text: new Date().toLocaleDateString(),
+            scraped_at: new Date(),
+            icon_url: baseUrl + '/favicon.ico',
+            water_clarity: null
         },
         {
             source: 'Blackfoot River Outfitters',
             river: 'Clark Fork River',
-            url: 'https://blackfootriver.com/blogs/fishing-reports/clark-fork-river-fishing-report',
+            url: baseUrl + '/blogs/fishing-reports/clark-fork-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString(),
-            icon_url: null
+            last_updated_text: new Date().toLocaleDateString(),
+            scraped_at: new Date(),
+            icon_url: baseUrl + '/favicon.ico',
+            water_clarity: null
         },
         {
             source: 'Blackfoot River Outfitters',
             river: 'Bitterroot River',
-            url: 'https://blackfootriver.com/blogs/fishing-reports/bitterroot-river-fishing-report',
+            url: baseUrl + '/blogs/fishing-reports/bitterroot-river-fishing-report',
             last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString(),
-            icon_url: null
+            last_updated_text: new Date().toLocaleDateString(),
+            scraped_at: new Date(),
+            icon_url: baseUrl + '/favicon.ico',
+            water_clarity: null
         },
         {
             source: 'Blackfoot River Outfitters',
             river: 'Rock Creek',
-            url: 'https://blackfootriver.com/blogs/fishing-reports/rock-creek-fishing-report',
+            url: baseUrl + '/blogs/fishing-reports/rock-creek-fishing-report',
             last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString(),
-            icon_url: null
+            last_updated_text: new Date().toLocaleDateString(),
+            scraped_at: new Date(),
+            icon_url: baseUrl + '/favicon.ico',
+            water_clarity: null
         }
     ];
 }
