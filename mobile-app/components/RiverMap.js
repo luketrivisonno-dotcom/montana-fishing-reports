@@ -51,7 +51,6 @@ export default function RiverMap({ isPremium }) {
     return allPoints.filter(point => {
       if (selectedType === 'boat') return point.type === 'boat' || point.type === 'both';
       if (selectedType === 'wade') return point.type === 'wade' || point.type === 'both';
-      if (selectedType === 'restrooms') return point.restrooms;
       return true;
     });
   }, [allPoints, selectedType]);
@@ -128,20 +127,6 @@ export default function RiverMap({ isPremium }) {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.filterButton, selectedType === 'restrooms' && styles.filterButtonActive]}
-            onPress={() => setSelectedType('restrooms')}
-          >
-            <Ionicons 
-              name="business" 
-              size={16} 
-              color={selectedType === 'restrooms' ? '#f5f1e8' : COLORS.textLight} 
-            />
-            <Text style={[styles.filterText, selectedType === 'restrooms' && styles.filterTextActive]}>
-              Restrooms
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
             style={[styles.filterButton, showUSGS && styles.filterButtonActive]}
             onPress={() => setShowUSGS(!showUSGS)}
           >
@@ -151,7 +136,7 @@ export default function RiverMap({ isPremium }) {
               color={showUSGS ? '#f5f1e8' : COLORS.textLight} 
             />
             <Text style={[styles.filterText, showUSGS && styles.filterTextActive]}>
-              USGS Gauges
+              USGS
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -279,9 +264,7 @@ export default function RiverMap({ isPremium }) {
             <Text style={styles.legendText}>USGS Gauge</Text>
           </View>
         </View>
-        <Text style={styles.legendCount}>
-          {filteredPoints.length} access points shown
-        </Text>
+
       </View>
     </View>
   );
@@ -390,19 +373,21 @@ const styles = StyleSheet.create({
   },
   legend: {
     backgroundColor: COLORS.surface,
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
   legendTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: COLORS.text,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   legendItems: {
     flexDirection: 'row',
-    gap: 18,
+    flexWrap: 'wrap',
+    gap: 12,
   },
   legendItem: {
     flexDirection: 'row',
@@ -418,9 +403,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-  legendCount: {
-    fontSize: 11,
-    color: COLORS.textLight,
-    marginTop: 8,
-  },
+
 });
