@@ -147,6 +147,7 @@ export default function RiverMap({ isPremium }) {
 
       {/* Map with Satellite/Hybrid View */}
       <MapView
+        key={`map-${selectedType}-${showUSGS}`}
         style={styles.map}
         initialRegion={INITIAL_REGION}
         region={selectedRegion}
