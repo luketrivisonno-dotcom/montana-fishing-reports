@@ -14,7 +14,7 @@ const MONTANA_ANGLER_URLS = {
   'Yellowstone National Park': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
 };
 
-const ICON_URL = 'https://www.montanaangler.com/wp-content/uploads/2021/03/montana-angler-logo.png';
+const ICON_URL = null;
 
 async function scrapeMontanaAngler() {
   let reports = [];

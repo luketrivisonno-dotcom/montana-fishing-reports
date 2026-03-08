@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const ICON_URL = null;
+// Note: Favicons disabled - using letter avatars for reliability
 
 const ORVIS_URLS = {
   'Gallatin River': 'https://fishingreports.orvis.com/west/montana/gallatin-river',

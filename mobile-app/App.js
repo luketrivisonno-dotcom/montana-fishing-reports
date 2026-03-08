@@ -81,6 +81,15 @@ const removeDuplicateReports = (reports) => {
   });
 };
 
+const openReport = (url) => {
+  if (url) {
+    Linking.openURL(url).catch(err => {
+      console.error('Failed to open URL:', err);
+      Alert.alert('Error', 'Could not open the report.');
+    });
+  }
+};
+
 // ============================================
 // TAB NAVIGATION
 // ============================================
@@ -319,8 +328,6 @@ function RiverDetailsScreen({ route, navigation }) {
     else { globalFavorites.push(river); }
     setIsFavorite(!isFavorite);
   };
-
-  const openReport = (url) => { if (url) Linking.openURL(url); };
 
   if (loading) {
     return (

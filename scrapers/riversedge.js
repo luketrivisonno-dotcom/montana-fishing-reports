@@ -10,8 +10,8 @@ const RIVERS_EDGE_URLS = {
   'Spring Creeks': 'https://theriversedge.com/pages/spring-creeks-fishing-report'
 };
 
-// Icon URL for The River's Edge
-const RIVERS_EDGE_ICON = 'https://theriversedge.com/cdn/shop/files/TRE_Logo_Black_600x.png?v=1614309653';
+// Icon disabled - using letter avatar
+const RIVERS_EDGE_ICON = null;
 
 async function scrapeRiversEdge() {
   let reports = [];

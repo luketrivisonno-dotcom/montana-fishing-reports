@@ -9,7 +9,7 @@ const RIVERS = [
     { name: 'Missouri River', path: 'missouri-river-fishing-report' }
 ];
 
-const ICON_URL = 'https://grizzlyhackle.com/cdn/shop/files/GH_Logo_400x.png?v=1614323385';
+const ICON_URL = null;
 
 async function scrapeGrizzlyHackle() {
     let reports = [];

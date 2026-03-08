@@ -25,7 +25,7 @@ async function scrapeBighornAngler() {
       url: url,
       last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
       scraped_at: new Date(),
-      icon_url: 'https://bighornangler.com/wp-content/uploads/2022/01/BighornAnglerLogoTransparent.png'
+      icon_url: null
     }];
     
   } catch (error) {

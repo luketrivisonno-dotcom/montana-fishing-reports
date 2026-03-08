@@ -50,7 +50,7 @@ async function scrapeTroutfitters() {
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         last_updated_text: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://troutfitters.com/wp-content/uploads/2021/03/troutfitters-logo.png',
+        icon_url: null,
         water_clarity: waterClarity
       });
       

@@ -30,7 +30,7 @@ async function scrapeGallatinRiverGuides() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: 'https://www.montanaflyfishing.com/wp-content/uploads/2021/03/grg-logo.png'
+        icon_url: null
       });
       
     } catch (error) {
