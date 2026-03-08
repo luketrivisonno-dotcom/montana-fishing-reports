@@ -285,7 +285,12 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       {(hatchData.waterTemp || hatchData.waterConditions) && (
         <View style={styles.conditionsBox}>
           {hatchData.waterTemp && (
-            <Text style={styles.waterTempText}>💧 Water Temp: {hatchData.waterTemp}</Text>
+            <Text style={styles.waterTempText}>
+              💧 Water Temp: {hatchData.waterTemp}
+              {hatchData.tempSource && (
+                <Text style={styles.tempSourceText}> ({hatchData.tempSource})</Text>
+              )}
+            </Text>
           )}
           {hatchData.waterConditions && (
             <Text style={styles.conditionsText}>🎯 {hatchData.waterConditions}</Text>
@@ -377,6 +382,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.primary,
+  },
+  tempSourceText: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: COLORS.textLight,
     marginBottom: 4,
   },
   conditionsText: {

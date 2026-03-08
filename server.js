@@ -908,12 +908,17 @@ async function getDynamicHatchData(riverName) {
     // Get seasonal hatches
     const seasonalHatches = getStaticHatches(riverName) || getDefaultHatches(month);
     
-    // Get real water temperature if available
+    // Get water temperature (real, nearby, or estimated)
     const usgsData = await getUSGSData(riverName);
     let waterTemp = null;
+    let tempSource = 'Seasonal forecast';
+    
     if (usgsData && usgsData.temp) {
         const tempMatch = usgsData.temp.match(/(\d+)/);
-        if (tempMatch) waterTemp = parseInt(tempMatch[1]);
+        if (tempMatch) {
+            waterTemp = parseInt(tempMatch[1]);
+            tempSource = usgsData.tempSource || 'USGS';
+        }
     }
     
     // Adjust recommendations based on conditions
@@ -943,7 +948,8 @@ async function getDynamicHatchData(riverName) {
         flies: generateFlyRecommendations(adjustedHatches),
         waterTemp: waterTemp ? `${waterTemp}°F` : null,
         waterConditions: conditions.length > 0 ? conditions.join('. ') : null,
-        source: waterTemp ? 'Live conditions + seasonal forecast' : 'Seasonal forecast',
+        tempSource: tempSource,
+        source: waterTemp ? `${tempSource} + seasonal forecast` : 'Seasonal forecast',
         seasonalForecast: seasonalHatches
     };
 }

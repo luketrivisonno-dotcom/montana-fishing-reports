@@ -395,7 +395,12 @@ function RiverDetailsScreen({ route, navigation }) {
                   )}
                 </View>
                 <Text style={styles.conditionValue}>{data.usgs.flow}</Text>
-                <Text style={styles.conditionSubtext}>Temp: {data.usgs.temp}</Text>
+                <Text style={styles.conditionSubtext}>
+                  Temp: {data.usgs.temp}
+                  {data.usgs.tempSource && data.usgs.tempSource !== 'USGS Live' && (
+                    <Text style={{ fontSize: 10, color: COLORS.textLight }}> ({data.usgs.tempSource})</Text>
+                  )}
+                </Text>
               </View>
               <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
             </TouchableOpacity>
