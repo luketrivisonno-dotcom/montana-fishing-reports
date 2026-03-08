@@ -6,6 +6,7 @@ import {
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAllAccessPoints } from '../data/accessPoints';
+import { getUSGSStations, getUSGSUrl } from '../data/usgsStations';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -40,8 +41,10 @@ export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState(INITIAL_REGION);
   const [mapType, setMapType] = useState('hybrid');
+  const [showUSGS, setShowUSGS] = useState(true);
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
+  const usgsStations = useMemo(() => getUSGSStations(), []);
 
   const filteredPoints = useMemo(() => {
     if (selectedType === 'all') return allPoints;
@@ -65,6 +68,12 @@ export default function RiverMap({ isPremium }) {
   const openFWP = (url) => {
     if (url) {
       Linking.openURL(url).catch(() => {});
+    }
+  };
+
+  const openUSGS = (siteId) => {
+    if (siteId) {
+      Linking.openURL(getUSGSUrl(siteId)).catch(() => {});
     }
   };
 
@@ -131,6 +140,20 @@ export default function RiverMap({ isPremium }) {
               Restrooms
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.filterButton, showUSGS && styles.filterButtonActive]}
+            onPress={() => setShowUSGS(!showUSGS)}
+          >
+            <MaterialCommunityIcons 
+              name="gauge" 
+              size={16} 
+              color={showUSGS ? '#f5f1e8' : COLORS.textLight} 
+            />
+            <Text style={[styles.filterText, showUSGS && styles.filterTextActive]}>
+              USGS Gauges
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -145,6 +168,29 @@ export default function RiverMap({ isPremium }) {
         showsCompass={true}
         showsScale={true}
       >
+        {showUSGS && usgsStations.map((station, index) => (
+          <Marker
+            key={`usgs-${index}`}
+            coordinate={{ 
+              latitude: station.lat, 
+              longitude: station.lon 
+            }}
+            pinColor="#0066cc"
+          >
+            <Callout onPress={() => openUSGS(station.siteId)}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{station.river}</Text>
+                <Text style={styles.calloutRiver}>USGS Gauge #{station.siteId}</Text>
+                <Text style={styles.calloutText}>{station.location}</Text>
+                <View style={styles.calloutButton}>
+                  <Text style={styles.calloutButtonText}>View on USGS</Text>
+                  <Ionicons name="open-outline" size={14} color={COLORS.primary} />
+                </View>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
+
         {filteredPoints.map((point, index) => (
           <Marker
             key={index}
@@ -227,6 +273,10 @@ export default function RiverMap({ isPremium }) {
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: COLORS.both }]} />
             <Text style={styles.legendText}>Both</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: '#0066cc' }]} />
+            <Text style={styles.legendText}>USGS Gauge</Text>
           </View>
         </View>
         <Text style={styles.legendCount}>
