@@ -21,9 +21,19 @@ const USGS_SITES = {
   'Swan River': { id: '12370000', location: 'Big Fork, MT' }
 };
 
+// Seasonal gauges - USGS stations that only run part of the year
+const SEASONAL_GAUGES = [
+  'Beaverhead River',  // Typically ice-affected in winter
+  'Big Hole River',    // Often seasonal ice effects
+  'Jefferson River',   // Seasonal/intermittent flows
+  'Ruby River',        // Small stream, seasonal patterns
+  'Swan River'         // Seasonal high/low flows
+];
+
 // Nearby rivers to use as temp backup (in order of preference)
 const NEARBY_RIVERS = {
   'Jefferson River': ['Upper Madison River', 'Missouri River', 'Ruby River'],
+  'Beaverhead River': ['Ruby River', 'Big Hole River', 'Jefferson River'],
   'Spring Creeks': ['Missouri River', 'Upper Madison River'],
   'Stillwater River': ['Yellowstone River', 'Rock Creek'],
   'Boulder River': ['Yellowstone River', 'Stillwater River'],
@@ -163,10 +173,13 @@ async function getUSGSData(riverName) {
   
   // No USGS site or failed - try nearby rivers for temp
   const nearbyTemp = await getNearbyRiverTemp(riverName);
+  const isSeasonal = SEASONAL_GAUGES.includes(riverName);
+  const noDataLabel = isSeasonal ? 'Seasonal Gauge' : 'No USGS Station';
+  
   if (nearbyTemp) {
     return {
       river: riverName,
-      flow: 'No USGS Station',
+      flow: noDataLabel,
       temp: nearbyTemp.temp,
       tempSource: nearbyTemp.source,
       location: 'Nearby Station',
@@ -179,7 +192,7 @@ async function getUSGSData(riverName) {
   if (seasonalTemp) {
     return {
       river: riverName,
-      flow: 'No USGS Station',
+      flow: noDataLabel,
       temp: `${seasonalTemp}°F (est.)`,
       tempSource: 'Seasonal Estimate',
       location: null,
