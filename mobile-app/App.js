@@ -333,53 +333,62 @@ function RiverDetailsScreen({ route, navigation }) {
                 <Text style={styles.weatherEmoji}>{data.weather.icon || '☁️'}</Text>
               </View>
               <View style={styles.conditionInfo}>
-                <Text style={styles.conditionLabel}>Weather</Text>
+                <View style={styles.conditionHeader}>
+                  <Text style={styles.conditionLabel}>Weather</Text>
+                  {data.weather.station && (
+                    <Text style={styles.locationText}>{data.weather.station}</Text>
+                  )}
+                </View>
                 <Text style={styles.conditionValue}>{data.weather.high}° / {data.weather.low}°</Text>
                 <Text style={styles.conditionSubtext}>{data.weather.condition}</Text>
                 {data.weather.wind && (
                   <Text style={styles.conditionSubtext}>💨 {data.weather.wind}</Text>
                 )}
               </View>
-              {data.weather.station && (
-                <View style={styles.locationBadge}>
-                  <Text style={styles.locationText}>{data.weather.station}</Text>
-                </View>
-              )}
             </View>
           )}
 
-          {data?.usgs && (
+          {data?.usgs ? (
             <TouchableOpacity style={styles.conditionCard} onPress={() => openReport(data.usgs.url)}>
               <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.primary + '15' }]}>
                 <MaterialCommunityIcons name="waves" size={22} color={COLORS.primary} />
               </View>
               <View style={styles.conditionInfo}>
-                <Text style={styles.conditionLabel}>Flow</Text>
+                <View style={styles.conditionHeader}>
+                  <Text style={styles.conditionLabel}>Flow</Text>
+                  {data.usgs.location && (
+                    <Text style={styles.locationText}>{data.usgs.location}</Text>
+                  )}
+                </View>
                 <Text style={styles.conditionValue}>{data.usgs.flow}</Text>
-                <Text style={styles.conditionSubtext}>{data.usgs.temp}</Text>
+                <Text style={styles.conditionSubtext}>Temp: {data.usgs.temp}</Text>
               </View>
-              <View style={styles.locationContainer}>
-                {data.usgs.location && (
-                  <Text style={styles.locationText}>{data.usgs.location}</Text>
-                )}
-                <Ionicons name="open-outline" size={16} color={COLORS.textLight} />
-              </View>
+              <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
             </TouchableOpacity>
-          )}
-
-          {/* Water Clarity Card */}
-          {data?.clarity && (
-            <View style={styles.conditionCard}>
-              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
-                <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
+          ) : (
+            <View style={[styles.conditionCard, { opacity: 0.7 }]}>
+              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.textLight + '15' }]}>
+                <MaterialCommunityIcons name="waves" size={22} color={COLORS.textLight} />
               </View>
               <View style={styles.conditionInfo}>
-                <Text style={styles.conditionLabel}>Water Clarity</Text>
-                <Text style={styles.conditionValue}>{data.clarity}</Text>
-                <Text style={styles.conditionSubtext}>From recent reports</Text>
+                <Text style={styles.conditionLabel}>Flow</Text>
+                <Text style={[styles.conditionValue, { color: COLORS.textLight }]}>No USGS Station</Text>
+                <Text style={styles.conditionSubtext}>Check local reports below</Text>
               </View>
             </View>
           )}
+
+          {/* Water Clarity Card - Show even if null for debugging */}
+          <View style={styles.conditionCard}>
+            <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
+              <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
+            </View>
+            <View style={styles.conditionInfo}>
+              <Text style={styles.conditionLabel}>Water Clarity</Text>
+              <Text style={styles.conditionValue}>{data?.clarity || 'No data available'}</Text>
+              <Text style={styles.conditionSubtext}>{data?.clarity ? 'From recent reports' : 'Check individual reports below'}</Text>
+            </View>
+          </View>
         </View>
 
         {/* DYNAMIC HATCH CHART with live conditions */}
@@ -628,8 +637,8 @@ const styles = StyleSheet.create({
   heroContent: { gap: 4 },
   heroTitle: { fontSize: 26, fontWeight: '800', color: '#f5f1e8' },
   detailScroll: { flex: 1, padding: 16 },
-  conditionsGrid: { flexDirection: 'row', gap: 12, marginBottom: 16 },
-  conditionCard: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 14, borderRadius: 12, gap: 10, elevation: 2, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 },
+  conditionsGrid: { flexDirection: 'column', gap: 12, marginBottom: 16 },
+  conditionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 14, borderRadius: 12, gap: 10, elevation: 2, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 },
   conditionIconContainer: { width: 44, height: 44, borderRadius: 10, backgroundColor: COLORS.accent + '20', justifyContent: 'center', alignItems: 'center' },
   weatherEmoji: { fontSize: 26 },
   conditionInfo: { flex: 1 },
@@ -642,14 +651,16 @@ const styles = StyleSheet.create({
   reportCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 14, borderRadius: 10, marginBottom: 8, elevation: 1, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 },
   reportContent: { flex: 1, gap: 3 },
   reportSourceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sourceDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COLORS.primary },
-  sourceIcon: { width: 24, height: 24, borderRadius: 4 },
+  sourceDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.primary },
+  sourceIcon: { width: 32, height: 32, borderRadius: 6, backgroundColor: '#fff' },
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
   waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },
+  conditionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
   locationBadge: { position: 'absolute', top: 8, right: 8, backgroundColor: COLORS.primary + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   locationContainer: { alignItems: 'flex-end', marginLeft: 'auto' },
-  locationText: { fontSize: 10, color: COLORS.textLight, fontWeight: '500' },
+  locationText: { fontSize: 11, color: COLORS.textLight, fontWeight: '500', fontStyle: 'italic' },
+  openIcon: { marginLeft: 'auto' },
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 10 },
   emptyText: { fontSize: 15, color: COLORS.textLight },
   emptyTitle: { fontSize: 17, fontWeight: '600', color: COLORS.text },

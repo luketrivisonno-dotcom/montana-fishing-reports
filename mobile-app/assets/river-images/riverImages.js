@@ -1,73 +1,86 @@
 // Local river images mapping
-// Edit this file to assign specific images to specific rivers
-// Images are numbered river1.jpg through river26.jpg
-// View the images to see which ones correspond to which rivers
+// Images are now properly named based on river names in the filenames
 
-// Import all images
+// Import all properly named images
 const images = {
-  river1: require('./river1.jpg'),   // Gallatin River - scenic mountain view
-  river2: require('./river2.jpg'),   // Brown trout catch
-  river3: require('./river3.jpg'),   // Missouri River - wide river with hills
-  river4: require('./river4.jpg'),   // Mountain river with trees
-  river5: require('./river5.jpg'),   // Alpine lake fishing
-  river6: require('./river6.jpg'),   // Mountain river
-  river7: require('./river7.jpg'),   // River with railroad bridge
-  river8: require('./river8.jpg'),   // Mountain river
-  river9: require('./river9.jpg'),   // Mountain river
-  river10: require('./river10.jpg'), // Mountain river
-  river11: require('./river11.jpg'), // Mountain river
-  river12: require('./river12.jpg'), // River scene
-  river13: require('./river13.jpg'), // River scene
-  river14: require('./river14.jpg'), // River scene
-  river15: require('./river15.jpg'), // River scene
-  river16: require('./river16.jpg'), // Madison/Gallatin type river
-  river17: require('./river17.jpg'), // River scene
-  river18: require('./river18.jpg'), // River scene
-  river19: require('./river19.jpg'), // Fly fishing action shot
-  river20: require('./river20.jpg'), // River scene
-  river21: require('./river21.jpg'), // Smith River gorge
-  river22: require('./river22.jpg'), // River/lake scene
-  river23: require('./river23.jpg'), // River scene
-  river24: require('./river24.jpg'), // River scene
-  river25: require('./river25.jpg'), // River scene
-  river26: require('./river26.jpg'), // River scene
+  // Named images from filenames
+  Beaverhead: require('./Beaverhead.jpeg'),
+  Bighole: require('./Bighole.jpeg'),
+  Bighorn: require('./Bighorn.jpeg'),
+  Bitterroot: require('./Bitterroot.jpg'),
+  Blackfoot: require('./Blackfoot.jpg'),
+  ClarkFork: require('./Clark fork.jpeg'),
+  Gallatin: require('./Gallatin.jpeg'),
+  Jefferson: require('./Jefferson.jpeg'),
+  LowerMadison: require('./Lower madison.jpeg'),
+  Missouri: require('./Missouri.jpeg'),
+  RockCreek: require('./Rock Creek.jpeg'),
+  Ruby: require('./Ruby.jpeg'),
+  SpringCreeks: require('./spring creeks.jpeg'),
+  Stillwater: require('./stillwater.jpeg'),
+  Swan: require('./Swan.jpeg'),
+  UpperMadison: require('./Upper Madison.jpg'),
+  Yellowstone: require('./yellowstone.jpg'),
+  YellowstoneNP: require('./yellowstone national park.jpeg'),
+  Flathead: require('./Flathead.jpg'),
+  
+  // Keep numbered images as fallbacks
+  river1: require('./river1.jpg'),
+  river2: require('./river2.jpg'),
+  river3: require('./river3.jpg'),
+  river4: require('./river4.jpg'),
+  river5: require('./river5.jpg'),
+  river6: require('./river6.jpg'),
+  river7: require('./river7.jpg'),
+  river8: require('./river8.jpg'),
+  river9: require('./river9.jpg'),
+  river10: require('./river10.jpg'),
+  river11: require('./river11.jpg'),
+  river12: require('./river12.jpg'),
+  river13: require('./river13.jpg'),
+  river14: require('./river14.jpg'),
+  river15: require('./river15.jpg'),
+  river16: require('./river16.jpg'),
+  river17: require('./river17.jpg'),
+  river18: require('./river18.jpg'),
+  river19: require('./river19.jpg'),
+  river20: require('./river20.jpg'),
+  river21: require('./river21.jpg'),
+  river22: require('./river22.jpg'),
+  river23: require('./river23.jpg'),
+  river24: require('./river24.jpg'),
+  river25: require('./river25.jpg'),
+  river26: require('./river26.jpg'),
 };
 
-// Map river names to specific images
-// Edit these assignments based on which images correspond to which rivers
+// Map river names to specific images based on filenames
 const RIVER_IMAGE_MAP = {
-  'Gallatin River': images.river1,           // Scenic mountain Gallatin
-  'Madison River': images.river16,           // Beautiful mountain river
-  'Upper Madison River': images.river4,      // Mountain river with trees
-  'Lower Madison River': images.river3,      // Wide river
-  'Yellowstone River': images.river7,        // River with railroad bridge
-  'Missouri River': images.river3,           // Wide river with hills
-  'Bighorn River': images.river21,           // Gorge (Smith River style)
-  'Blackfoot River': images.river16,         // Mountain river
-  'Bitterroot River': images.river6,         // Mountain river
-  'Rock Creek': images.river4,               // Mountain stream
-  'Clark Fork River': images.river21,        // Rocky gorge
-  'Jefferson River': images.river3,          // Wide river
-  'Beaverhead River': images.river8,         // Mountain river
-  'Big Hole River': images.river9,           // Mountain river
-  'Ruby River': images.river10,              // Mountain river
-  'Stillwater River': images.river11,        // Mountain river
-  'Boulder River': images.river12,           // River scene
-  'Swan River': images.river13,              // River scene
-  'Smith River': images.river21,             // Smith River gorge
-  'Spring Creeks': images.river14,           // Creek scene
-  'Yellowstone National Park': images.river5, // Alpine lake
-  'Belt Creek': images.river15,              // River scene
-  'Judith River': images.river17,            // River scene
-  'Musselshell River': images.river18,       // River scene
-  'Little Blackfoot River': images.river20,  // River scene
-  'Flathead River': images.river22,          // River/lake
+  // Exact matches to filenames
+  'Beaverhead River': images.Beaverhead,
+  'Big Hole River': images.Bighole,
+  'Bighorn River': images.Bighorn,
+  'Bitterroot River': images.Bitterroot,
+  'Blackfoot River': images.Blackfoot,
+  'Clark Fork River': images.ClarkFork,
+  'Gallatin River': images.Gallatin,
+  'Jefferson River': images.Jefferson,
+  'Lower Madison River': images.LowerMadison,
+  'Missouri River': images.Missouri,
+  'Rock Creek': images.RockCreek,
+  'Ruby River': images.Ruby,
+  'Spring Creeks': images.SpringCreeks,
+  'Stillwater River': images.Stillwater,
+  'Swan River': images.Swan,
+  'Upper Madison River': images.UpperMadison,
+  'Yellowstone River': images.Yellowstone,
+  'Yellowstone National Park': images.YellowstoneNP,
+  'Flathead River': images.Flathead,
   
   // Regional categories
-  'Prairie': images.river3,                  // Wide open
-  'Hi-Line': images.river7,                  // Open landscape
-  'Fort Peck': images.river23,               // Lake/river
-  'Western': images.river1,                  // Mountain scene
+  'Prairie': images.Missouri,
+  'Hi-Line': images.river7,
+  'Fort Peck': images.river23,
+  'Western': images.Gallatin,
   
   // Default fallback
   'Other Montana Waters': images.river1,
@@ -76,8 +89,8 @@ const RIVER_IMAGE_MAP = {
 // Get image for a river - returns the mapped image or a rotated fallback
 let fallbackIndex = 0;
 const fallbackImages = [
-  images.river1, images.river4, images.river6, images.river16, 
-  images.river7, images.river21, images.river3, images.river19
+  images.Gallatin, images.Missouri, images.Bighorn, images.Yellowstone,
+  images.river1, images.river4, images.river6, images.river16
 ];
 
 export function getRiverImage(riverName) {
@@ -91,7 +104,7 @@ export function getRiverImage(riverName) {
 }
 
 // Default image for when no river is specified
-export const DEFAULT_RIVER_IMAGE = images.river1;
+export const DEFAULT_RIVER_IMAGE = images.Gallatin;
 
 // Export all images in case they're needed
 export { images };

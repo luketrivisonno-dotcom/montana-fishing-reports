@@ -833,22 +833,21 @@ app.post('/api/admin/purge-bad-urls', async (req, res) => {
     }
 });
 
-// Admin endpoint to clear broken icons
-app.post('/api/admin/fix-icons', async (req, res) => {
+// Admin endpoint to refresh icons from scrapers
+app.post('/api/admin/refresh-icons', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     if (adminKey !== process.env.ADMIN_KEY) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     
     try {
-        // Clear all broken icon URLs (they 404)
-        const result = await db.query(
-            `UPDATE reports SET icon_url = NULL WHERE icon_url IS NOT NULL`
-        );
+        // Re-run scrapers to update icons
+        const { runAllScrapers } = require('./scrapers');
+        const result = await runAllScrapers();
         
         res.json({
-            message: 'Broken icons cleared - app will show dots instead',
-            updatedCount: result.rowCount
+            message: 'Icons refreshed from scrapers',
+            scraperResult: result
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

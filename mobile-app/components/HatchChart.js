@@ -156,19 +156,34 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
 
   useEffect(() => {
     // If hatchData is passed from parent (API), use it directly
-    if (propHatchData && propHatchData.hatches) {
-      setHatchData({
-        hatches: propHatchData.hatches,
-        flies: propHatchData.flies || getFlyRecommendations(propHatchData.hatches),
-        waterTemp: propHatchData.waterTemp,
-        waterConditions: propHatchData.waterConditions,
-        source: propHatchData.source
-      });
-      setLoading(false);
-      return;
+    if (propHatchData) {
+      const hatches = propHatchData.hatches || propHatchData.currentHatches || [];
+      if (hatches.length > 0) {
+        setHatchData({
+          hatches: hatches,
+          flies: propHatchData.flies || propHatchData.recommendedFlies || getFlyRecommendations(hatches),
+          waterTemp: propHatchData.waterTemp,
+          waterConditions: propHatchData.waterConditions,
+          source: propHatchData.source || 'Live conditions'
+        });
+        setLoading(false);
+        return;
+      }
     }
     fetchHatchData();
   }, [riverName, isPremium, propHatchData]);
+
+  // Always ensure we have fallback data
+  useEffect(() => {
+    if (!loading && (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0)) {
+      const staticHatches = getStaticHatches(riverName);
+      setHatchData({
+        hatches: staticHatches,
+        flies: getFlyRecommendations(staticHatches),
+        source: 'Seasonal forecast'
+      });
+    }
+  }, [loading, hatchData, riverName]);
 
   const getStaticHatches = (river) => {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
@@ -228,6 +243,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
             waterTemp: data.waterTemp,
             waterConditions: data.waterConditions
           });
+          setLoading(false);
           return;
         }
       }
