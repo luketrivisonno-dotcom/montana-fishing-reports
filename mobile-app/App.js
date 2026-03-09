@@ -15,6 +15,7 @@ import {
 } from '@expo/vector-icons';
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
+import SolunarTimes from './components/SolunarTimes';
 import RiverMap from './components/RiverMap';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
@@ -445,6 +446,9 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* DYNAMIC HATCH CHART with live conditions */}
         <HatchChart riverName={river} isPremium={globalIsPremium} hatchData={data?.hatchData} />
+
+        {/* SOLUNAR FISHING TIMES */}
+        <SolunarTimes riverName={river} />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Fishing Reports</Text>
