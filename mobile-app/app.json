@@ -2,14 +2,14 @@
   "expo": {
     "name": "Montana Fishing Reports",
     "slug": "montana-fishing-reports",
-    "version": "2.3.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a5f7a"
+      "backgroundColor": "#2d4a3e"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -17,50 +17,41 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.montanafishing.reports",
-      "buildNumber": "2.3.0",
+      "buildNumber": "2.0.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Montana Fishing Reports uses your location to show nearby rivers and access points.",
-        "NSLocationAlwaysUsageDescription": "Montana Fishing Reports uses your location to provide notifications about nearby fishing conditions."
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points."
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a5f7a"
+        "backgroundColor": "#2d4a3e"
       },
       "package": "com.montanafishing.reports",
-      "versionCode": 23,
+      "versionCode": 2,
       "permissions": [
-        "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "RECEIVE_BOOT_COMPLETED",
-        "SCHEDULE_EXACT_ALARM"
+        "ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow Montana Fishing Reports to use your location to find nearby rivers and access points."
-        }
-      ],
       [
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#1a5f7a"
+          "color": "#2d4a3e"
         }
       ]
     ],
     "extra": {
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "your-project-id-here"
       }
     },
-    "owner": "montana-fishing-reports"
+    "owner": "your-expo-username"
   }
 }
