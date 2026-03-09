@@ -17,6 +17,13 @@ import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offli
 import HatchChart from './components/HatchChart';
 import SolunarTimes from './components/SolunarTimes';
 import FlowChart from './components/FlowChart';
+import { 
+  registerForPushNotificationsAsync, 
+  subscribeToRiverNotifications,
+  unsubscribeFromRiverNotifications,
+  isSubscribedToRiver,
+  setupNotificationListeners 
+} from './utils/notifications';
 import RiverMap from './components/RiverMap';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
@@ -294,8 +301,44 @@ function RiverDetailsScreen({ route, navigation }) {
   const [isOffline, setIsOffline] = useState(false);
   const [isFavorite, setIsFavorite] = useState(globalFavorites.includes(river));
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  useEffect(() => { fetchRiverData(); }, []);
+  useEffect(() => { 
+    fetchRiverData();
+    checkSubscription();
+    setupNotifications();
+  }, []);
+
+  const checkSubscription = async () => {
+    const subscribed = await isSubscribedToRiver(river);
+    setIsSubscribed(subscribed);
+  };
+
+  const setupNotifications = async () => {
+    const token = await registerForPushNotificationsAsync();
+    setNotificationsEnabled(!!token);
+    setupNotificationListeners();
+  };
+
+  const toggleNotifications = async () => {
+    if (!notificationsEnabled) {
+      const token = await registerForPushNotificationsAsync();
+      if (!token) {
+        Alert.alert('Notifications', 'Please enable notifications in settings');
+        return;
+      }
+      setNotificationsEnabled(true);
+    }
+    
+    if (isSubscribed) {
+      await unsubscribeFromRiverNotifications(river);
+      setIsSubscribed(false);
+    } else {
+      await subscribeToRiverNotifications(river);
+      setIsSubscribed(true);
+    }
+  };
 
   const fetchRiverData = async () => {
     try {
@@ -358,9 +401,18 @@ function RiverDetailsScreen({ route, navigation }) {
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.heroButton}>
               <Ionicons name="arrow-back" size={22} color="#f5f1e8" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={toggleFavorite} style={styles.heroButton}>
-              <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color="#f5f1e8" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity onPress={toggleNotifications} style={styles.heroButton}>
+                <Ionicons 
+                  name={isSubscribed ? "notifications" : "notifications-outline"} 
+                  size={22} 
+                  color={isSubscribed ? COLORS.accent : "#f5f1e8"} 
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleFavorite} style={styles.heroButton}>
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color="#f5f1e8" />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.heroContent}>
             <Text style={styles.heroTitle}>{river}</Text>

@@ -181,6 +181,26 @@ async function initDatabase() {
         await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_current ON hatch_reports(is_current)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_date ON hatch_reports(report_date)`);
         
+        // Push notification tables
+        await db.query(`CREATE TABLE IF NOT EXISTS push_tokens (
+            id SERIAL PRIMARY KEY,
+            token VARCHAR(255) UNIQUE NOT NULL,
+            platform VARCHAR(20),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
+        await db.query(`CREATE TABLE IF NOT EXISTS notification_subscriptions (
+            id SERIAL PRIMARY KEY,
+            token VARCHAR(255) NOT NULL,
+            river VARCHAR(100) NOT NULL,
+            subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(token, river)
+        )`);
+        
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_subscriptions_token ON notification_subscriptions(token)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_subscriptions_river ON notification_subscriptions(river)`);
+        
         await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_source_normalized ON reports(source_normalized)`);
@@ -575,6 +595,79 @@ app.get('/api/usgs/history/:river',
         }
     }
 );
+
+// ============================================================================
+// PUSH NOTIFICATION ENDPOINTS
+// ============================================================================
+
+// Store push tokens
+app.post('/api/notifications/register', async (req, res) => {
+    try {
+        const { token, platform } = req.body;
+        if (!token) return res.status(400).json({ error: 'Token required' });
+        
+        await db.query(`
+            INSERT INTO push_tokens (token, platform, created_at) 
+            VALUES ($1, $2, NOW())
+            ON CONFLICT (token) DO UPDATE SET last_used = NOW()
+        `, [token, platform || 'unknown']);
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Token registration error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Subscribe to river alerts
+app.post('/api/notifications/subscribe', async (req, res) => {
+    try {
+        const { token, river } = req.body;
+        if (!token || !river) return res.status(400).json({ error: 'Token and river required' });
+        
+        await db.query(`
+            INSERT INTO notification_subscriptions (token, river, subscribed_at)
+            VALUES ($1, $2, NOW())
+            ON CONFLICT (token, river) DO UPDATE SET subscribed_at = NOW()
+        `, [token, river]);
+        
+        res.json({ success: true, subscribed: true });
+    } catch (error) {
+        console.error('Subscription error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Unsubscribe from river alerts
+app.post('/api/notifications/unsubscribe', async (req, res) => {
+    try {
+        const { token, river } = req.body;
+        if (!token || !river) return res.status(400).json({ error: 'Token and river required' });
+        
+        await db.query(`
+            DELETE FROM notification_subscriptions WHERE token = $1 AND river = $2
+        `, [token, river]);
+        
+        res.json({ success: true, subscribed: false });
+    } catch (error) {
+        console.error('Unsubscribe error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get user subscriptions
+app.get('/api/notifications/subscriptions/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        const result = await db.query(`
+            SELECT river FROM notification_subscriptions WHERE token = $1
+        `, [token]);
+        
+        res.json({ subscriptions: result.rows.map(r => r.river) });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // Get full river details
 app.get('/api/river-details/:river', 
