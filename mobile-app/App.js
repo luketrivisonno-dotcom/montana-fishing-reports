@@ -16,6 +16,7 @@ import {
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
 import HatchChart from './components/HatchChart';
 import SolunarTimes from './components/SolunarTimes';
+import FlowChart from './components/FlowChart';
 import RiverMap from './components/RiverMap';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
@@ -446,6 +447,9 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* DYNAMIC HATCH CHART with live conditions */}
         <HatchChart riverName={river} isPremium={globalIsPremium} hatchData={data?.hatchData} />
+
+        {/* 7-DAY FLOW HISTORY */}
+        <FlowChart riverName={river} />
 
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />

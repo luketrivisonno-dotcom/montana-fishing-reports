@@ -493,6 +493,89 @@ app.get('/api/usgs/:river',
     }
 );
 
+// Get 7-day flow history for charts
+app.get('/api/usgs/history/:river',
+    apiLimiter,
+    param('river').trim().escape().isLength({ min: 1, max: 100 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { USGS_SITES } = require('./utils/usgs');
+            const axios = require('axios');
+            
+            const riverName = req.params.river;
+            const site = USGS_SITES[riverName];
+            
+            if (!site) {
+                return res.status(404).json({ error: 'No USGS station for this river' });
+            }
+            
+            // Fetch 7 days of daily values
+            const response = await axios.get(
+                `https://waterservices.usgs.gov/nwis/dv/?format=json&sites=${site.id}&parameterCd=00060&period=P7D`,
+                { timeout: 10000 }
+            );
+            
+            const timeSeries = response.data.value.timeSeries;
+            if (!timeSeries || timeSeries.length === 0) {
+                return res.status(404).json({ error: 'No flow data available' });
+            }
+            
+            const values = timeSeries[0].values[0].value;
+            const flowData = values
+                .filter(v => v.value !== '-999999')
+                .map(v => ({
+                    date: v.dateTime.split('T')[0],
+                    flow: Math.round(parseFloat(v.value))
+                }));
+            
+            // Calculate daily averages and trends
+            const dailyData = [];
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            for (let i = 0; i < flowData.length; i++) {
+                const date = new Date(flowData[i].date);
+                const dayName = dayNames[date.getDay()];
+                
+                let trend = 'stable';
+                if (i > 0) {
+                    const prev = flowData[i - 1].flow;
+                    const curr = flowData[i].flow;
+                    if (curr > prev * 1.05) trend = 'rising';
+                    else if (curr < prev * 0.95) trend = 'falling';
+                }
+                
+                dailyData.push({
+                    ...flowData[i],
+                    day: dayName,
+                    trend
+                });
+            }
+            
+            // Get current flow (most recent)
+            const currentFlow = dailyData.length > 0 ? dailyData[dailyData.length - 1].flow : null;
+            
+            // Calculate 7-day average
+            const avgFlow = dailyData.length > 0 
+                ? Math.round(dailyData.reduce((sum, d) => sum + d.flow, 0) / dailyData.length)
+                : null;
+            
+            res.json({
+                river: riverName,
+                siteId: site.id,
+                currentFlow,
+                averageFlow: avgFlow,
+                flowHistory: dailyData,
+                unit: 'CFS'
+            });
+            
+        } catch (error) {
+            console.error('Flow history error:', error.message);
+            res.status(500).json({ error: 'Failed to fetch flow history' });
+        }
+    }
+);
+
 // Get full river details
 app.get('/api/river-details/:river', 
     apiLimiter,
