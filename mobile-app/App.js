@@ -309,6 +309,7 @@ function RiverDetailsScreen({ route, navigation }) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
+  const [logRefreshKey, setLogRefreshKey] = useState(0);
 
   useEffect(() => { 
     fetchRiverData();
@@ -363,6 +364,7 @@ function RiverDetailsScreen({ route, navigation }) {
       existing.push(newCatch);
       await AsyncStorage.setItem('fishingLog', JSON.stringify(existing));
       Alert.alert('Success', 'Catch logged!');
+      setLogRefreshKey(prev => prev + 1); // Trigger refresh
       return true;
     } catch (error) {
       console.error('Save catch error:', error);
@@ -539,6 +541,7 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* PERSONAL FISHING LOG */}
         <FishingLogList 
+          key={`log-${logRefreshKey}`}
           riverName={river} 
           onAddNew={() => setShowLogModal(true)}
         />
