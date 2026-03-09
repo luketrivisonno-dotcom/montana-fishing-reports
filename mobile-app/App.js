@@ -17,6 +17,8 @@ import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offli
 import HatchChart from './components/HatchChart';
 import SolunarTimes from './components/SolunarTimes';
 import FlowChart from './components/FlowChart';
+import FishingLogList from './components/FishingLogList';
+import FishingLogModal from './components/FishingLogModal';
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -303,6 +305,7 @@ function RiverDetailsScreen({ route, navigation }) {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showLogModal, setShowLogModal] = useState(false);
 
   useEffect(() => { 
     fetchRiverData();
@@ -337,6 +340,22 @@ function RiverDetailsScreen({ route, navigation }) {
     } else {
       await subscribeToRiverNotifications(river);
       setIsSubscribed(true);
+    }
+  };
+
+  const saveCatch = async (catchData) => {
+    try {
+      const existing = JSON.parse(await AsyncStorage.getItem('fishingLog') || '[]');
+      const newCatch = {
+        ...catchData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      };
+      existing.push(newCatch);
+      await AsyncStorage.setItem('fishingLog', JSON.stringify(existing));
+      Alert.alert('Success', 'Catch logged!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save catch');
     }
   };
 
@@ -505,6 +524,19 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
+
+        {/* PERSONAL FISHING LOG */}
+        <FishingLogList 
+          riverName={river} 
+          onAddNew={() => setShowLogModal(true)}
+        />
+
+        <FishingLogModal
+          visible={showLogModal}
+          onClose={() => setShowLogModal(false)}
+          riverName={river}
+          onSave={saveCatch}
+        />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Fishing Reports</Text>
