@@ -37,9 +37,9 @@ export async function registerForPushNotificationsAsync() {
   }
   
   try {
-    token = (await Notifications.getExpoPushTokenAsync({
-      projectId: 'your-project-id' // Will be set during EAS build
-    })).data;
+    // Get project ID from Expo config or use a placeholder for dev
+    const projectId = process.env.EXPO_PUBLIC_PROJECT_ID || 'montana-fishing-reports';
+    token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
     
     console.log('Push token:', token);
     
@@ -50,7 +50,8 @@ export async function registerForPushNotificationsAsync() {
     await registerTokenWithServer(token);
     
   } catch (error) {
-    console.error('Error getting push token:', error);
+    console.log('Push notifications not available (Expo Go limitation):', error.message);
+    // In Expo Go, push tokens won't work - that's OK for development
   }
   
   // Configure Android notification channel

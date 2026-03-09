@@ -283,7 +283,10 @@ function ReportCard({ report }) {
           <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
         </View>
         <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
-        {report.water_clarity && (
+        {report.water_clarity && 
+         report.water_clarity.toLowerCase() !== 'hidden' &&
+         report.water_clarity.toLowerCase() !== 'n/a' &&
+         report.water_clarity.toLowerCase() !== 'unknown' && (
           <Text style={styles.waterClarity}>Clarity: {report.water_clarity}</Text>
         )}
       </View>
@@ -319,9 +322,14 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const setupNotifications = async () => {
-    const token = await registerForPushNotificationsAsync();
-    setNotificationsEnabled(!!token);
-    setupNotificationListeners();
+    try {
+      const token = await registerForPushNotificationsAsync();
+      setNotificationsEnabled(!!token);
+      setupNotificationListeners();
+    } catch (error) {
+      console.log('Notifications setup skipped:', error.message);
+      setNotificationsEnabled(false);
+    }
   };
 
   const toggleNotifications = async () => {
@@ -345,7 +353,8 @@ function RiverDetailsScreen({ route, navigation }) {
 
   const saveCatch = async (catchData) => {
     try {
-      const existing = JSON.parse(await AsyncStorage.getItem('fishingLog') || '[]');
+      const existingStr = await AsyncStorage.getItem('fishingLog');
+      const existing = existingStr ? JSON.parse(existingStr) : [];
       const newCatch = {
         ...catchData,
         id: Date.now().toString(),
@@ -354,8 +363,11 @@ function RiverDetailsScreen({ route, navigation }) {
       existing.push(newCatch);
       await AsyncStorage.setItem('fishingLog', JSON.stringify(existing));
       Alert.alert('Success', 'Catch logged!');
+      return true;
     } catch (error) {
-      Alert.alert('Error', 'Failed to save catch');
+      console.error('Save catch error:', error);
+      Alert.alert('Error', 'Failed to save catch: ' + error.message);
+      return false;
     }
   };
 
