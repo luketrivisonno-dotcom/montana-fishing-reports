@@ -37,7 +37,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // ============================================
 // DEVELOPMENT MODE
 // ============================================
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
@@ -401,7 +401,8 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const toggleFavorite = async () => {
-    if (!globalIsPremium) { setShowPremiumModal(true); return; }
+    // Premium check disabled for free version
+    // if (!globalIsPremium) { setShowPremiumModal(true); return; }
     if (isFavorite) { globalFavorites = globalFavorites.filter(r => r !== river); }
     else { globalFavorites.push(river); }
     setIsFavorite(!isFavorite);
@@ -515,7 +516,7 @@ function RiverDetailsScreen({ route, navigation }) {
         </View>
 
         {/* DYNAMIC HATCH CHART with live conditions */}
-        <HatchChart riverName={river} isPremium={globalIsPremium} hatchData={data?.hatchData} />
+        <HatchChart riverName={river} isPremium={true} hatchData={data?.hatchData} />
 
         {/* 7-DAY FLOW HISTORY - Only show for rivers with USGS data */}
         {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && (
@@ -596,14 +597,8 @@ function MapScreen({ navigation }) {
       <DevModeBanner />
       <View style={styles.mapHeader}>
         <Text style={styles.mapHeaderTitle}>Access Points</Text>
-        {!globalIsPremium && (
-          <View style={styles.mapBadge}>
-            <MaterialIcons name="lock" size={12} color={COLORS.premiumDark} />
-            <Text style={styles.mapBadgeText}>Premium</Text>
-          </View>
-        )}
       </View>
-      <RiverMap navigation={navigation} isPremium={globalIsPremium} />
+      <RiverMap navigation={navigation} isPremium={true} />
     </SafeAreaView>
   );
 }
@@ -615,19 +610,20 @@ function FavoritesScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   useEffect(() => { setFavorites(globalFavorites); }, []);
 
-  if (!globalIsPremium) {
-    return (
-      <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
-        <DevModeBanner />
-        <View style={styles.upsellContainer}>
-          <MaterialIcons name="diamond" size={64} color={COLORS.premium} />
-          <Text style={styles.upsellTitle}>Premium Feature</Text>
-          <TouchableOpacity style={styles.upsellButton}><Text style={styles.upsellButtonText}>Upgrade to Premium</Text></TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Premium check disabled for free version
+  // if (!globalIsPremium) {
+  //   return (
+  //     <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
+  //       <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
+  //       <DevModeBanner />
+  //       <View style={styles.upsellContainer}>
+  //         <MaterialIcons name="diamond" size={64} color={COLORS.premium} />
+  //         <Text style={styles.upsellTitle}>Premium Feature</Text>
+  //         <TouchableOpacity style={styles.upsellButton}><Text style={styles.upsellButtonText}>Upgrade to Premium</Text></TouchableOpacity>
+  //       </View>
+  //     </SafeAreaView>
+  //   );
+  // }
 
   if (favorites.length === 0) {
     return (
@@ -731,7 +727,8 @@ export default function App() {
         <Tab.Screen name="Rivers" component={RiversStack} />
         <Tab.Screen name="Map" component={MapScreen} />
         <Tab.Screen name="Favorites" component={FavoritesScreen} />
-        <Tab.Screen name="Premium" component={PremiumScreen} />
+        {/* Premium tab hidden for now - will enable later */}
+        {/* <Tab.Screen name="Premium" component={PremiumScreen} /> */}
       </Tab.Navigator>
     </NavigationContainer>
   );
