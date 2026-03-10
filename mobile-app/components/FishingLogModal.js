@@ -154,6 +154,7 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
           </View>
         </View>
       </KeyboardAvoidingView>
+    </View>
     </Modal>
   );
 };
