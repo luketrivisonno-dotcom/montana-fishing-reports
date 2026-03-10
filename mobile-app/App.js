@@ -21,6 +21,7 @@ import FishingLogList from './components/FishingLogList';
 import FishingLogModal from './components/FishingLogModal';
 import RegulationsInfo from './components/RegulationsInfo';
 import AdBanner from './components/AdBanner';
+import AdManager from './components/AdManager';
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -312,6 +313,8 @@ function RiverDetailsScreen({ route, navigation }) {
     fetchRiverData();
     checkSubscription();
     setupNotifications();
+    // Show interstitial ad every 3rd river view
+    AdManager.showInterstitialWithFrequency('river_details', 3);
   }, []);
 
   const checkSubscription = async () => {

@@ -13,10 +13,10 @@ const TEST_REWARDED_ID = Platform.select({
   android: 'ca-app-pub-3940256099942544/5224354917',
 });
 
-// Production IDs - Replace with your real IDs
+// Production IDs - Your real AdMob IDs
 const PRODUCTION_INTERSTITIAL_ID = Platform.select({
-  ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-  android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+  ios: 'ca-app-pub-9219871596282320/7938533170',
+  android: 'ca-app-pub-9219871596282320/7938533170',
 });
 
 const PRODUCTION_REWARDED_ID = Platform.select({
