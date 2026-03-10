@@ -39,9 +39,9 @@ const INITIAL_REGION = {
 
 export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
-  const [selectedRegion, setSelectedRegion] = useState(INITIAL_REGION);
   const [mapType, setMapType] = useState('hybrid');
   const [showUSGS, setShowUSGS] = useState(true);
+  const mapRef = React.useRef(null);
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
   const usgsStations = useMemo(() => getUSGSStations(), []);
@@ -147,15 +147,14 @@ export default function RiverMap({ isPremium }) {
 
       {/* Map with Satellite/Hybrid View */}
       <MapView
-        key={`map-${selectedType}-${showUSGS}`}
+        ref={mapRef}
         style={styles.map}
         initialRegion={INITIAL_REGION}
-        region={selectedRegion}
-        onRegionChangeComplete={setSelectedRegion}
         mapType={mapType}
         showsUserLocation={true}
         showsCompass={true}
         showsScale={true}
+        moveOnMarkerPress={false}
       >
         {showUSGS && usgsStations.map((station, index) => (
           <Marker

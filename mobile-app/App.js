@@ -522,20 +522,7 @@ function RiverDetailsScreen({ route, navigation }) {
         {/* REGULATIONS & SEASONS */}
         <RegulationsInfo riverName={river} />
 
-        {/* PERSONAL FISHING LOG */}
-        <FishingLogList 
-          riverName={river} 
-          onAddNew={() => setShowLogModal(true)}
-          refreshKey={logRefreshKey}
-        />
-
-        <FishingLogModal
-          visible={showLogModal}
-          onClose={() => setShowLogModal(false)}
-          riverName={river}
-          onSave={saveCatch}
-        />
-
+        {/* FISHING REPORTS */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Fishing Reports</Text>
           <Text style={styles.sectionCount}>{data?.reports?.length || 0} sources</Text>
@@ -552,6 +539,20 @@ function RiverDetailsScreen({ route, navigation }) {
             <Text style={styles.emptyText}>Check back later for updates</Text>
           </View>
         )}
+
+        {/* PERSONAL FISHING LOG - Moved below reports */}
+        <FishingLogList 
+          riverName={river} 
+          onAddNew={() => setShowLogModal(true)}
+          refreshKey={logRefreshKey}
+        />
+
+        <FishingLogModal
+          visible={showLogModal}
+          onClose={() => setShowLogModal(false)}
+          riverName={river}
+          onSave={saveCatch}
+        />
       </ScrollView>
 
       <Modal visible={showPremiumModal} transparent={true} animationType="slide" onRequestClose={() => setShowPremiumModal(false)}>

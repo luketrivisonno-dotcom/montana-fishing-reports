@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, Modal, TouchableOpacity, 
-  TextInput, ScrollView, Alert, ActivityIndicator
+  TextInput, ScrollView, Alert, ActivityIndicator,
+  KeyboardAvoidingView, Platform, Keyboard
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -69,63 +70,73 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>🎣 Log Your Catch</Text>
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color={COLORS.text} />
-            </TouchableOpacity>
-          </View>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.title}>🎣 Log Your Catch</Text>
+              <TouchableOpacity onPress={onClose}>
+                <Ionicons name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
 
-          <ScrollView style={styles.form}>
-            <Text style={styles.label}>River</Text>
-            <Text style={styles.riverName}>{riverName}</Text>
+            <ScrollView 
+              style={styles.form}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={true}
+            >
+              <Text style={styles.label}>River</Text>
+              <Text style={styles.riverName}>{riverName}</Text>
 
-            <Text style={styles.label}>Date *</Text>
-            <TextInput
-              style={styles.input}
-              value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-            />
+              <Text style={styles.label}>Date *</Text>
+              <TextInput
+                style={styles.input}
+                value={date}
+                onChangeText={setDate}
+                placeholder="YYYY-MM-DD"
+              />
 
-            <Text style={styles.label}>Species *</Text>
-            <TextInput
-              style={styles.input}
-              value={species}
-              onChangeText={setSpecies}
-              placeholder="e.g., Rainbow Trout, Brown Trout"
-            />
+              <Text style={styles.label}>Species *</Text>
+              <TextInput
+                style={styles.input}
+                value={species}
+                onChangeText={setSpecies}
+                placeholder="e.g., Rainbow Trout, Brown Trout"
+              />
 
-            <Text style={styles.label}>Length (inches)</Text>
-            <TextInput
-              style={styles.input}
-              value={length}
-              onChangeText={setLength}
-              placeholder="e.g., 18"
-              keyboardType="numeric"
-            />
+              <Text style={styles.label}>Length (inches)</Text>
+              <TextInput
+                style={styles.input}
+                value={length}
+                onChangeText={setLength}
+                placeholder="e.g., 18"
+                keyboardType="numeric"
+              />
 
-            <Text style={styles.label}>Fly Used</Text>
-            <TextInput
-              style={styles.input}
-              value={fly}
-              onChangeText={setFly}
-              placeholder="e.g., Elk Hair Caddis #14"
-            />
+              <Text style={styles.label}>Fly Used</Text>
+              <TextInput
+                style={styles.input}
+                value={fly}
+                onChangeText={setFly}
+                placeholder="e.g., Elk Hair Caddis #14"
+              />
 
-            <Text style={styles.label}>Notes</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Water conditions, weather, etc."
-              multiline
-              numberOfLines={4}
-            />
-          </ScrollView>
+              <Text style={styles.label}>Notes</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="Water conditions, weather, etc."
+                multiline
+                numberOfLines={4}
+              />
+              {/* Spacer for keyboard */}
+              <View style={{ height: 100 }} />
+            </ScrollView>
 
-          <View style={styles.footer}>
+            <View style={styles.footer}>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
@@ -142,7 +153,7 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -151,6 +162,10 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  keyboardView: {
+    flex: 1,
     justifyContent: 'flex-end',
   },
   container: {
