@@ -17,7 +17,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.luketrivisonno.montanafishing",
-      "buildNumber": "2.0.0",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
