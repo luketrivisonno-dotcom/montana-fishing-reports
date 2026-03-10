@@ -63,27 +63,27 @@ New in this version:
 
 ### Support URL
 ```
-https://montanafishingreports.com/support
+https://snazzy-lily-3ac29f.netlify.app//support
 ```
 (Or create a simple support page)
 
 ### Marketing URL
 ```
-https://montanafishingreports.com
+https://snazzy-lily-3ac29f.netlify.app/
 ```
 
 ### Privacy Policy URL
 ```
-https://montanafishingreports.com/privacy
+https://snazzy-lily-3ac29f.netlify.app//privacy
 ```
 
 ## App Review Information
 
 ### Contact Information
-- **First Name**: [Your First Name]
-- **Last Name**: [Your Last Name]
-- **Email**: [Your Email]
-- **Phone**: [Your Phone]
+- **First Name**: Dhaul
+- **Last Name**: User
+- **Email**: Dhaul12@protonmail.com
+- **Phone**: 
 
 ### Demo Account (if required)
 Not required - app is free to use
@@ -161,7 +161,7 @@ Weather
 ## TODO Before Submission
 
 - [ ] Replace [YOUR_EMAIL] with real support email
-- [ ] Replace [YOUR_WEBSITE] with actual website (or create simple one)
+- [ ] Replace https://snazzy-lily-3ac29f.netlify.app/ with actual website (or create simple one)
 - [ ] Set up privacy policy page online
 - [ ] Set up support page online
 - [ ] Create 5-10 screenshots (see sizes below)
