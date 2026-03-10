@@ -137,24 +137,24 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
             </ScrollView>
 
             <View style={styles.footer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Text style={styles.saveText}>Save Catch</Text>
-              )}
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+                onPress={handleSave}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.saveText}>Save Catch</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+        </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 };
