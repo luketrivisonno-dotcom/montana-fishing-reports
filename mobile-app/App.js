@@ -20,6 +20,7 @@ import FlowChart from './components/FlowChart';
 import FishingLogList from './components/FishingLogList';
 import FishingLogModal from './components/FishingLogModal';
 import RegulationsInfo from './components/RegulationsInfo';
+import AdBanner from './components/AdBanner';
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -523,6 +524,9 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* REGULATIONS & SEASONS */}
         <RegulationsInfo riverName={river} />
+
+        {/* AD BANNER */}
+        <AdBanner size="banner" />
 
         {/* FISHING REPORTS */}
         <View style={styles.sectionHeader}>

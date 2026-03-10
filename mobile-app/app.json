@@ -20,8 +20,9 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
-        "ITSAppUsesNonExemptEncryption": false
-      }
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+      },
     },
     "android": {
       "adaptiveIcon": {
@@ -44,6 +45,13 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#2d4a3e"
+        }
+      ],
+      [
+        "expo-ads-admob",
+        {
+          "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
+          "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
         }
       ]
     ],
