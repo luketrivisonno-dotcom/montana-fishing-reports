@@ -37,6 +37,41 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
+// Static images with aggressive caching (acts like CDN for local images)
+app.use('/river-images', express.static('assets/river-images', {
+    maxAge: '7d',  // Cache for 7 days
+    etag: true,
+    lastModified: true
+}));
+
+// Cache middleware helper
+const cacheMiddleware = (duration = 300) => {  // default 5 minutes
+    return (req, res, next) => {
+        const key = `__express__${req.originalUrl || req.url}`;
+        const cachedBody = cache.get(key);
+        
+        if (cachedBody) {
+            res.set('X-Cache', 'HIT');
+            res.send(cachedBody);
+            return;
+        }
+        
+        res.set('X-Cache', 'MISS');
+        res.set('Cache-Control', `public, max-age=${duration}`);
+        
+        // Override res.send to cache the response
+        const originalSend = res.send.bind(res);
+        res.send = (body) => {
+            if (res.statusCode === 200) {
+                cache.set(key, body, duration);
+            }
+            originalSend(body);
+        };
+        
+        next();
+    };
+};
+
 // Rate limiting
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -363,6 +398,61 @@ app.get('/health', async (req, res) => {
     }
 });
 
+// Cache management endpoint (admin only - requires secret key)
+app.post('/api/admin/cache/clear', async (req, res) => {
+    const { secret, pattern } = req.body;
+    
+    // Simple secret check - should match env variable
+    if (secret !== process.env.ADMIN_SECRET) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        if (pattern) {
+            // Clear keys matching pattern
+            const keys = cache.keys();
+            const matchingKeys = keys.filter(k => k.includes(pattern));
+            matchingKeys.forEach(k => cache.del(k));
+            res.json({ 
+                message: `Cleared ${matchingKeys.length} cache entries matching "${pattern}"`,
+                keys: matchingKeys
+            });
+        } else {
+            // Clear all cache
+            const keys = cache.keys();
+            cache.flushAll();
+            res.json({ 
+                message: 'Cache cleared completely',
+                clearedKeys: keys.length
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get cache stats (admin only)
+app.get('/api/admin/cache/stats', async (req, res) => {
+    const secret = req.headers['x-admin-secret'];
+    
+    if (secret !== process.env.ADMIN_SECRET) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    const stats = cache.getStats();
+    const keys = cache.keys();
+    
+    res.json({
+        hits: stats.hits,
+        misses: stats.misses,
+        keys: keys.length,
+        keyList: keys.slice(0, 50), // First 50 keys only
+        hitRate: stats.hits + stats.misses > 0 
+            ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2) + '%'
+            : 'N/A'
+    });
+});
+
 // API root
 app.get('/', (req, res) => {
     res.json({ 
@@ -389,7 +479,17 @@ app.get('/', (req, res) => {
 app.post('/api/scrape', scrapeLimiter, async (req, res) => {
     try {
         const results = await runAllScrapers();
-        res.json({ message: 'Scrape completed', results });
+        
+        // Clear API caches after successful scrape so fresh data is served
+        const keys = cache.keys();
+        const apiKeys = keys.filter(k => k.includes('/api/'));
+        apiKeys.forEach(k => cache.del(k));
+        
+        res.json({ 
+            message: 'Scrape completed', 
+            results,
+            cacheCleared: apiKeys.length
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -447,7 +547,7 @@ app.post('/api/cleanup', async (req, res) => {
 });
 
 // Get all rivers
-app.get('/api/rivers', apiLimiter, async (req, res) => {
+app.get('/api/rivers', apiLimiter, cacheMiddleware(600), async (req, res) => {
     try {
         const result = await db.query(`SELECT DISTINCT river FROM reports WHERE is_active = true ORDER BY river`);
         const filteredRivers = result.rows.map(r => r.river).filter(river => 
@@ -464,6 +564,7 @@ app.get('/api/reports/:river',
     apiLimiter,
     param('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
+    cacheMiddleware(300),
     async (req, res) => {
         try {
             const { river } = req.params;
@@ -483,11 +584,12 @@ app.get('/api/reports/:river',
     }
 );
 
-// Get weather for a river
+// Get weather for a river (cache 10 min - changes slowly)
 app.get('/api/weather/:river', 
     apiLimiter,
     param('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
+    cacheMiddleware(600),
     async (req, res) => {
         try {
             const weather = await getWeatherForRiver(req.params.river);
@@ -498,11 +600,12 @@ app.get('/api/weather/:river',
     }
 );
 
-// Get USGS data for a river
+// Get USGS data for a river (cache 15 min - updates every 15 min)
 app.get('/api/usgs/:river', 
     apiLimiter,
     param('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
+    cacheMiddleware(900),
     async (req, res) => {
         try {
             const data = await getUSGSData(req.params.river);
@@ -513,11 +616,12 @@ app.get('/api/usgs/:river',
     }
 );
 
-// Get 7-day flow history for charts
+// Get 7-day flow history for charts (cache 1 hour - historical data)
 app.get('/api/usgs/history/:river',
     apiLimiter,
     param('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
+    cacheMiddleware(3600),
     async (req, res) => {
         try {
             const { USGS_SITES } = require('./utils/usgs');
@@ -669,11 +773,12 @@ app.get('/api/notifications/subscriptions/:token', async (req, res) => {
     }
 });
 
-// Get full river details
+// Get full river details (cache 5 min - aggregates multiple sources)
 app.get('/api/river-details/:river', 
     apiLimiter,
     param('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
+    cacheMiddleware(300),
     async (req, res) => {
         try {
             const { river } = req.params;
@@ -803,10 +908,11 @@ app.get('/api/premium/hatch-charts/:river',
     }
 );
 
-// Public hatch API (limited data)
+// Public hatch API (limited data) - cache 1 hour
 app.get('/api/hatches/:river',
     apiLimiter,
     param('river').trim().escape(),
+    cacheMiddleware(3600),
     async (req, res) => {
         try {
             const { river } = req.params;
