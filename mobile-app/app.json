@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.luketrivisonno.fishingreports",
+      "bundleIdentifier": "com.luketrivisonno.montanafishing",
       "buildNumber": "2.0.0",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2d4a3e"
       },
-      "package": "com.luketrivisonno.fishingreports",
+      "package": "com.luketrivisonno.montanafishing",
       "versionCode": 2,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
