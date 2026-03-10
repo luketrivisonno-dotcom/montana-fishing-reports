@@ -236,7 +236,7 @@ function RiversScreen({ navigation }) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })} activeOpacity={0.9)}
+          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })} activeOpacity={0.9}>
             <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
