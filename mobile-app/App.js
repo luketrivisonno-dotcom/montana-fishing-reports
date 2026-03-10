@@ -283,12 +283,7 @@ function ReportCard({ report }) {
           <Text style={styles.reportSource} numberOfLines={1}>{report.source}</Text>
         </View>
         <Text style={styles.reportDate}>{formatDate(report.last_updated)}</Text>
-        {report.water_clarity && 
-         report.water_clarity.toLowerCase() !== 'hidden' &&
-         report.water_clarity.toLowerCase() !== 'n/a' &&
-         report.water_clarity.toLowerCase() !== 'unknown' && (
-          <Text style={styles.waterClarity}>Clarity: {report.water_clarity}</Text>
-        )}
+
       </View>
       <Ionicons name="open-outline" size={18} color={COLORS.primary} />
     </TouchableOpacity>
@@ -511,23 +506,7 @@ function RiverDetailsScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Water Clarity Card - Only show if data exists */}
-          {data?.reports?.filter(r => r.water_clarity).length > 0 && (
-            <View style={styles.conditionCard}>
-              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.accent + '15' }]}>
-                <Ionicons name="eye-outline" size={22} color={COLORS.accent} />
-              </View>
-              <View style={styles.conditionInfo}>
-                <Text style={styles.conditionLabel}>Water Clarity</Text>
-                <Text style={styles.conditionValue}>
-                  {data.reports.filter(r => r.water_clarity)[0]?.water_clarity}
-                </Text>
-                <Text style={styles.conditionSubtext}>
-                  {data.reports.filter(r => r.water_clarity).length} report{data.reports.filter(r => r.water_clarity).length !== 1 ? 's' : ''} with clarity data
-                </Text>
-              </View>
-            </View>
-          )}
+
         </View>
 
         {/* DYNAMIC HATCH CHART with live conditions */}
@@ -800,7 +779,6 @@ const styles = StyleSheet.create({
   sourceIconText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   reportSource: { fontSize: 14, fontWeight: '600', color: COLORS.text, flex: 1 },
   reportDate: { fontSize: 12, color: COLORS.textLight, marginLeft: 15 },
-  waterClarity: { fontSize: 11, color: COLORS.textSecondary, marginLeft: 15, marginTop: 2 },
   conditionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
   locationBadge: { position: 'absolute', top: 8, right: 8, backgroundColor: COLORS.primary + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   locationContainer: { alignItems: 'flex-end', marginLeft: 'auto' },

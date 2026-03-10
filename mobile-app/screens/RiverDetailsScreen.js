@@ -166,10 +166,7 @@ const RiverDetailsScreen = ({ route, navigation }) => {
             <Text style={styles.conditionLabel}>Water Temp</Text>
             <Text style={styles.conditionValue}>{data?.waterTemp || 'N/A'}</Text>
           </View>
-          <View style={styles.conditionItem}>
-            <Text style={styles.conditionLabel}>Clarity</Text>
-            <Text style={styles.conditionValue}>{data?.clarity || 'N/A'}</Text>
-          </View>
+
         </View>
       </View>
 
