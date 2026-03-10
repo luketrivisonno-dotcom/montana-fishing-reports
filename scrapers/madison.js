@@ -50,7 +50,67 @@ async function scrapeMadisonOrvis() {
     ];
 }
 
+async function scrapeMadisonRiversEdge() {
+    return [
+        {
+            source: "The River's Edge",
+            river: 'Upper Madison River',
+            url: 'https://theriversedge.com/pages/upper-madison-river-fishing-report',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        },
+        {
+            source: "The River's Edge",
+            river: 'Lower Madison River',
+            url: 'https://theriversedge.com/pages/lower-madison-river-fishing-report',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        }
+    ];
+}
+
+async function scrapeMadisonBozemanFlySupply() {
+    return [
+        {
+            source: 'Bozeman Fly Supply',
+            river: 'Upper Madison River',
+            url: 'https://www.bozemanflysupply.com/fishing-reports/upper-madison',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        },
+        {
+            source: 'Bozeman Fly Supply',
+            river: 'Lower Madison River',
+            url: 'https://www.bozemanflysupply.com/fishing-reports/lower-madison',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        }
+    ];
+}
+
+async function scrapeMadisonYellowDog() {
+    return [
+        {
+            source: 'Yellow Dog Fly Fishing',
+            river: 'Upper Madison River',
+            url: 'https://www.yellowdogflyfishing.com/pages/upper-madison-fishing-reports',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        },
+        {
+            source: 'Yellow Dog Fly Fishing',
+            river: 'Lower Madison River',
+            url: 'https://www.yellowdogflyfishing.com/pages/lower-madison-fishing-reports',
+            last_updated: new Date().toLocaleDateString(),
+            scraped_at: new Date().toISOString()
+        }
+    ];
+}
+
 module.exports = {
     scrapeMadisonMontanaAngler,
-    scrapeMadisonOrvis
+    scrapeMadisonOrvis,
+    scrapeMadisonRiversEdge,
+    scrapeMadisonBozemanFlySupply,
+    scrapeMadisonYellowDog
 };

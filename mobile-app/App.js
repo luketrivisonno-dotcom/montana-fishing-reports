@@ -234,7 +234,7 @@ function RiversScreen({ navigation }) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('RiverDetails', { river: item })} activeOpacity={0.9}>
+          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })} activeOpacity={0.9)}
             <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
@@ -513,8 +513,10 @@ function RiverDetailsScreen({ route, navigation }) {
         {/* DYNAMIC HATCH CHART with live conditions */}
         <HatchChart riverName={river} isPremium={globalIsPremium} hatchData={data?.hatchData} />
 
-        {/* 7-DAY FLOW HISTORY */}
-        <FlowChart riverName={river} />
+        {/* 7-DAY FLOW HISTORY - Only show for rivers with USGS data */}
+        {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && (
+          <FlowChart riverName={river} />
+        )}
 
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
