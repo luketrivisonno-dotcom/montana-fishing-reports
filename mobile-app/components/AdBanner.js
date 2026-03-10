@@ -10,14 +10,14 @@ const TEST_BANNER_ID = Platform.select({
   android: 'ca-app-pub-3940256099942544/6300978111',  // Google test ID
 });
 
-// Production IDs - Replace these with your real AdMob IDs when ready
+// Production IDs - Your real AdMob IDs
 const PRODUCTION_BANNER_ID = Platform.select({
-  ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',  // Your iOS banner ID
-  android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',  // Your Android banner ID
+  ios: 'ca-app-pub-9219871596282320/1069397131',  // Your iOS banner ID
+  android: 'ca-app-pub-9219871596282320/1069397131',  // Your Android banner ID
 });
 
-// Set to false when using production IDs
-const USE_TEST_ADS = true;
+// Set to true for testing, false for production
+const USE_TEST_ADS = false;
 
 const AdBanner = ({ 
   size = 'banner',  // 'banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard'

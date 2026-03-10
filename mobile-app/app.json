@@ -50,8 +50,8 @@
       [
         "expo-ads-admob",
         {
-          "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
-          "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
+          "androidAppId": "ca-app-pub-9219871596282320~8470354941",
+          "iosAppId": "ca-app-pub-9219871596282320~8470354941"
         }
       ]
     ],
