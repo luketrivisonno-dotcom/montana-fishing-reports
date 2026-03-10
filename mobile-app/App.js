@@ -19,6 +19,7 @@ import SolunarTimes from './components/SolunarTimes';
 import FlowChart from './components/FlowChart';
 import FishingLogList from './components/FishingLogList';
 import FishingLogModal from './components/FishingLogModal';
+import RegulationsInfo from './components/RegulationsInfo';
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -518,11 +519,14 @@ function RiverDetailsScreen({ route, navigation }) {
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
 
+        {/* REGULATIONS & SEASONS */}
+        <RegulationsInfo riverName={river} />
+
         {/* PERSONAL FISHING LOG */}
         <FishingLogList 
-          key={`log-${logRefreshKey}`}
           riverName={river} 
           onAddNew={() => setShowLogModal(true)}
+          refreshKey={logRefreshKey}
         />
 
         <FishingLogModal

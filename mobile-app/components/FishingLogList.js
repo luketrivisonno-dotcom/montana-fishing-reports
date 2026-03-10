@@ -16,16 +16,17 @@ const COLORS = {
   success: '#5a7d5a',
 };
 
-const FishingLogList = ({ riverName, onAddNew }) => {
+const FishingLogList = ({ riverName, onAddNew, refreshKey }) => {
   const [catches, setCatches] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadCatches();
-  }, [riverName]);
+  }, [riverName, refreshKey]);
 
   const loadCatches = async () => {
     try {
+      setLoading(true);
       const allCatches = JSON.parse(await AsyncStorage.getItem('fishingLog') || '[]');
       const riverCatches = allCatches.filter(c => c.river === riverName);
       // Sort by date, newest first

@@ -39,17 +39,26 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
     }
 
     setLoading(true);
-    await onSave({
-      date,
-      river: riverName,
-      species,
-      length: length ? parseFloat(length) : null,
-      fly: fly || null,
-      notes: notes || null,
-    });
-    setLoading(false);
-    resetForm();
-    onClose();
+    try {
+      const success = await onSave({
+        date,
+        river: riverName,
+        species,
+        length: length ? parseFloat(length) : null,
+        fly: fly || null,
+        notes: notes || null,
+      });
+      
+      if (success) {
+        resetForm();
+        onClose();
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      Alert.alert('Error', 'Failed to save catch. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
