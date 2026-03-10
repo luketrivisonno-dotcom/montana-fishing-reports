@@ -1,80 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
-import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Ad unit IDs - Replace with your actual AdMob IDs
-// Use these test IDs during development
-const TEST_BANNER_ID = Platform.select({
-  ios: 'ca-app-pub-3940256099942544/2934735716',  // Google test ID
-  android: 'ca-app-pub-3940256099942544/6300978111',  // Google test ID
-});
-
-// Production IDs - Your real AdMob IDs
+// Production Ad Unit ID
 const PRODUCTION_BANNER_ID = Platform.select({
-  ios: 'ca-app-pub-9219871596282320/1069397131',  // Your iOS banner ID
-  android: 'ca-app-pub-9219871596282320/1069397131',  // Your Android banner ID
+  ios: 'ca-app-pub-9219871596282320/1069397131',
+  android: 'ca-app-pub-9219871596282320/1069397131',
 });
 
-// Set to true for testing, false for production
-const USE_TEST_ADS = false;
+// Use test ID for development
+const USE_TEST_ADS = true;
 
 const AdBanner = ({ 
-  size = 'banner',  // 'banner', 'largeBanner', 'mediumRectangle', 'fullBanner', 'leaderboard'
+  size = BannerAdSize.BANNER,
   style 
 }) => {
   const [isPremium, setIsPremium] = useState(false);
   const [adLoaded, setAdLoaded] = useState(false);
-  const [adError, setAdError] = useState(null);
 
-  useEffect(() => {
-    checkPremiumStatus();
-    // Set test device ID for development
-    if (USE_TEST_ADS) {
-      setTestDeviceIDAsync('EMULATOR');
-    }
+  // Check premium status
+  React.useEffect(() => {
+    const checkPremium = async () => {
+      try {
+        const premiumStatus = await AsyncStorage.getItem('premiumStatus');
+        setIsPremium(premiumStatus === 'true');
+      } catch (error) {
+        console.log('Error checking premium:', error);
+      }
+    };
+    checkPremium();
   }, []);
-
-  const checkPremiumStatus = async () => {
-    try {
-      const premiumStatus = await AsyncStorage.getItem('premiumStatus');
-      setIsPremium(premiumStatus === 'true');
-    } catch (error) {
-      console.log('Error checking premium:', error);
-    }
-  };
 
   // Don't show ads for premium users
   if (isPremium) {
     return null;
   }
 
-  const adUnitID = USE_TEST_ADS ? TEST_BANNER_ID : PRODUCTION_BANNER_ID;
-
-  const handleAdLoaded = () => {
-    setAdLoaded(true);
-    setAdError(null);
-  };
-
-  const handleAdError = (error) => {
-    console.log('Ad error:', error);
-    setAdError(error);
-    setAdLoaded(false);
-  };
-
-  // Don't render if there was an error loading the ad
-  if (adError) {
-    return null;
-  }
+  const adUnitId = USE_TEST_ADS ? TestIds.BANNER : PRODUCTION_BANNER_ID;
 
   return (
-    <View style={[styles.container, style, !adLoaded && styles.hidden]}>
-      <AdMobBanner
-        bannerSize={size}
-        adUnitID={adUnitID}
-        servePersonalizedAds={true}
-        onDidFailToReceiveAdWithError={handleAdError}
-        onAdViewDidReceiveAd={handleAdLoaded}
+    <View style={[styles.container, style]}>
+      <BannerAd
+        unitId={adUnitId}
+        size={size}
+        onAdLoaded={() => setAdLoaded(true)}
+        onAdFailedToLoad={(error) => {
+          console.log('Banner ad failed to load:', error);
+          setAdLoaded(false);
+        }}
       />
     </View>
   );
@@ -85,10 +59,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
-  },
-  hidden: {
-    height: 0,
-    overflow: 'hidden',
+    minHeight: 50,
   },
 });
 

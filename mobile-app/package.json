@@ -20,7 +20,6 @@
     "@react-navigation/native": "^7.1.28",
     "@react-navigation/stack": "^7.7.2",
     "expo": "~54.0.33",
-    "expo-ads-admob": "^13.0.0",
     "expo-av": "~16.0.8",
     "expo-dev-client": "~6.0.20",
     "expo-device": "~8.0.10",
@@ -30,6 +29,7 @@
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-google-mobile-ads": "^16.2.2",
     "react-native-maps": "1.20.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0"

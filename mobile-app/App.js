@@ -22,6 +22,7 @@ import FishingLogModal from './components/FishingLogModal';
 import RegulationsInfo from './components/RegulationsInfo';
 import AdBanner from './components/AdBanner';
 import AdManager from './components/AdManager';
+import mobileAds from 'react-native-google-mobile-ads';
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -712,6 +713,14 @@ function RiversStack() {
 }
 
 export default function App() {
+  useEffect(() => {
+    // Initialize Google Mobile Ads SDK
+    mobileAds()
+      .initialize()
+      .then(() => console.log('Google Mobile Ads initialized'))
+      .catch(err => console.log('Ad initialization error:', err));
+  }, []);
+
   return (
     <NavigationContainer>
       <Tab.Navigator

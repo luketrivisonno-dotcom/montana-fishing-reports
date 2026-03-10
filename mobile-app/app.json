@@ -48,7 +48,7 @@
         }
       ],
       [
-        "expo-ads-admob",
+        "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-9219871596282320~8470354941",
           "iosAppId": "ca-app-pub-9219871596282320~8470354941"
