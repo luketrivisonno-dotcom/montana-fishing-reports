@@ -570,12 +570,14 @@ app.get('/api/reports/:river',
             const { river } = req.params;
             const result = await db.query(
                 `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
-                 FROM reports WHERE river = $1 AND is_active = true ORDER BY scraped_at DESC`, 
+                 FROM reports WHERE river = $1 AND is_active = true ORDER BY last_updated DESC, scraped_at DESC`, 
                 [river]
             );
             const reports = result.rows.map(report => ({ 
                 ...report, 
-                last_updated: formatDateForDisplay(report.last_updated) 
+                // Use last_updated_text if available (original format), otherwise format the date
+                last_updated: report.last_updated_text || formatDateForDisplay(report.last_updated),
+                last_updated_date: formatDateForDisplay(report.last_updated)
             }));
             res.json({ river: river, count: reports.length, reports: reports });
         } catch (error) {
@@ -788,7 +790,7 @@ app.get('/api/river-details/:river',
                 db.query(`SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
                           FROM reports WHERE river = $1 AND is_active = true 
                           AND source NOT LIKE '%USGS%' AND url IS NOT NULL 
-                          AND url != '' AND url LIKE 'http%' ORDER BY scraped_at DESC`, 
+                          AND url != '' AND url LIKE 'http%' ORDER BY last_updated DESC, scraped_at DESC`, 
                          [river]),
                 getDynamicHatchData(river)
             ]);
@@ -796,7 +798,9 @@ app.get('/api/river-details/:river',
             const seenSources = new Set();
             const reports = reportsResult.rows.map(report => ({ 
                 ...report, 
-                last_updated: formatDateForDisplay(report.last_updated) 
+                // Use last_updated_text if available (original format), otherwise format the date
+                last_updated: report.last_updated_text || formatDateForDisplay(report.last_updated),
+                last_updated_date: formatDateForDisplay(report.last_updated)
             })).filter(report => {
                 const normalized = normalizeSource(report.source);
                 if (seenSources.has(normalized)) return false;

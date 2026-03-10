@@ -34,17 +34,29 @@ const gallatin = require('./gallatin');
 function parseDate(dateString) {
   if (!dateString) return new Date();
   
+  // Try parsing the date string directly first
+  let parsed = new Date(dateString);
+  if (!isNaN(parsed.getTime())) {
+    return parsed;
+  }
+  
+  // Common date formats to try
   const formats = [
-    /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
-    /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-    /(\d{4})-(\d{2})-(\d{2})/
+    // March 10, 2026
+    { regex: /([A-Za]+)\s+(\d{1,2}),?\s+(\d{4})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${m[3]}`) },
+    // 03/10/2026
+    { regex: /(\d{1,2})\/(\d{1,2})\/(\d{4})/, fn: (m) => new Date(`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`) },
+    // 2026-03-10
+    { regex: /(\d{4})-(\d{2})-(\d{2})/, fn: (m) => new Date(`${m[1]}-${m[2]}-${m[3]}`) },
+    // Mar 10
+    { regex: /([A-Za]{3})\s+(\d{1,2})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${new Date().getFullYear()}`) }
   ];
   
   for (const format of formats) {
-    const match = dateString.match(format);
+    const match = dateString.match(format.regex);
     if (match) {
       try {
-        const date = new Date(dateString);
+        const date = format.fn(match);
         if (!isNaN(date.getTime())) return date;
       } catch (e) {
         continue;
@@ -114,7 +126,10 @@ async function runAllScrapers() {
       for (const item of results) {
         if (item && item.url) {
           const parsedDate = parseDate(item.last_updated);
-          const dateString = parsedDate.toISOString().split('T')[0];
+          // Store full ISO string for proper date comparison, but keep the date-only format for the field
+          // Also store the original text for display purposes
+          const dateString = parsedDate.toISOString(); // Full timestamp
+          const displayDate = item.last_updated_text || item.last_updated || parsedDate.toLocaleDateString();
           
           const existing = await db.query(
             'SELECT * FROM reports WHERE source = $1 AND river = $2 ORDER BY scraped_at DESC LIMIT 1',
@@ -123,24 +138,29 @@ async function runAllScrapers() {
           
           if (existing.rows.length === 0) {
             await db.query(
-              `INSERT INTO reports (source, river, url, last_updated, scraped_at, is_active, icon_url, water_clarity) 
-               VALUES ($1, $2, $3, $4, $5, true, $6, $7)`,
-              [item.source, item.river, item.url, dateString, item.scraped_at, item.icon_url || null, item.water_clarity || null]
+              `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity) 
+               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8)`,
+              [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null]
             );
-            console.log(`✓ Inserted: ${item.source} (${item.river})`);
+            console.log(`✓ Inserted: ${item.source} (${item.river}) - ${displayDate}`);
             successCount++;
           } else {
             const existingDate = new Date(existing.rows[0].last_updated);
             const newDate = parsedDate;
             
-            if (newDate >= existingDate || isNaN(existingDate.getTime())) {
+            // Only update if new date is newer or same day but scraped more recently
+            const shouldUpdate = newDate > existingDate || 
+                                 (newDate.getTime() === existingDate.getTime() && 
+                                  new Date(item.scraped_at) > new Date(existing.rows[0].scraped_at));
+            
+            if (shouldUpdate || isNaN(existingDate.getTime())) {
               await db.query(
                 `UPDATE reports 
-                 SET last_updated = $1, scraped_at = $2, url = $3, is_active = true, icon_url = $4, water_clarity = $5
-                 WHERE source = $6 AND river = $7`,
-                [dateString, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
+                 SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6
+                 WHERE source = $7 AND river = $8`,
+                [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
               );
-              console.log(`✓ Updated: ${item.source} (${item.river})`);
+              console.log(`✓ Updated: ${item.source} (${item.river}) - ${displayDate}`);
               successCount++;
             } else {
               console.log(`⊘ Skipped (older): ${item.source} (${item.river})`);
