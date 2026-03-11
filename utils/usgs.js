@@ -78,7 +78,7 @@ const RIVER_TYPES = {
   'Lower Madison River': 'tailwater',
   'Ruby River': 'tailwater',
   'Spring Creeks': 'spring_creek',
-  'Gallatin River': 'mountain',
+  'Gallatin River': 'freestone',
   'Upper Madison River': 'freestone',
   'Yellowstone River': 'freestone',
   'Big Hole River': 'freestone',
@@ -91,7 +91,7 @@ const RIVER_TYPES = {
 
   'Stillwater River': 'freestone',
   'Boulder River': 'freestone',
-  'Swan River': 'mountain',
+  'Swan River': 'freestone',
 
 };
 

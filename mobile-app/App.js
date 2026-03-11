@@ -107,7 +107,6 @@ const getRiverTypeColor = (type) => {
   switch (type) {
     case 'tailwater': return '#4a90d9'; // Blue for dam-controlled
     case 'spring_creek': return '#5a9e6e'; // Green for spring-fed
-    case 'mountain': return '#8b7355'; // Brown for mountain streams
     case 'freestone':
     default: return '#c9a227'; // Gold for freestone
   }
