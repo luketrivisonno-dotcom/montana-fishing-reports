@@ -27,7 +27,9 @@ const images = {
   // YNP Rivers - new photos
   Firehole: require('./Firehole.jpeg'),
   SodaButte: require('./Soda Butte.jpeg'),
+  Slough: require('./Slough.jpeg'),
   Lamar: require('./Lamar.jpg'),
+  Gardner: require('./Gardner.jpeg'),
   
   // Keep numbered images as fallbacks
   river1: require('./river1.jpg'),
@@ -82,10 +84,10 @@ const RIVER_IMAGE_MAP = {
   'Boulder River': images.Boulder,
   
   // YNP Rivers - now with proper photos
-  'Slough Creek': images.river19,
+  'Slough Creek': images.Slough,
   'Soda Butte Creek': images.SodaButte,
   'Lamar River': images.Lamar,
-  'Gardner River': images.river22,
+  'Gardner River': images.Gardner,
   'Firehole River': images.Firehole,
   
   // Regional categories

@@ -648,6 +648,55 @@ app.post('/api/cleanup-ynp-category', async (req, res) => {
     }
 });
 
+// Check rivers and their report counts
+app.get('/api/check-rivers', async (req, res) => {
+    try {
+        // Get all active rivers with counts
+        const activeRivers = await db.query(`
+            SELECT river, COUNT(*) as report_count 
+            FROM reports 
+            WHERE is_active = true 
+            GROUP BY river 
+            ORDER BY river
+        `);
+        
+        // Check for problematic entries
+        const madisonCheck = await db.query(`
+            SELECT source, is_active 
+            FROM reports 
+            WHERE river = 'Madison River'
+        `);
+        
+        const ynpCheck = await db.query(`
+            SELECT source, is_active 
+            FROM reports 
+            WHERE river = 'Yellowstone National Park'
+        `);
+        
+        // Check YNP rivers specifically
+        const ynpRivers = await db.query(`
+            SELECT river, COUNT(*) as count 
+            FROM reports 
+            WHERE river IN ('Slough Creek', 'Soda Butte Creek', 'Lamar River', 'Gardner River', 'Firehole River')
+              AND is_active = true
+            GROUP BY river
+            ORDER BY river
+        `);
+        
+        res.json({
+            totalActiveRivers: activeRivers.rows.length,
+            activeRivers: activeRivers.rows,
+            problematicEntries: {
+                'Madison River': madisonCheck.rows,
+                'Yellowstone National Park': ynpCheck.rows
+            },
+            ynpRivers: ynpRivers.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get all rivers
 app.get('/api/rivers', apiLimiter, cacheMiddleware(600), async (req, res) => {
     try {
