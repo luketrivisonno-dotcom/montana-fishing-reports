@@ -4,7 +4,13 @@ import {
   ActivityIndicator, RefreshControl, Alert, Linking
 } from 'react-native';
 import { isFavorite, addFavorite, removeFavorite } from '../utils/storage';
-import { scheduleFishingReportNotification, cancelRiverNotifications, sendTestNotification } from '../utils/notifications';
+import { 
+  subscribeToRiverNotifications, 
+  unsubscribeFromRiverNotifications,
+  isSubscribedToRiver,
+  registerForPushNotificationsAsync,
+  scheduleLocalNotification
+} from '../utils/notifications';
 import { getAccessPoints } from '../data/accessPoints';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -17,10 +23,12 @@ const RiverDetailsScreen = ({ route, navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [isFav, setIsFav] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [accessPoints, setAccessPoints] = useState([]);
 
   useEffect(() => {
     checkFavoriteStatus();
+    checkSubscriptionStatus();
     fetchRiverData();
     loadAccessPoints();
   }, []);
@@ -28,48 +36,94 @@ const RiverDetailsScreen = ({ route, navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity 
-          style={styles.headerFavoriteButton}
-          onPress={toggleFavorite}
-        >
-          <MaterialCommunityIcons 
-            name={isFav ? "star" : "star-outline"} 
-            size={24} 
-            color={isFav ? '#e74c3c' : '#7f8c8d'} 
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          {/* Notification Bell */}
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={toggleNotificationSubscription}
+          >
+            <MaterialCommunityIcons 
+              name={isSubscribed ? "bell" : "bell-outline"} 
+              size={24} 
+              color={isSubscribed ? '#f39c12' : '#7f8c8d'} 
+            />
+          </TouchableOpacity>
+          {/* Favorite Star */}
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={toggleFavorite}
+          >
+            <MaterialCommunityIcons 
+              name={isFav ? "star" : "star-outline"} 
+              size={24} 
+              color={isFav ? '#e74c3c' : '#7f8c8d'} 
+            />
+          </TouchableOpacity>
+        </View>
       ),
     });
-  }, [isFav, navigation]);
+  }, [isFav, isSubscribed, navigation]);
 
   const checkFavoriteStatus = async () => {
     const fav = await isFavorite(river);
     setIsFav(fav);
   };
 
+  const checkSubscriptionStatus = async () => {
+    const subscribed = await isSubscribedToRiver(river);
+    setIsSubscribed(subscribed);
+  };
+
   const toggleFavorite = async () => {
     if (isFav) {
       await removeFavorite(river);
-      await cancelRiverNotifications(river);
       Alert.alert('Removed from Favorites', `${river} removed from your favorites.`);
     } else {
       await addFavorite(river);
-      await scheduleFishingReportNotification(river);
-      Alert.alert(
-        'Added to Favorites', 
-        `${river} added to favorites!\n\nYou'll receive daily notifications about new fishing reports.`,
-        [
-          { text: 'OK', style: 'default' },
-          { 
-            text: 'Test Notification', 
-            onPress: async () => {
-              await sendTestNotification();
-            }
-          }
-        ]
-      );
+      Alert.alert('Added to Favorites', `${river} added to favorites!`);
     }
     setIsFav(!isFav);
+  };
+
+  const toggleNotificationSubscription = async () => {
+    // First ensure we have push permission
+    await registerForPushNotificationsAsync();
+    
+    if (isSubscribed) {
+      const success = await unsubscribeFromRiverNotifications(river);
+      if (success) {
+        setIsSubscribed(false);
+        Alert.alert('Unsubscribed', `You'll no longer receive notifications for ${river}`);
+      }
+    } else {
+      const success = await subscribeToRiverNotifications(river);
+      if (success) {
+        setIsSubscribed(true);
+        Alert.alert(
+          '🎣 Notifications Enabled!', 
+          `You'll receive push notifications when new fishing reports are posted for ${river}.`,
+          [
+            { text: 'Great!', style: 'default' },
+            { 
+              text: 'Send Test', 
+              onPress: async () => {
+                await scheduleLocalNotification(
+                  `🎣 ${river}`,
+                  'Test notification - This is how you\'ll be alerted to new reports!',
+                  { river, type: 'test' }
+                );
+              }
+            }
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Enable Notifications',
+          'Please enable push notifications in your device settings to receive fishing report alerts.',
+          [{ text: 'OK' }]
+        );
+      }
+    }
   };
 
   const fetchRiverData = async () => {
@@ -255,11 +309,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: '#7f8c8d',
   },
-  headerFavoriteButton: {
-    marginRight: 16,
-    padding: 8,
-  },
-  headerFavoriteButton: {
+  headerButton: {
     padding: 8,
     marginRight: 8,
   },

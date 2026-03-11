@@ -1,4 +1,5 @@
 const db = require('../db');
+const { notifyNewReports } = require('../utils/pushNotifications');
 
 // Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
@@ -74,6 +75,9 @@ async function runAllScrapers() {
   console.log('Starting scraper run:', new Date().toISOString());
   console.log('========================================\n');
   
+  // Track new/updated reports for notifications
+  const newReports = [];
+  
   const allScrapers = [
     // Main multi-river scrapers (with working implementations)
     { name: 'Montana Angler', fn: scrapeMontanaAngler },
@@ -147,6 +151,13 @@ async function runAllScrapers() {
               [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null]
             );
             console.log(`✓ Inserted: ${item.source} (${item.river}) - ${displayDate}`);
+            // Track for push notification
+            newReports.push({
+              source: item.source,
+              river: item.river,
+              url: item.url,
+              last_updated: displayDate
+            });
             successCount++;
           } else {
             const existingDate = new Date(existing.rows[0].last_updated);
@@ -165,6 +176,15 @@ async function runAllScrapers() {
                 [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
               );
               console.log(`✓ Updated: ${item.source} (${item.river}) - ${displayDate}`);
+              // Track for push notification (only if actually new content)
+              if (newDate > existingDate) {
+                newReports.push({
+                  source: item.source,
+                  river: item.river,
+                  url: item.url,
+                  last_updated: displayDate
+                });
+              }
               successCount++;
             } else {
               console.log(`⊘ Skipped (older): ${item.source} (${item.river})`);
@@ -196,7 +216,13 @@ async function runAllScrapers() {
   console.log(`Complete: ${successCount} succeeded, ${failCount} failed`);
   console.log('========================================\n');
   
-  return { successCount, failCount };
+  // Send push notifications for new reports
+  if (newReports.length > 0) {
+    console.log(`📱 Sending push notifications for ${newReports.length} new reports...`);
+    await notifyNewReports(newReports);
+  }
+  
+  return { successCount, failCount, newReports: newReports.length };
 }
 
 module.exports = { runAllScrapers };

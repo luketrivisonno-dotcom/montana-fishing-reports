@@ -931,6 +931,62 @@ app.get('/api/notifications/subscriptions/:token', async (req, res) => {
     }
 });
 
+// Send test push notification
+app.post('/api/notifications/test', async (req, res) => {
+    try {
+        const { token, river } = req.body;
+        if (!token) return res.status(400).json({ error: 'Push token required' });
+        
+        const { sendTestNotification } = require('./utils/pushNotifications');
+        const result = await sendTestNotification(
+            token,
+            river ? `🎣 Test: ${river}` : '🎣 Montana Fishing Reports',
+            river 
+                ? `This is a test notification for ${river}`
+                : 'Your push notifications are working!'
+        );
+        
+        res.json({ 
+            success: true, 
+            message: 'Test notification sent',
+            expoResponse: result 
+        });
+    } catch (error) {
+        console.error('Test notification error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get notification stats (admin)
+app.get('/api/admin/notifications/stats', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        const [tokenStats, subscriptionStats, topRivers] = await Promise.all([
+            db.query('SELECT COUNT(*) as total_tokens, COUNT(DISTINCT platform) as platforms FROM push_tokens'),
+            db.query('SELECT COUNT(*) as total_subscriptions FROM notification_subscriptions'),
+            db.query(`
+                SELECT river, COUNT(*) as subscriber_count 
+                FROM notification_subscriptions 
+                GROUP BY river 
+                ORDER BY subscriber_count DESC 
+                LIMIT 10
+            `)
+        ]);
+        
+        res.json({
+            tokens: tokenStats.rows[0],
+            subscriptions: subscriptionStats.rows[0],
+            topSubscribedRivers: topRivers.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get full river details (cache 5 min - aggregates multiple sources)
 app.get('/api/river-details/:river', 
     apiLimiter,
