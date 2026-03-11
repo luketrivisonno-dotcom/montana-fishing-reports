@@ -223,6 +223,12 @@ export default function RiverMap({ isPremium }) {
                       <Text style={styles.calloutText}>Boat Ramp</Text>
                     </View>
                   )}
+                  {point.camping && (
+                    <View style={styles.calloutRow}>
+                      <Ionicons name="bonfire" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>Camping</Text>
+                    </View>
+                  )}
                 </View>
                 <View style={styles.calloutButton}>
                   <Text style={styles.calloutButtonText}>View on FWP</Text>
