@@ -117,6 +117,19 @@ const REGULATIONS_DATA = {
     limits: 'Check landowner regulations',
     link: 'https://fwp.mt.gov/fish/regulations',
   },
+  'Spring Creeks': {
+    season: 'Varies by creek',
+    restrictions: [
+      'Trio Creek: Private water, rod fees required',
+      'DePuy Spring Creek: Private water, rod fees required', 
+      'Armstrong Spring Creek: Private water, rod fees required',
+      'Nelsons Spring Creek: Private water, rod fees required',
+      'All spring creeks: Check with individual landowner for access',
+      'Catch and release strongly encouraged',
+    ],
+    limits: 'Check individual creek regulations - varies by property',
+    link: 'https://fwp.mt.gov/fish/regulations',
+  },
   'Rock Creek': {
     season: 'Open all year',
     restrictions: [

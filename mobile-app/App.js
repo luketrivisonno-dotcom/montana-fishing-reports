@@ -560,9 +560,6 @@ function RiverDetailsScreen({ route, navigation }) {
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
 
-        {/* REGULATIONS & SEASONS */}
-        <RegulationsInfo riverName={river} />
-
         {/* AD BANNER */}
         <AdBanner size="banner" />
 
@@ -584,7 +581,7 @@ function RiverDetailsScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* PERSONAL FISHING LOG - Moved below reports */}
+        {/* PERSONAL FISHING LOG */}
         <FishingLogList 
           riverName={river} 
           onAddNew={() => setShowLogModal(true)}
@@ -597,6 +594,9 @@ function RiverDetailsScreen({ route, navigation }) {
           riverName={river}
           onSave={saveCatch}
         />
+
+        {/* REGULATIONS & SEASONS - Moved to bottom */}
+        <RegulationsInfo riverName={river} />
       </ScrollView>
 
       <Modal visible={showPremiumModal} transparent={true} animationType="slide" onRequestClose={() => setShowPremiumModal(false)}>
