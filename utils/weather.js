@@ -2,7 +2,7 @@ const axios = require('axios');
 
 // River locations with weather station names
 const RIVER_LOCATIONS = {
-  'Gallatin River': { lat: 45.2602, lon: -111.1951, station: 'Gallatin Gateway', noaaStation: 'KGTF' },
+  'Gallatin River': { lat: 45.5200, lon: -111.2000, station: 'Gallatin Gateway', noaaStation: 'KGTF' },
   'Upper Madison River': { lat: 45.2847, lon: -111.4753, station: 'Ennis', noaaStation: 'KEKS' },
   'Lower Madison River': { lat: 45.6000, lon: -111.6500, station: 'Three Forks', noaaStation: 'K3TR' },
   'Yellowstone River': { lat: 45.6770, lon: -110.5631, station: 'Livingston', noaaStation: 'KLVM' },
