@@ -93,17 +93,29 @@ async function registerTokenWithServer(token) {
   }
 }
 
-// Subscribe to river notifications
+// Subscribe to river notifications (PREMIUM ONLY)
 export async function subscribeToRiverNotifications(riverName) {
   try {
     const token = await AsyncStorage.getItem('pushToken');
-    if (!token) return false;
+    if (!token) return { success: false, error: 'no_token' };
+    
+    // Get API key for premium check
+    const apiKey = await AsyncStorage.getItem('apiKey');
+    const email = await AsyncStorage.getItem('userEmail');
     
     const response = await fetch(`${API_URL}/api/notifications/subscribe`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey || '',
+        'x-user-email': email || '',
+      },
       body: JSON.stringify({ token, river: riverName }),
     });
+    
+    if (response.status === 403) {
+      return { success: false, error: 'premium_required' };
+    }
     
     if (response.ok) {
       // Save subscription locally
@@ -112,12 +124,12 @@ export async function subscribeToRiverNotifications(riverName) {
         subscriptions.push(riverName);
         await AsyncStorage.setItem('riverSubscriptions', JSON.stringify(subscriptions));
       }
-      return true;
+      return { success: true };
     }
-    return false;
+    return { success: false, error: 'subscription_failed' };
   } catch (error) {
     console.error('Error subscribing:', error);
-    return false;
+    return { success: false, error: error.message };
   }
 }
 

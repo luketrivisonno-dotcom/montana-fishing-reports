@@ -105,43 +105,66 @@ const RiverDetailsScreen = ({ route, navigation }) => {
   };
 
   const toggleNotificationSubscription = async () => {
-    // First ensure we have push permission
-    await registerForPushNotificationsAsync();
-    
     if (isSubscribed) {
       const success = await unsubscribeFromRiverNotifications(river);
       if (success) {
         setIsSubscribed(false);
         Alert.alert('Unsubscribed', `You'll no longer receive notifications for ${river}`);
       }
-    } else {
-      const success = await subscribeToRiverNotifications(river);
-      if (success) {
-        setIsSubscribed(true);
-        Alert.alert(
-          '🎣 Notifications Enabled!', 
-          `You'll receive push notifications when new fishing reports are posted for ${river}.`,
-          [
-            { text: 'Great!', style: 'default' },
-            { 
-              text: 'Send Test', 
-              onPress: async () => {
-                await scheduleLocalNotification(
-                  `🎣 ${river}`,
-                  'Test notification - This is how you\'ll be alerted to new reports!',
-                  { river, type: 'test' }
-                );
-              }
+      return;
+    }
+    
+    // Check if premium
+    if (!isPremium) {
+      Alert.alert(
+        '🔒 Premium Feature',
+        'Get instant push notifications when new fishing reports are posted. Upgrade to Premium to unlock!',
+        [
+          { text: 'Not Now', style: 'cancel' },
+          { 
+            text: 'Upgrade to Premium', 
+            style: 'default',
+            onPress: () => {
+              // Navigate to premium or show modal
+              Alert.alert('Coming Soon', 'Premium upgrade will be available in the App Store!');
             }
-          ]
-        );
-      } else {
-        Alert.alert(
-          'Enable Notifications',
-          'Please enable push notifications in your device settings to receive fishing report alerts.',
-          [{ text: 'OK' }]
-        );
-      }
+          }
+        ]
+      );
+      return;
+    }
+    
+    // Premium user - proceed with subscription
+    await registerForPushNotificationsAsync();
+    const result = await subscribeToRiverNotifications(river);
+    
+    if (result.success) {
+      setIsSubscribed(true);
+      Alert.alert(
+        '🎣 Notifications Enabled!', 
+        `You'll receive push notifications when new fishing reports are posted for ${river}.`,
+        [
+          { text: 'Great!', style: 'default' },
+          { 
+            text: 'Send Test', 
+            onPress: async () => {
+              await scheduleLocalNotification(
+                `🎣 ${river}`,
+                'Test notification - This is how you\'ll be alerted to new reports!',
+                { river, type: 'test' }
+              );
+            }
+          }
+        ]
+      );
+    } else if (result.error === 'premium_required') {
+      Alert.alert('Premium Required', 'Push notifications are a premium feature.');
+    } else {
+      Alert.alert(
+        'Enable Notifications',
+        'Please enable push notifications in your device settings.',
+        [{ text: 'OK' }]
+      );
     }
   };
 

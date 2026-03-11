@@ -894,9 +894,20 @@ app.post('/api/notifications/register', async (req, res) => {
     }
 });
 
-// Subscribe to river alerts
+// Subscribe to river alerts (PREMIUM ONLY)
 app.post('/api/notifications/subscribe', async (req, res) => {
     try {
+        const email = req.headers['x-user-email'];
+        const isPremium = email ? await checkUserPremium(email) : false;
+        
+        if (!isPremium) {
+            return res.status(403).json({ 
+                error: 'Premium subscription required',
+                message: 'Push notifications are a premium feature. Upgrade to receive alerts when new fishing reports are posted.',
+                upgradeRequired: true
+            });
+        }
+        
         const { token, river } = req.body;
         if (!token || !river) return res.status(400).json({ error: 'Token and river required' });
         
@@ -1177,18 +1188,59 @@ app.get('/api/weather-icon/:code', (req, res) => {
 // PREMIUM ENDPOINTS
 
 // Check premium status
-app.get('/api/premium/status', checkPremium, async (req, res) => {
+app.get('/api/premium/status', async (req, res) => {
+    const email = req.headers['x-user-email'];
+    const apiKey = req.headers['x-api-key'];
+    
+    let isPremium = false;
+    let expiresAt = null;
+    
+    if (email && apiKey) {
+        try {
+            const result = await db.query(
+                `SELECT subscription_status, expires_at FROM premium_users 
+                 WHERE email = $1 AND subscription_status = 'active' 
+                 AND (expires_at IS NULL OR expires_at > NOW())`,
+                [email]
+            );
+            if (result.rows.length > 0) {
+                isPremium = true;
+                expiresAt = result.rows[0].expires_at;
+            }
+        } catch (error) {
+            console.error('Premium check error:', error);
+        }
+    }
+    
     res.json({
-        isPremium: req.isPremium,
-        expiresAt: req.premiumExpiry,
-        features: req.isPremium ? [
+        isPremium,
+        expiresAt,
+        freeFeatures: [
+            'fishing_reports',
+            'weather',
+            'flows',
+            'map',
+            '1_favorite'
+        ],
+        premiumFeatures: isPremium ? [
             'ad_free',
-            'hatch_charts',
-            'access_points',
+            'unlimited_favorites',
+            'push_notifications',
+            'hatch_alerts',
+            'detailed_hatch_charts',
             '7_day_forecast',
-            'fishing_log',
-            'offline_mode'
-        ] : []
+            'offline_mode',
+            'access_points'
+        ] : [
+            'ad_free',
+            'unlimited_favorites', 
+            'push_notifications',
+            'hatch_alerts',
+            'detailed_hatch_charts'
+        ],
+        limits: {
+            favorites: isPremium ? 'unlimited' : 1
+        }
     });
 });
 
@@ -1289,55 +1341,96 @@ app.post('/api/scrape-hatches', scrapeLimiter, async (req, res) => {
     }
 });
 
-// User favorites (premium)
-app.get('/api/premium/favorites', checkPremium, async (req, res) => {
-    if (!req.isPremium) {
-        return res.status(403).json({ error: 'Premium subscription required' });
-    }
-    
+// User favorites - FREE users get 1 favorite, PREMIUM get unlimited
+// ============================================
+
+const FREE_FAVORITES_LIMIT = 1;
+
+// Get favorites (works for both free and premium)
+app.get('/api/favorites', async (req, res) => {
     const email = req.headers['x-user-email'];
+    if (!email) {
+        return res.status(400).json({ error: 'Email required' });
+    }
     
     try {
         const result = await db.query(
             `SELECT river, created_at FROM user_favorites WHERE email = $1 ORDER BY created_at DESC`,
             [email]
         );
-        res.json({ favorites: result.rows });
+        
+        // Check premium status
+        const isPremium = await checkUserPremium(email);
+        
+        res.json({ 
+            favorites: result.rows,
+            isPremium,
+            limit: isPremium ? 'unlimited' : FREE_FAVORITES_LIMIT,
+            canAddMore: isPremium || result.rows.length < FREE_FAVORITES_LIMIT
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-app.post('/api/premium/favorites', 
-    checkPremium,
+// Add favorite - FREE users limited to 1, PREMIUM unlimited
+app.post('/api/favorites', 
     body('river').trim().escape().isLength({ min: 1, max: 100 }),
     handleValidationErrors,
     async (req, res) => {
-        if (!req.isPremium) {
-            return res.status(403).json({ error: 'Premium subscription required' });
+        const email = req.headers['x-user-email'];
+        if (!email) {
+            return res.status(400).json({ error: 'Email required' });
         }
         
-        const email = req.headers['x-user-email'];
         const { river } = req.body;
         
         try {
+            // Check current favorites count
+            const countResult = await db.query(
+                `SELECT COUNT(*) as count FROM user_favorites WHERE email = $1`,
+                [email]
+            );
+            const currentCount = parseInt(countResult.rows[0].count);
+            
+            // Check if premium
+            const isPremium = await checkUserPremium(email);
+            
+            // Enforce limit for free users
+            if (!isPremium && currentCount >= FREE_FAVORITES_LIMIT) {
+                return res.status(403).json({ 
+                    error: 'Free plan limit reached',
+                    message: `Free users can only save ${FREE_FAVORITES_LIMIT} favorite. Upgrade to Premium for unlimited favorites.`,
+                    upgradeRequired: true,
+                    currentCount,
+                    limit: FREE_FAVORITES_LIMIT
+                });
+            }
+            
             await db.query(
                 `INSERT INTO user_favorites (email, river) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
                 [email, river]
             );
-            res.json({ message: 'Added to favorites', river });
+            
+            res.json({ 
+                message: 'Added to favorites', 
+                river,
+                isPremium,
+                totalFavorites: currentCount + 1
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 );
 
-app.delete('/api/premium/favorites/:river', checkPremium, async (req, res) => {
-    if (!req.isPremium) {
-        return res.status(403).json({ error: 'Premium subscription required' });
+// Delete favorite (works for both free and premium)
+app.delete('/api/favorites/:river', async (req, res) => {
+    const email = req.headers['x-user-email'];
+    if (!email) {
+        return res.status(400).json({ error: 'Email required' });
     }
     
-    const email = req.headers['x-user-email'];
     const { river } = req.params;
     
     try {
@@ -1350,6 +1443,21 @@ app.delete('/api/premium/favorites/:river', checkPremium, async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Helper function to check if user is premium
+async function checkUserPremium(email) {
+    try {
+        const result = await db.query(
+            `SELECT subscription_status, expires_at FROM premium_users 
+             WHERE email = $1 AND subscription_status = 'active' 
+             AND (expires_at IS NULL OR expires_at > NOW())`,
+            [email]
+        );
+        return result.rows.length > 0;
+    } catch (error) {
+        return false;
+    }
+}
 
 // Analytics endpoint (admin only)
 app.get('/api/admin/analytics', async (req, res) => {
