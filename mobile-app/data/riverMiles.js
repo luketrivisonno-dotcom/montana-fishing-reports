@@ -48,12 +48,16 @@ export const RIVER_MILES = {
     {
       "name": "POINT OF ROCKS (HOOKEM)",
       "mile": 21.6,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.25476,
+      "lon": -110.8694
     },
     {
       "name": "POINT OF ROCKS (MDT)",
       "mile": 22.5,
-      "type": "BROWN"
+      "type": "BROWN",
+      "lat": 45.25476,
+      "lon": -110.8694
     },
     {
       "name": "MEDITATION POINT",
@@ -68,22 +72,30 @@ export const RIVER_MILES = {
     {
       "name": "EMIGRANT",
       "mile": 33.5,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.36703,
+      "lon": -110.7255
     },
     {
       "name": "EMIGRANT WEST",
       "mile": 34.1,
-      "type": "BROWN"
+      "type": "BROWN",
+      "lat": 45.37657,
+      "lon": -110.72437
     },
     {
       "name": "CHICORY",
       "mile": 36.0,
-      "type": "BROWN"
+      "type": "BROWN",
+      "lat": 45.39763,
+      "lon": -110.70213
     },
     {
       "name": "GREY OWL",
       "mile": 36.0,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.39787,
+      "lon": -110.70414
     },
     {
       "name": "MILL CREEK",
@@ -93,12 +105,16 @@ export const RIVER_MILES = {
     {
       "name": "DAN BAILEY",
       "mile": 40.3,
-      "type": "BROWN"
+      "type": "BROWN",
+      "lat": 45.42045,
+      "lon": -110.63664
     },
     {
       "name": "LOCH LEVEN",
       "mile": 44.4,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.45721,
+      "lon": -110.62422
     },
     {
       "name": "MALLARD REST",
@@ -108,7 +124,9 @@ export const RIVER_MILES = {
     {
       "name": "PINE CREEK",
       "mile": 50.7,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.51182,
+      "lon": -110.58341
     },
     {
       "name": "CARTERS BRIDGE",
@@ -135,22 +153,30 @@ export const RIVER_MILES = {
     {
       "name": "Ennis",
       "mile": 50.2,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.34442,
+      "lon": -111.72309
     },
     {
       "name": "Burnt Tree Hole",
       "mile": 47.5,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.31492,
+      "lon": -111.74869
     },
     {
       "name": "Eight Mile Ford",
       "mile": 46.3,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.29998,
+      "lon": -111.75405
     },
     {
       "name": "Varney Bridge",
       "mile": 41.0,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.229,
+      "lon": -111.75195
     },
     {
       "name": "Story Ditch",
@@ -160,7 +186,9 @@ export const RIVER_MILES = {
     {
       "name": "McAtee Bridge",
       "mile": 31.9,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 45.09665,
+      "lon": -111.66151
     },
     {
       "name": "Ruby Cr/W Madison",
@@ -180,7 +208,9 @@ export const RIVER_MILES = {
     {
       "name": "Lyons Bridge",
       "mile": 18.7,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 44.8991,
+      "lon": -111.59259
     },
     {
       "name": "West Fork",
@@ -200,7 +230,9 @@ export const RIVER_MILES = {
     {
       "name": "Three Dollar Bridge",
       "mile": 9.3,
-      "type": "GREEN"
+      "type": "GREEN",
+      "lat": 44.83193,
+      "lon": -111.51416
     },
     {
       "name": "Reynolds Pass Bridge",

@@ -7,6 +7,7 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAllAccessPoints } from '../data/accessPoints';
 import { getUSGSStations, getUSGSUrl } from '../data/usgsStations';
+import { RIVER_MILES } from '../data/riverMiles';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -40,10 +41,24 @@ const INITIAL_REGION = {
 export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
   const [mapType, setMapType] = useState('hybrid');
+  const [showMileMarkers, setShowMileMarkers] = useState(false);
   const mapRef = React.useRef(null);
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
   const usgsStations = useMemo(() => getUSGSStations(), []);
+
+  // Get all river mile markers that have coordinates
+  const allMileMarkers = useMemo(() => {
+    const markers = [];
+    Object.entries(RIVER_MILES).forEach(([river, mileData]) => {
+      mileData.forEach(marker => {
+        if (marker.lat && marker.lon) {
+          markers.push({ ...marker, river });
+        }
+      });
+    });
+    return markers;
+  }, []);
 
   const filteredPoints = useMemo(() => {
     console.log('Filtering by type:', selectedType, 'Total points:', allPoints.length);
@@ -142,6 +157,20 @@ export default function RiverMap({ isPremium }) {
               USGS
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.filterButton, showMileMarkers && styles.filterButtonActive]}
+            onPress={() => setShowMileMarkers(!showMileMarkers)}
+          >
+            <MaterialCommunityIcons 
+              name="map-marker-distance" 
+              size={16} 
+              color={showMileMarkers ? '#f5f1e8' : COLORS.textLight} 
+            />
+            <Text style={[styles.filterText, showMileMarkers && styles.filterTextActive]}>
+              Miles
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -227,6 +256,36 @@ export default function RiverMap({ isPremium }) {
                 <View style={styles.calloutButton}>
                   <Text style={styles.calloutButtonText}>View on FWP</Text>
                   <Ionicons name="open-outline" size={14} color={COLORS.primary} />
+                </View>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
+
+        {/* River Mile Markers */}
+        {showMileMarkers && allMileMarkers.map((marker, index) => (
+          <Marker
+            key={`mile-${index}`}
+            coordinate={{ 
+              latitude: marker.lat, 
+              longitude: marker.lon 
+            }}
+            pinColor="#9b59b6"
+          >
+            <Callout>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{marker.name}</Text>
+                <Text style={styles.calloutRiver}>{marker.river}</Text>
+                <View style={styles.calloutRow}>
+                  <MaterialCommunityIcons name="map-marker-distance" size={14} color={COLORS.textSecondary} />
+                  <Text style={styles.calloutText}>Mile {marker.mile}</Text>
+                </View>
+                <View style={[styles.typeBadge, { backgroundColor: 
+                  marker.type === 'GREEN' ? '#27ae60' : 
+                  marker.type === 'BROWN' ? '#8b7355' : 
+                  marker.type === 'RED' ? '#e74c3c' : '#7f8c8d'
+                }]}>
+                  <Text style={styles.typeBadgeText}>{marker.type}</Text>
                 </View>
               </View>
             </Callout>
@@ -373,6 +432,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: COLORS.primary,
+  },
+  typeBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginTop: 6,
+  },
+  typeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
   },
   legend: {
     backgroundColor: COLORS.surface,
