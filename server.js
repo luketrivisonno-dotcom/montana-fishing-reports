@@ -5,7 +5,7 @@ const cron = require('node-cron');
 const db = require('./db');
 const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
-const { getUSGSData } = require('./utils/usgs');
+const { getUSGSData, RIVER_TYPES } = require('./utils/usgs');
 const { runHatchScraper, getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
 
 // Security and rate limiting
@@ -816,8 +816,12 @@ app.get('/api/river-details/:river',
                 clarity = clarityReports[0].water_clarity;
             }
             
+            // Get river type classification
+            const riverType = RIVER_TYPES[river] || 'freestone';
+            
             res.json({ 
                 river, 
+                riverType,
                 weather, 
                 usgs, 
                 reports: reports,

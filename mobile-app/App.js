@@ -103,6 +103,16 @@ const removeDuplicateReports = (reports) => {
   });
 };
 
+const getRiverTypeColor = (type) => {
+  switch (type) {
+    case 'tailwater': return '#4a90d9'; // Blue for dam-controlled
+    case 'spring_creek': return '#5a9e6e'; // Green for spring-fed
+    case 'mountain': return '#8b7355'; // Brown for mountain streams
+    case 'freestone':
+    default: return '#c9a227'; // Gold for freestone
+  }
+};
+
 const openReport = (url) => {
   if (url) {
     Linking.openURL(url).catch(err => {
@@ -458,6 +468,11 @@ function RiverDetailsScreen({ route, navigation }) {
           </View>
           <View style={styles.heroContent}>
             <Text style={styles.heroTitle}>{river}</Text>
+            {data?.riverType && (
+              <View style={[styles.riverTypeBadge, { backgroundColor: getRiverTypeColor(data.riverType) }]}>
+                <Text style={styles.riverTypeText}>{data.riverType}</Text>
+              </View>
+            )}
           </View>
         </View>
       </ImageBackground>
@@ -801,6 +816,20 @@ const styles = StyleSheet.create({
   heroButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(26, 47, 39, 0.5)', justifyContent: 'center', alignItems: 'center' },
   heroContent: { gap: 4 },
   heroTitle: { fontSize: 26, fontWeight: '800', color: '#f5f1e8' },
+  riverTypeBadge: { 
+    alignSelf: 'flex-start', 
+    paddingHorizontal: 12, 
+    paddingVertical: 4, 
+    borderRadius: 12,
+    marginTop: 6 
+  },
+  riverTypeText: { 
+    fontSize: 12, 
+    fontWeight: '700', 
+    color: '#fff', 
+    textTransform: 'uppercase',
+    letterSpacing: 0.5 
+  },
   detailScroll: { flex: 1, padding: 16 },
   conditionsGrid: { flexDirection: 'column', gap: 12, marginBottom: 16 },
   conditionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 14, borderRadius: 12, gap: 10, elevation: 2, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 },

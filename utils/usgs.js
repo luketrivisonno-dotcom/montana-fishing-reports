@@ -241,4 +241,4 @@ async function getNearbyRiverTemp(riverName) {
   return null;
 }
 
-module.exports = { getUSGSData, USGS_SITES, getSeasonalTemp };
+module.exports = { getUSGSData, USGS_SITES, getSeasonalTemp, RIVER_TYPES };
