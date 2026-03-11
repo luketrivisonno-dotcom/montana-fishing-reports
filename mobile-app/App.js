@@ -465,7 +465,11 @@ function RiverDetailsScreen({ route, navigation }) {
       <ScrollView style={styles.detailScroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}>
         <View style={styles.conditionsGrid}>
           {data?.weather && (
-            <View style={styles.conditionCard}>
+            <TouchableOpacity 
+              style={styles.conditionCard} 
+              onPress={() => data.weather.noaaUrl && openReport(data.weather.noaaUrl)}
+              activeOpacity={data.weather.noaaUrl ? 0.8 : 1}
+            >
               <View style={styles.conditionIconContainer}>
                 <Text style={styles.weatherEmoji}>{data.weather.icon || '☁️'}</Text>
               </View>
@@ -473,7 +477,12 @@ function RiverDetailsScreen({ route, navigation }) {
                 <View style={styles.conditionHeader}>
                   <Text style={styles.conditionLabel}>Weather</Text>
                   {data.weather.station && (
-                    <Text style={styles.locationText}>{data.weather.station}</Text>
+                    <View style={styles.sourceRow}>
+                      <Text style={styles.locationText}>{data.weather.station}</Text>
+                      {data.weather.noaaUrl && (
+                        <Ionicons name="open-outline" size={12} color={COLORS.textLight} style={{marginLeft: 4}} />
+                      )}
+                    </View>
                   )}
                 </View>
                 <Text style={styles.conditionValue}>{data.weather.high}° / {data.weather.low}°</Text>
@@ -482,7 +491,10 @@ function RiverDetailsScreen({ route, navigation }) {
                   <Text style={styles.conditionSubtext}>💨 {data.weather.wind}</Text>
                 )}
               </View>
-            </View>
+              {data.weather.noaaUrl && (
+                <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
+              )}
+            </TouchableOpacity>
           )}
 
           {data?.usgs ? (
@@ -814,6 +826,7 @@ const styles = StyleSheet.create({
   locationBadge: { position: 'absolute', top: 8, right: 8, backgroundColor: COLORS.primary + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   locationContainer: { alignItems: 'flex-end', marginLeft: 'auto' },
   locationText: { fontSize: 11, color: COLORS.textLight, fontWeight: '500', fontStyle: 'italic' },
+  sourceRow: { flexDirection: 'row', alignItems: 'center' },
   openIcon: { marginLeft: 'auto' },
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 10 },
   emptyText: { fontSize: 15, color: COLORS.textLight },
