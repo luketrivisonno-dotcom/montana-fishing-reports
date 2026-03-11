@@ -550,18 +550,23 @@ function RiverDetailsScreen({ route, navigation }) {
             </TouchableOpacity>
           )}
 
-          {/* Only show flow card if there's actual USGS data (not 'No USGS Station') */}
-          {data?.usgs && data.usgs.flow && !data.usgs.flow.includes('No USGS') && !data.usgs.flow.includes('Seasonal') ? (
-            <TouchableOpacity style={styles.conditionCard} onPress={() => openReport(data.usgs.url)}>
+          {/* Show flow card for all rivers with USGS data, including seasonal */}
+          {data?.usgs && !data.usgs.flow?.includes('No USGS') ? (
+            <TouchableOpacity style={styles.conditionCard} onPress={() => data.usgs.url && openReport(data.usgs.url)}>
               <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.primary + '15' }]}>
                 <MaterialCommunityIcons name="waves" size={22} color={COLORS.primary} />
               </View>
               <View style={styles.conditionInfo}>
                 <View style={styles.conditionHeader}>
                   <Text style={styles.conditionLabel}>Flow</Text>
-                  {data.usgs.location && (
-                    <Text style={styles.locationText}>{data.usgs.location}</Text>
-                  )}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {data.usgs.location && (
+                      <Text style={styles.locationText}>{data.usgs.location}</Text>
+                    )}
+                    {data.usgs.isSeasonal && (
+                      <Text style={{ fontSize: 10, color: COLORS.textLight, marginLeft: 4 }}>(Seasonal)</Text>
+                    )}
+                  </View>
                 </View>
                 <Text style={styles.conditionValue}>{data.usgs.flow}</Text>
                 <Text style={styles.conditionSubtext}>
@@ -571,7 +576,9 @@ function RiverDetailsScreen({ route, navigation }) {
                   )}
                 </Text>
               </View>
-              <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
+              {data.usgs.url && (
+                <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
+              )}
             </TouchableOpacity>
           ) : null}
         </View>

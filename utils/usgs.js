@@ -129,6 +129,8 @@ async function getUSGSData(riverName) {
         }
       });
 
+      const isSeasonal = SEASONAL_GAUGES.includes(riverName);
+      
       // If we have real temp, use it
       if (temp) {
         return {
@@ -138,7 +140,8 @@ async function getUSGSData(riverName) {
           tempSource: 'USGS Live',
           siteId: site.id,
           location: site.location,
-          url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`
+          url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`,
+          isSeasonal
         };
       }
       
@@ -154,7 +157,8 @@ async function getUSGSData(riverName) {
             tempSource: nearbyTemp.source,
             siteId: site.id,
             location: site.location,
-            url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`
+            url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`,
+            isSeasonal
           };
         }
         
@@ -167,7 +171,8 @@ async function getUSGSData(riverName) {
           tempSource: 'Seasonal Estimate',
           siteId: site.id,
           location: site.location,
-          url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`
+          url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`,
+          isSeasonal
         };
       }
     } catch (error) {
@@ -187,7 +192,8 @@ async function getUSGSData(riverName) {
       temp: nearbyTemp.temp,
       tempSource: nearbyTemp.source,
       location: 'Nearby Station',
-      url: null
+      url: null,
+      isSeasonal
     };
   }
   
@@ -200,7 +206,8 @@ async function getUSGSData(riverName) {
       temp: `${seasonalTemp}°F (est.)`,
       tempSource: 'Seasonal Estimate',
       location: null,
-      url: null
+      url: null,
+      isSeasonal
     };
   }
   
