@@ -81,6 +81,8 @@ export const ACCESS_POINTS = {
     { name: 'Loch Leven', lat: 45.45721, lon: -110.62422, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753564' },
     { name: 'Bridger Bend', lat: 45.10641, lon: -109.02257, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753834' },
     { name: 'Carter Ferry', lat: 47.75585, lon: -110.899, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753640' },
+    { name: 'Sunny Brook Springs', lat: 45.30887, lon: -110.89089, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754529' },
+    { name: 'Queen of the Waters', lat: 45.04377, lon: -110.73163, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753436' },
   ],
   'Bitterroot River': [
     { name: 'Forest Cooper', lat: 45.96901, lon: -114.14079, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754521' },
@@ -220,8 +222,7 @@ export const ACCESS_POINTS = {
     { name: 'Valley Garden', lat: 45.36725, lon: -111.70539, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753456' },
     { name: 'Raynolds\' Pass', lat: 44.82871, lon: -111.47932, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753440' },
     { name: 'Blacktail Meadows', lat: 45.22375, lon: -112.6378, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754531' },
-    { name: 'Sunny Brook Springs', lat: 45.30887, lon: -110.89089, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754529' },
-    { name: 'Queen of the Waters', lat: 45.04377, lon: -110.73163, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753436' },
+
     { name: 'Meadow Lake', lat: 45.44336, lon: -111.70797, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753410' },
     { name: 'Harrison Lake', lat: 45.69942, lon: -111.70798, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753406' },
     { name: 'Blackbird', lat: 45.90138, lon: -111.5269, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753500' },
