@@ -1517,9 +1517,38 @@ function generateFishingTips(river, month) {
 // DYNAMIC HATCH DATA - combines seasonal patterns with real-time conditions
 async function getDynamicHatchData(riverName) {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
-    const monthNum = new Date().getMonth();
     
-    // Get seasonal hatches
+    // FIRST: Try to get REAL scraped hatch data from fly shop reports
+    try {
+        const scrapedResult = await db.query(
+            `SELECT hatches, fly_recommendations, water_temp, water_conditions, source, report_date 
+             FROM hatch_reports 
+             WHERE river = $1 AND is_current = true 
+             ORDER BY scraped_at DESC 
+             LIMIT 1`,
+            [riverName]
+        );
+        
+        if (scrapedResult.rows.length > 0) {
+            const scraped = scrapedResult.rows[0];
+            console.log(`Using scraped hatch data for ${riverName} from ${scraped.source}`);
+            
+            return {
+                hatches: scraped.hatches,
+                flies: scraped.fly_recommendations || generateFlyRecommendations(scraped.hatches),
+                waterTemp: scraped.water_temp,
+                waterConditions: scraped.water_conditions,
+                source: scraped.source,
+                reportDate: scraped.report_date,
+                isScraped: true,
+                isForecast: false
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching scraped hatch data:', error.message);
+    }
+    
+    // FALLBACK: Use seasonal forecast if no scraped data available
     const seasonalHatches = getStaticHatches(riverName) || getDefaultHatches(month);
     
     // Get water temperature (real, nearby, or estimated)
@@ -1551,12 +1580,6 @@ async function getDynamicHatchData(riverName) {
         }
     }
     
-    // Get wind data for recommendations
-    const weather = await getWeatherForRiver(riverName);
-    if (weather && weather.windSpeed > 15) {
-        conditions.push('Windy - use heavier flies, fish lee side');
-    }
-    
     return {
         hatches: adjustedHatches,
         flies: generateFlyRecommendations(adjustedHatches),
@@ -1564,7 +1587,9 @@ async function getDynamicHatchData(riverName) {
         waterConditions: conditions.length > 0 ? conditions.join('. ') : null,
         tempSource: tempSource,
         source: waterTemp ? `${tempSource} + seasonal forecast` : 'Seasonal forecast',
-        seasonalForecast: seasonalHatches
+        seasonalForecast: seasonalHatches,
+        isScraped: false,
+        isForecast: true
     };
 }
 
