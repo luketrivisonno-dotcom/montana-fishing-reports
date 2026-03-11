@@ -75,6 +75,8 @@ const RIVER_TYPES = {
   'Missouri River': 'tailwater',
   'Bighorn River': 'tailwater',
   'Beaverhead River': 'tailwater',
+  'Lower Madison River': 'tailwater',
+  'Ruby River': 'tailwater',
   'Spring Creeks': 'spring_creek',
   'Gallatin River': 'mountain',
   'Upper Madison River': 'freestone',
@@ -86,11 +88,11 @@ const RIVER_TYPES = {
   'Clark Fork River': 'freestone',
   'Flathead River': 'freestone',
   'Jefferson River': 'freestone',
-  'Ruby River': 'freestone',
+
   'Stillwater River': 'freestone',
   'Boulder River': 'freestone',
   'Swan River': 'mountain',
-  'Lower Madison River': 'freestone'
+
 };
 
 function getSeasonalTemp(riverName) {
