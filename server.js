@@ -577,6 +577,47 @@ app.post('/api/cleanup', async (req, res) => {
     }
 });
 
+// Cleanup Madison River entries - deactivates plain "Madison River" (keep Upper/Lower)
+app.post('/api/cleanup-madison', async (req, res) => {
+    try {
+        // Check current state
+        const before = await db.query(`
+            SELECT river, COUNT(*) as count 
+            FROM reports 
+            WHERE river LIKE '%Madison%'
+            GROUP BY river
+            ORDER BY river
+        `);
+        
+        // Deactivate plain "Madison River" entries
+        const result = await db.query(`
+            UPDATE reports 
+            SET is_active = false 
+            WHERE river = 'Madison River'
+            RETURNING id, source
+        `);
+        
+        // Verify after
+        const after = await db.query(`
+            SELECT river, COUNT(*) as count 
+            FROM reports 
+            WHERE is_active = true 
+              AND river LIKE '%Madison%'
+            GROUP BY river
+            ORDER BY river
+        `);
+        
+        res.json({
+            message: 'Madison River cleanup completed',
+            before: before.rows,
+            deactivated: result.rowCount,
+            after: after.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get all rivers
 app.get('/api/rivers', apiLimiter, cacheMiddleware(600), async (req, res) => {
     try {
