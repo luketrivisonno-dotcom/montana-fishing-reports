@@ -21,7 +21,6 @@ const images = {
   Swan: require('./Swan.jpeg'),
   UpperMadison: require('./Upper Madison 2.jpg'),
   Yellowstone: require('./yellowstone.jpg'),
-  YellowstoneNP: require('./yellowstone national park.jpeg'),
   Flathead: require('./Flathead.jpg'),
   Boulder: require('./282AC285-4027-4FD9-98E9-74051B5CA5CE_1_105_c.jpeg'),
   

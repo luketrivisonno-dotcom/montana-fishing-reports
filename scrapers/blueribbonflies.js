@@ -18,13 +18,45 @@ async function scrapeBlueRibbonFlies() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    return [{
-      source: 'Blue Ribbon Flies',
-      river: 'Yellowstone National Park',
-      url: url,
-      last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
-      scraped_at: new Date()
-    }];
+    // Return reports for all YNP rivers since this is a general YNP report
+    const dateStr = dateMatch ? dateMatch[1] : new Date().toLocaleDateString();
+    return [
+      {
+        source: 'Blue Ribbon Flies',
+        river: 'Slough Creek',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Blue Ribbon Flies',
+        river: 'Soda Butte Creek',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Blue Ribbon Flies',
+        river: 'Lamar River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Blue Ribbon Flies',
+        river: 'Gardner River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Blue Ribbon Flies',
+        river: 'Firehole River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      }
+    ];
     
   } catch (error) {
     console.error('Blue Ribbon Flies error:', error.message);

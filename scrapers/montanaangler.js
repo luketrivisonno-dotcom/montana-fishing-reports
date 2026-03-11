@@ -12,7 +12,11 @@ const MONTANA_ANGLER_URLS = {
   'Ruby River': 'https://www.montanaangler.com/montana-fishing-report/ruby-river-fishing-report',
   'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-report',
   'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
-  'Yellowstone National Park': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
+  'Slough Creek': 'https://www.montanaangler.com/fly-fishing-yellowstone-park',
+  'Soda Butte Creek': 'https://www.montanaangler.com/fly-fishing-yellowstone-park',
+  'Lamar River': 'https://www.montanaangler.com/fly-fishing-yellowstone-park',
+  'Gardner River': 'https://www.montanaangler.com/fly-fishing-yellowstone-park',
+  'Firehole River': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
 };
 
 const ICON_URL = null;

@@ -19,7 +19,10 @@ const HATCH_SOURCES = {
     'Madison River': 'https://www.blueribbonflies.com/fishing-report/',
     'Firehole River': 'https://www.blueribbonflies.com/fishing-report/',
     'Gibbon River': 'https://www.blueribbonflies.com/fishing-report/',
-    'Yellowstone National Park': 'https://www.blueribbonflies.com/fishing-report/',
+    'Slough Creek': 'https://www.blueribbonflies.com/fishing-report/',
+    'Soda Butte Creek': 'https://www.blueribbonflies.com/fishing-report/',
+    'Lamar River': 'https://www.blueribbonflies.com/fishing-report/',
+    'Gardner River': 'https://www.blueribbonflies.com/fishing-report/',
   }
 };
 
@@ -193,12 +196,15 @@ async function scrapeBlueRibbonFliesHatches() {
     const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
     
     // Blue Ribbon Flies focuses on West Yellowstone area rivers
-    // The report covers Madison, Firehole, Gibbon, and YNP
+    // The report covers Madison, Firehole, Gibbon, and YNP rivers
     const rivers = [
       { name: 'Madison River', keywords: ['madison', 'madison river'] },
       { name: 'Firehole River', keywords: ['firehole', 'firehole river'] },
       { name: 'Gibbon River', keywords: ['gibbon', 'gibbon river'] },
-      { name: 'Yellowstone National Park', keywords: ['ynp', 'yellowstone park', 'the park'] }
+      { name: 'Slough Creek', keywords: ['slough creek'] },
+      { name: 'Soda Butte Creek', keywords: ['soda butte'] },
+      { name: 'Lamar River', keywords: ['lamar river'] },
+      { name: 'Gardner River', keywords: ['gardner river'] }
     ];
     
     // Try to assign hatches to specific rivers based on text context

@@ -618,6 +618,36 @@ app.post('/api/cleanup-madison', async (req, res) => {
     }
 });
 
+// Cleanup Yellowstone National Park entries - deactivates the old category (individual YNP rivers remain)
+app.post('/api/cleanup-ynp-category', async (req, res) => {
+    try {
+        // Check current state
+        const before = await db.query(`
+            SELECT river, COUNT(*) as count 
+            FROM reports 
+            WHERE river = 'Yellowstone National Park'
+            GROUP BY river
+        `);
+        
+        // Deactivate "Yellowstone National Park" category entries
+        const result = await db.query(`
+            UPDATE reports 
+            SET is_active = false 
+            WHERE river = 'Yellowstone National Park'
+            RETURNING id, source
+        `);
+        
+        res.json({
+            message: 'Yellowstone National Park category cleanup completed',
+            before: before.rows,
+            deactivated: result.rowCount,
+            note: 'Individual YNP rivers (Slough Creek, Soda Butte, etc.) remain active'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get all rivers
 app.get('/api/rivers', apiLimiter, cacheMiddleware(600), async (req, res) => {
     try {

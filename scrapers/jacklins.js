@@ -18,13 +18,45 @@ async function scrapeJacklins() {
       pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
-    return [{
-      source: 'Jacklin\'s Fly Shop',
-      river: 'Yellowstone National Park',
-      url: url,
-      last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
-      scraped_at: new Date()
-    }];
+    // Return reports for all YNP rivers since this is a general YNP report
+    const dateStr = dateMatch ? dateMatch[1] : new Date().toLocaleDateString();
+    return [
+      {
+        source: 'Jacklin\'s Fly Shop',
+        river: 'Slough Creek',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Jacklin\'s Fly Shop',
+        river: 'Soda Butte Creek',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Jacklin\'s Fly Shop',
+        river: 'Lamar River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Jacklin\'s Fly Shop',
+        river: 'Gardner River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      },
+      {
+        source: 'Jacklin\'s Fly Shop',
+        river: 'Firehole River',
+        url: url,
+        last_updated: dateStr,
+        scraped_at: new Date()
+      }
+    ];
     
   } catch (error) {
     console.error('Jacklin\'s error:', error.message);

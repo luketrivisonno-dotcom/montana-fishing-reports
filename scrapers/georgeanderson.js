@@ -4,7 +4,11 @@ const cheerio = require('cheerio');
 const GEORGE_URLS = {
   'Yellowstone River': 'https://www.yellowstoneangler.com/pages/yellowstone-river-fishing-report',
   'Spring Creeks': 'https://www.yellowstoneangler.com/pages/spring-creek-fishing-report',
-  'Yellowstone National Park': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report'
+  'Slough Creek': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Soda Butte Creek': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Lamar River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Gardner River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Firehole River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report'
 };
 
 async function scrapeGeorgeAnderson() {

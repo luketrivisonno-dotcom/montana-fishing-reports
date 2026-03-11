@@ -8,7 +8,11 @@ const YELLOWDOG_URLS = {
   'Yellowstone River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-river-fishing-reports',
   'Spring Creeks': 'https://www.yellowdogflyfishing.com/pages/spring-creeks-fishing-reports',
   'Missouri River': 'https://www.yellowdogflyfishing.com/pages/missouri-river-fishing-reports',
-  'Yellowstone National Park': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Slough Creek': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Soda Butte Creek': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Lamar River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Gardner River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
+  'Firehole River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-park-fishing-reports',
   'Bighorn River': 'https://www.yellowdogflyfishing.com/pages/bighorn-river-fishing-reports'
 };
 
