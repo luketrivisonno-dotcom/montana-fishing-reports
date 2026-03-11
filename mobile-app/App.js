@@ -22,7 +22,14 @@ import FishingLogModal from './components/FishingLogModal';
 import RegulationsInfo from './components/RegulationsInfo';
 import AdBanner from './components/AdBanner';
 import AdManager from './components/AdManager';
-import mobileAds from 'react-native-google-mobile-ads';
+
+// Try to import mobile ads SDK - will be null in Expo Go
+let mobileAds = null;
+try {
+  mobileAds = require('react-native-google-mobile-ads').default;
+} catch (e) {
+  console.log('Google Mobile Ads SDK not available (Expo Go)');
+}
 import { 
   registerForPushNotificationsAsync, 
   subscribeToRiverNotifications,
@@ -714,11 +721,15 @@ function RiversStack() {
 
 export default function App() {
   useEffect(() => {
-    // Initialize Google Mobile Ads SDK
-    mobileAds()
-      .initialize()
-      .then(() => console.log('Google Mobile Ads initialized'))
-      .catch(err => console.log('Ad initialization error:', err));
+    // Initialize Google Mobile Ads SDK if available
+    if (mobileAds) {
+      mobileAds()
+        .initialize()
+        .then(() => console.log('Google Mobile Ads initialized'))
+        .catch(err => console.log('Ad initialization error:', err));
+    } else {
+      console.log('Google Mobile Ads not available (running in Expo Go)');
+    }
   }, []);
 
   return (

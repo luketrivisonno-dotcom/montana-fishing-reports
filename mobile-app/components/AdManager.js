@@ -1,6 +1,41 @@
-import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Check if we're in Expo Go (development without native modules)
+const isExpoGo = !Platform.select({
+  ios: () => {
+    try {
+      const NativeModules = require('react-native').NativeModules;
+      return !!NativeModules.RNGoogleMobileAdsModule;
+    } catch (e) {
+      return false;
+    }
+  },
+  android: () => {
+    try {
+      const NativeModules = require('react-native').NativeModules;
+      return !!NativeModules.RNGoogleMobileAdsModule;
+    } catch (e) {
+      return false;
+    }
+  },
+})?.();
+
+// Lazy load the ads module only when needed
+let InterstitialAd = null;
+let AdEventType = null;
+let TestIds = null;
+
+if (!isExpoGo) {
+  try {
+    const ads = require('react-native-google-mobile-ads');
+    InterstitialAd = ads.InterstitialAd;
+    AdEventType = ads.AdEventType;
+    TestIds = ads.TestIds;
+  } catch (e) {
+    console.log('Google Mobile Ads not available');
+  }
+}
 
 // Production IDs
 const PRODUCTION_INTERSTITIAL_ID = Platform.select({
@@ -12,7 +47,11 @@ const USE_TEST_ADS = true;
 
 class AdManager {
   constructor() {
-    this.interstitialAdId = USE_TEST_ADS ? TestIds.INTERSTITIAL : PRODUCTION_INTERSTITIAL_ID;
+    if (!isExpoGo && TestIds) {
+      this.interstitialAdId = USE_TEST_ADS ? TestIds.INTERSTITIAL : PRODUCTION_INTERSTITIAL_ID;
+    } else {
+      this.interstitialAdId = null;
+    }
     this.interstitialAd = null;
     this.isPremium = false;
   }
@@ -29,6 +68,11 @@ class AdManager {
 
   // Initialize and load interstitial ad
   async loadInterstitial() {
+    if (isExpoGo || !InterstitialAd) {
+      console.log('Interstitial ads not available in Expo Go');
+      return;
+    }
+    
     if (await this.checkPremiumStatus()) return;
 
     try {
@@ -56,6 +100,11 @@ class AdManager {
 
   // Show interstitial ad
   async showInterstitial() {
+    if (isExpoGo || !InterstitialAd) {
+      console.log('Interstitial ads not available in Expo Go');
+      return;
+    }
+    
     if (await this.checkPremiumStatus()) return;
 
     try {
@@ -72,6 +121,11 @@ class AdManager {
 
   // Show interstitial with frequency cap (e.g., every 3rd time)
   async showInterstitialWithFrequency(key, frequency = 3) {
+    if (isExpoGo || !InterstitialAd) {
+      console.log('Interstitial ads not available in Expo Go');
+      return;
+    }
+    
     if (await this.checkPremiumStatus()) return;
 
     try {
