@@ -44,6 +44,9 @@ import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverI
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// YNP Rivers - show YNP badge
+const YNP_RIVERS = ['Slough Creek', 'Soda Butte Creek', 'Lamar River', 'Gardner River', 'Firehole River'];
+
 // ============================================
 // DEVELOPMENT MODE
 // ============================================
@@ -278,7 +281,14 @@ function RiversScreen({ navigation }) {
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
                   <View style={styles.riverInfo}>
-                    <Text style={styles.riverName}>{item}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={styles.riverName}>{item}</Text>
+                      {YNP_RIVERS.includes(item) && (
+                        <View style={styles.ynpBadge}>
+                          <Text style={styles.ynpBadgeText}>YNP</Text>
+                        </View>
+                      )}
+                    </View>
                     <Text style={styles.riverMeta}>Tap for conditions & reports</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={22} color="#c9a227" />
@@ -829,6 +839,8 @@ const styles = StyleSheet.create({
   riverInfo: { flex: 1 },
   riverName: { fontSize: 17, fontWeight: '700', color: '#f5f1e8' },
   riverMeta: { fontSize: 12, color: 'rgba(245, 241, 232, 0.8)', marginTop: 2 },
+  ynpBadge: { backgroundColor: '#f1c40f', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  ynpBadgeText: { fontSize: 10, fontWeight: '700', color: '#2c2416' },
   heroHeader: { height: 200 },
   heroOverlay: { flex: 1, backgroundColor: 'rgba(26, 47, 39, 0.5)', justifyContent: 'space-between', padding: 16 },
   heroNav: { flexDirection: 'row', justifyContent: 'space-between' },

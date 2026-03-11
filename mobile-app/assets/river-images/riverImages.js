@@ -74,7 +74,12 @@ const RIVER_IMAGE_MAP = {
   'Swan River': images.Swan,
   'Upper Madison River': images.UpperMadison,
   'Yellowstone River': images.Yellowstone,
-  'Yellowstone National Park': images.YellowstoneNP,
+  // YNP Rivers
+  'Slough Creek': images.river19,
+  'Soda Butte Creek': images.river20,
+  'Lamar River': images.river21,
+  'Gardner River': images.river22,
+  'Firehole River': images.river23,
   'Flathead River': images.Flathead,
   'Boulder River': images.Boulder,
   

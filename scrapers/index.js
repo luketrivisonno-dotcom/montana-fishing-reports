@@ -18,6 +18,8 @@ const scrapePerfectFly = require('./perfectfly');
 const scrapeRiversEdge = require('./riversedge');
 const scrapeFinsFeathers = require('./finsfeathers');
 const scrapeStoneflyShop = require('./stoneflyshop');
+const scrapeYellowstoneAngler = require('./yellowstoneangler');
+const scrapeParksFlyShop = require('./parksflyshop');
 
 // River-specific scrapers
 const madison = require('./madison');
@@ -91,6 +93,8 @@ async function runAllScrapers() {
     { name: 'The River\'s Edge', fn: scrapeRiversEdge },
     { name: 'Fins & Feathers', fn: scrapeFinsFeathers },
     { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
+    { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
+    { name: 'Parks Fly Shop', fn: scrapeParksFlyShop },
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },

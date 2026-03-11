@@ -64,13 +64,16 @@ const ALL_RIVERS = [
     'Swan River',
     'Rock Creek',
     'Spring Creeks',
-    'Yellowstone National Park',
+    // YNP Rivers (marked with YNP designation)
     'Slough Creek',
     'Soda Butte Creek',
     'Lamar River',
     'Gardner River',
     'Firehole River'
 ];
+
+// Rivers in Yellowstone National Park (for YNP badge)
+const YNP_RIVERS = ['Slough Creek', 'Soda Butte Creek', 'Lamar River', 'Gardner River', 'Firehole River'];
 
 // Cache middleware helper
 const cacheMiddleware = (duration = 300) => {  // default 5 minutes
