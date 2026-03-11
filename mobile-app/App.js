@@ -40,6 +40,8 @@ import {
   setupNotificationListeners 
 } from './utils/notifications';
 import RiverMap from './components/RiverMap';
+import Paywall from './components/Paywall';
+import { initializeRevenueCat, checkPremiumStatus } from './services/revenuecat';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -803,7 +805,19 @@ function RiversStack() {
 }
 
 export default function App() {
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [isPremium, setIsPremium] = useState(DEV_MODE);
+  
   useEffect(() => {
+    // Initialize RevenueCat
+    initializeRevenueCat().then(() => {
+      // Check premium status
+      checkPremiumStatus().then(status => {
+        setIsPremium(status.isPremium || DEV_MODE);
+        globalIsPremium = status.isPremium || DEV_MODE;
+      });
+    });
+    
     // Initialize Google Mobile Ads SDK if available
     if (mobileAds) {
       mobileAds()
@@ -814,6 +828,12 @@ export default function App() {
       console.log('Google Mobile Ads not available (running in Expo Go)');
     }
   }, []);
+  
+  const handlePurchaseSuccess = () => {
+    setIsPremium(true);
+    globalIsPremium = true;
+    setShowPaywall(false);
+  };
 
   return (
     <NavigationContainer>
@@ -830,9 +850,14 @@ export default function App() {
         <Tab.Screen name="Rivers" component={RiversStack} />
         <Tab.Screen name="Map" component={MapScreen} />
         <Tab.Screen name="Favorites" component={FavoritesScreen} />
-        {/* Premium tab hidden for now - will enable later */}
-        {/* <Tab.Screen name="Premium" component={PremiumScreen} /> */}
       </Tab.Navigator>
+      
+      {/* RevenueCat Paywall */}
+      <Paywall 
+        visible={showPaywall} 
+        onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={handlePurchaseSuccess}
+      />
     </NavigationContainer>
   );
 }

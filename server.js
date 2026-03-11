@@ -1467,6 +1467,116 @@ async function checkUserPremium(email) {
     }
 }
 
+// ============================================
+// REVENUECAT INTEGRATION
+// ============================================
+
+// Sync purchase with backend (called from mobile app after RevenueCat purchase)
+app.post('/api/premium/sync', async (req, res) => {
+    try {
+        const { revenuecatId, isPremium, expiryDate, productIdentifier } = req.body;
+        
+        if (!revenuecatId || !isPremium) {
+            return res.status(400).json({ error: 'Invalid data' });
+        }
+        
+        // Generate API key for this user
+        const apiKey = require('crypto').randomBytes(32).toString('hex');
+        const email = `rc_${revenuecatId}@montanafishing.app`;
+        
+        // Determine subscription type
+        const subscriptionType = productIdentifier?.includes('annual') ? 'yearly' : 'monthly';
+        
+        // Insert or update premium user
+        await db.query(`
+            INSERT INTO premium_users 
+            (email, subscription_type, subscription_status, stripe_customer_id, stripe_subscription_id, expires_at, last_accessed)
+            VALUES ($1, $2, 'active', $3, $4, $5, NOW())
+            ON CONFLICT (email) DO UPDATE SET
+                subscription_type = $2,
+                subscription_status = 'active',
+                expires_at = $5,
+                last_accessed = NOW()
+        `, [email, subscriptionType, revenuecatId, productIdentifier, expiryDate || null]);
+        
+        res.json({
+            success: true,
+            apiKey,
+            email,
+            isPremium: true,
+            expiresAt: expiryDate
+        });
+    } catch (error) {
+        console.error('RevenueCat sync error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// RevenueCat webhook endpoint
+// This receives events when subscriptions change (renewals, cancellations, etc.)
+app.post('/api/webhooks/revenuecat', async (req, res) => {
+    try {
+        // Verify webhook signature (you should set a secret in RevenueCat dashboard)
+        const authHeader = req.headers.authorization;
+        const expectedSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+        
+        if (expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        
+        const event = req.body;
+        console.log('RevenueCat webhook:', event.type);
+        
+        const { app_user_id, product_id, expiration_at_ms } = event;
+        const email = `rc_${app_user_id}@montanafishing.app`;
+        const expiryDate = expiration_at_ms ? new Date(expiration_at_ms) : null;
+        
+        switch (event.type) {
+            case 'INITIAL_PURCHASE':
+            case 'RENEWAL':
+            case 'UNCANCELLATION':
+                // Activate or extend subscription
+                const subscriptionType = product_id?.includes('annual') ? 'yearly' : 'monthly';
+                await db.query(`
+                    INSERT INTO premium_users 
+                    (email, subscription_type, subscription_status, stripe_customer_id, stripe_subscription_id, expires_at, last_accessed)
+                    VALUES ($1, $2, 'active', $3, $4, $5, NOW())
+                    ON CONFLICT (email) DO UPDATE SET
+                        subscription_type = $2,
+                        subscription_status = 'active',
+                        expires_at = $5,
+                        last_accessed = NOW()
+                `, [email, subscriptionType, app_user_id, product_id, expiryDate]);
+                console.log(`✅ Subscription activated/renewed for ${email}`);
+                break;
+                
+            case 'CANCELLATION':
+            case 'EXPIRATION':
+                // Mark subscription as cancelled (will expire at expiryDate)
+                await db.query(`
+                    UPDATE premium_users 
+                    SET subscription_status = 'cancelled', last_accessed = NOW()
+                    WHERE email = $1
+                `, [email]);
+                console.log(`⚠️ Subscription cancelled for ${email}`);
+                break;
+                
+            case 'BILLING_ISSUE':
+                // Grace period - subscription still active but payment failed
+                console.log(`⚠️ Billing issue for ${email}`);
+                break;
+                
+            default:
+                console.log(`Unhandled RevenueCat event: ${event.type}`);
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('RevenueCat webhook error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Analytics endpoint (admin only)
 app.get('/api/admin/analytics', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
