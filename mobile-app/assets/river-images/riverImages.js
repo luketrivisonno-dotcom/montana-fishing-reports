@@ -23,6 +23,7 @@ const images = {
   Yellowstone: require('./yellowstone.jpg'),
   YellowstoneNP: require('./yellowstone national park.jpeg'),
   Flathead: require('./Flathead.jpg'),
+  Boulder: require('./282AC285-4027-4FD9-98E9-74051B5CA5CE_1_105_c.jpeg'),
   
   // Keep numbered images as fallbacks
   river1: require('./river1.jpg'),
@@ -75,6 +76,7 @@ const RIVER_IMAGE_MAP = {
   'Yellowstone River': images.Yellowstone,
   'Yellowstone National Park': images.YellowstoneNP,
   'Flathead River': images.Flathead,
+  'Boulder River': images.Boulder,
   
   // Regional categories
   'Prairie': images.Missouri,
