@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TouchableOpacity, 
-  Alert, ActivityIndicator
+  Alert, ActivityIndicator, Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -84,6 +84,10 @@ const FishingLogList = ({ riverName, onAddNew, refreshKey }) => {
         <Text style={styles.notes}>{item.notes}</Text>
       )}
       
+      {item.photo && (
+        <Image source={{ uri: item.photo }} style={styles.catchPhoto} />
+      )}
+      
       <TouchableOpacity 
         style={styles.deleteButton}
         onPress={() => deleteCatch(item.id)}
@@ -162,6 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f1e8',
     borderRadius: 10,
     padding: 12,
+    paddingBottom: 36,
     marginBottom: 8,
   },
   catchHeader: {
@@ -206,11 +211,20 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontStyle: 'italic',
   },
+  catchPhoto: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    marginTop: 10,
+    backgroundColor: '#e8e4da',
+  },
   deleteButton: {
     position: 'absolute',
-    top: 8,
+    bottom: 8,
     right: 8,
-    padding: 4,
+    padding: 6,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 16,
   },
   emptyState: {
     alignItems: 'center',

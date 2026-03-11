@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, Modal, TouchableOpacity, 
   TextInput, ScrollView, Alert, ActivityIndicator,
-  KeyboardAvoidingView, Platform, Keyboard
+  KeyboardAvoidingView, Platform, Keyboard, Image
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -23,6 +24,7 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
   const [length, setLength] = useState('');
   const [fly, setFly] = useState('');
   const [notes, setNotes] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
@@ -31,6 +33,44 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
     setLength('');
     setFly('');
     setNotes('');
+    setPhoto(null);
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please allow access to your photo library');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setPhoto(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please allow access to your camera');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setPhoto(result.assets[0].uri);
+    }
   };
 
   const handleSave = async () => {
@@ -48,6 +88,7 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
         length: length ? parseFloat(length) : null,
         fly: fly || null,
         notes: notes || null,
+        photo: photo || null,
       });
       
       if (success) {
@@ -135,6 +176,31 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
                 multiline
                 numberOfLines={4}
               />
+
+              <Text style={styles.label}>Photo</Text>
+              {photo ? (
+                <View style={styles.photoContainer}>
+                  <Image source={{ uri: photo }} style={styles.photoPreview} />
+                  <TouchableOpacity 
+                    style={styles.removePhotoButton}
+                    onPress={() => setPhoto(null)}
+                  >
+                    <Ionicons name="close-circle" size={24} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.photoButtons}>
+                  <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
+                    <Ionicons name="camera" size={20} color={COLORS.primary} />
+                    <Text style={styles.photoButtonText}>Take Photo</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
+                    <Ionicons name="images" size={20} color={COLORS.primary} />
+                    <Text style={styles.photoButtonText}>Choose Photo</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
               {/* Spacer for keyboard */}
               <View style={{ height: 100 }} />
             </ScrollView>
@@ -254,6 +320,41 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#fff',
+  },
+  photoContainer: {
+    position: 'relative',
+    alignSelf: 'flex-start',
+  },
+  photoPreview: {
+    width: 200,
+    height: 150,
+    borderRadius: 10,
+    backgroundColor: '#f5f1e8',
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+  },
+  photoButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  photoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f1e8',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 8,
+  },
+  photoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 });
 
