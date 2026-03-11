@@ -21,6 +21,7 @@ import FlowChart from './components/FlowChart';
 import FishingLogList from './components/FishingLogList';
 import FishingLogModal from './components/FishingLogModal';
 import RegulationsInfo from './components/RegulationsInfo';
+import RiverMileCalculator from './components/RiverMileCalculator';
 import AdBanner from './components/AdBanner';
 import AdManager from './components/AdManager';
 
@@ -596,6 +597,9 @@ function RiverDetailsScreen({ route, navigation }) {
 
         {/* AD BANNER */}
         <AdBanner size="banner" />
+
+        {/* RIVER MILE CALCULATOR */}
+        <RiverMileCalculator riverName={river} />
 
         {/* PERSONAL FISHING LOG */}
         <FishingLogList 
