@@ -575,9 +575,9 @@ app.get('/api/reports/:river',
             );
             const reports = result.rows.map(report => ({ 
                 ...report, 
-                // Use last_updated_text if available (original format), otherwise format the date
-                last_updated: report.last_updated_text || formatDateForDisplay(report.last_updated),
-                last_updated_date: formatDateForDisplay(report.last_updated)
+                // Always use consistent date format: "Mar 10, 2024"
+                last_updated: formatDateForDisplay(report.last_updated),
+                original_date: report.last_updated_text || report.last_updated
             }));
             res.json({ river: river, count: reports.length, reports: reports });
         } catch (error) {
@@ -798,9 +798,9 @@ app.get('/api/river-details/:river',
             const seenSources = new Set();
             const reports = reportsResult.rows.map(report => ({ 
                 ...report, 
-                // Use last_updated_text if available (original format), otherwise format the date
-                last_updated: report.last_updated_text || formatDateForDisplay(report.last_updated),
-                last_updated_date: formatDateForDisplay(report.last_updated)
+                // Always use consistent date format: "Mar 10, 2024"
+                last_updated: formatDateForDisplay(report.last_updated),
+                original_date: report.last_updated_text || report.last_updated
             })).filter(report => {
                 const normalized = normalizeSource(report.source);
                 if (seenSources.has(normalized)) return false;

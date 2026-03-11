@@ -553,7 +553,7 @@ function RiverDetailsScreen({ route, navigation }) {
         <HatchChart riverName={river} isPremium={true} hatchData={data?.hatchData} />
 
         {/* 7-DAY FLOW HISTORY - Only show for rivers with USGS data */}
-        {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && (
+        {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && river !== 'Slough Creek' && river !== 'Soda Butte Creek' && river !== 'Lamar River' && river !== 'Gardner River' && river !== 'Firehole River' && (
           <FlowChart riverName={river} />
         )}
 

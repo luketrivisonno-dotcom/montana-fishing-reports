@@ -127,6 +127,12 @@ const STATIC_HATCHES = {
     'Jun': ['PMDs', 'Yellow Sallies'], 'Jul': ['PMDs', 'Tricos'],
     'Aug': ['Tricos', 'Hoppers'], 'Sep': ['Tricos', 'Mahogany Duns'],
     'Oct': ['Baetis'], 'Nov': ['Midges', 'Baetis'], 'Dec': ['Midges']
+  },
+  'Boulder River': {
+    'Apr': ['Midges', 'BWO'], 'May': ['BWO', 'March Browns'],
+    'Jun': ['March Browns', 'Salmonflies'], 'Jul': ['PMDs', 'Yellow Sallies'],
+    'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
+    'Oct': ['Baetis', 'October Caddis']
   }
 };
 
