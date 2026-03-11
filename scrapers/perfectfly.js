@@ -2,7 +2,8 @@ const axios = require('axios');
 
 const PERFECT_FLY_URLS = {
   'Stillwater River': 'https://perfectflystore.com/your-streams/fly-fishing-stillwater-river-montana/',
-  'Ruby River': 'https://perfectflystore.com/your-streams/fly-fishing-ruby-river-montana/'
+  'Ruby River': 'https://perfectflystore.com/your-streams/fly-fishing-ruby-river-montana/',
+  'Boulder River': 'https://perfectflystore.com/your-streams/fly-fishing-boulder-river-montana/'
 };
 
 async function scrapePerfectFly() {

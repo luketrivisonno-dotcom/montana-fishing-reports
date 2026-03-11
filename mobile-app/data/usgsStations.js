@@ -551,6 +551,16 @@ const USGS_STATIONS = [
     type: 'usgs'
   },
 
+  // BOULDER RIVER
+  {
+    river: 'Boulder River',
+    siteId: '06207500',
+    location: 'Near Big Timber, MT',
+    lat: 45.8341,
+    lon: -109.9346,
+    type: 'usgs'
+  },
+
   // SWAN RIVER
   {
     river: 'Swan River',

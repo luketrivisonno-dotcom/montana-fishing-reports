@@ -18,6 +18,7 @@ const USGS_SITES = {
   'Jefferson River': { id: '06026500', location: 'Twin Bridges, MT' },
   'Ruby River': { id: '06019500', location: 'Alder, MT' },
   'Stillwater River': { id: '06205000', location: 'Absarokee, MT' },
+  'Boulder River': { id: '06207500', location: 'Big Timber, MT' },
   'Swan River': { id: '12370000', location: 'Big Fork, MT' }
 };
 
@@ -87,6 +88,7 @@ const RIVER_TYPES = {
   'Jefferson River': 'freestone',
   'Ruby River': 'freestone',
   'Stillwater River': 'freestone',
+  'Boulder River': 'freestone',
   'Swan River': 'mountain',
   'Lower Madison River': 'freestone'
 };

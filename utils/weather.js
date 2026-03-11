@@ -18,6 +18,7 @@ const RIVER_LOCATIONS = {
   'Jefferson River': { lat: 45.4819, lon: -112.3320, station: 'Twin Bridges', noaaStation: 'K3TR' },
   'Ruby River': { lat: 45.3295, lon: -112.1076, station: 'Alder', noaaStation: 'KRXE' },
   'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee', noaaStation: 'KBYZ' },
+  'Boulder River': { lat: 45.5333, lon: -109.9167, station: 'Big Timber', noaaStation: 'K6S0' },
   'Swan River': { lat: 48.0833, lon: -114.0665, station: 'Big Fork', noaaStation: 'KGPI' },
   'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone', noaaStation: 'KWYS' }
 };
