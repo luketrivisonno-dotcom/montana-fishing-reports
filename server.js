@@ -44,6 +44,34 @@ app.use('/river-images', express.static('assets/river-images', {
     lastModified: true
 }));
 
+// All rivers that should always appear in the app
+const ALL_RIVERS = [
+    'Upper Madison River',
+    'Lower Madison River',
+    'Yellowstone River',
+    'Missouri River',
+    'Bighorn River',
+    'Gallatin River',
+    'Jefferson River',
+    'Beaverhead River',
+    'Big Hole River',
+    'Bitterroot River',
+    'Blackfoot River',
+    'Boulder River',
+    'Clark Fork River',
+    'Ruby River',
+    'Stillwater River',
+    'Swan River',
+    'Rock Creek',
+    'Spring Creeks',
+    'Yellowstone National Park',
+    'Slough Creek',
+    'Soda Butte Creek',
+    'Lamar River',
+    'Gardner River',
+    'Firehole River'
+];
+
 // Cache middleware helper
 const cacheMiddleware = (duration = 300) => {  // default 5 minutes
     return (req, res, next) => {
@@ -512,7 +540,7 @@ app.post('/api/cleanup', async (req, res) => {
             '%beaverhead-river-fishing-report%',
             '%big-hole-river-fishing-report%',
             '%flathead-river-fishing-report%',
-            '%boulder-river-fishing-report%',
+            '%boulder-river-report%',
             '%thestonefly.com%',
             '%bigskyanglers.com%',
             '%flyfishingbozeman.com%',
@@ -550,10 +578,15 @@ app.post('/api/cleanup', async (req, res) => {
 app.get('/api/rivers', apiLimiter, cacheMiddleware(600), async (req, res) => {
     try {
         const result = await db.query(`SELECT DISTINCT river FROM reports WHERE is_active = true ORDER BY river`);
-        const filteredRivers = result.rows.map(r => r.river).filter(river => 
-            river !== 'General Montana' && river !== 'Montana General' && river !== 'Madison River'
+        const dbRivers = result.rows.map(r => r.river).filter(river => 
+            river !== 'General Montana' && river !== 'Montana General'
         );
-        res.json({ count: filteredRivers.length, rivers: filteredRivers });
+        
+        // Merge with static list to ensure all rivers appear even without active reports
+        const allRiversSet = new Set([...ALL_RIVERS, ...dbRivers]);
+        const mergedRivers = Array.from(allRiversSet).sort((a, b) => a.localeCompare(b));
+        
+        res.json({ count: mergedRivers.length, rivers: mergedRivers });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

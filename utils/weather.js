@@ -20,10 +20,11 @@ const RIVER_LOCATIONS = {
   'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee', noaaStation: 'KBYZ' },
   'Boulder River': { lat: 45.5333, lon: -109.9167, station: 'Big Timber', noaaStation: 'K6S0' },
   'Swan River': { lat: 48.0833, lon: -114.0665, station: 'Big Fork', noaaStation: 'KGPI' },
-  'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone', noaaStation: 'KWYS' }
+  'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone', noaaStation: 'KWYS' },
+  'Spring Creeks': { lat: 45.6625, lon: -110.5610, station: 'Livingston', noaaStation: 'KLVM' }
 };
 
-// WMO Weather codes to icons
+// WMO Weather codes to emoji icons
 const WEATHER_ICONS = {
   0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
   45: '🌫️', 48: '🌫️',

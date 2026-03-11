@@ -5,7 +5,10 @@ const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
   'Missouri River': 'https://troutfitters.com/reports/missouri-river',
-  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river'
+  'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
+  'Upper Madison River': 'https://troutfitters.com/reports/upper-madison',
+  'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
+  'Spring Creeks': 'https://troutfitters.com/reports/spring-creeks'
 };
 
 async function scrapeTroutfitters() {

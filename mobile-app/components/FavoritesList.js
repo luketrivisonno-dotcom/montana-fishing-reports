@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { getFavorites, removeFavorite } from '../utils/storage';
 import { cancelRiverNotifications } from '../utils/notifications';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const FavoritesList = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
@@ -28,7 +29,10 @@ const FavoritesList = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>⭐ Your Favorites</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialCommunityIcons name="star" size={18} color="#2c3e50" style={{ marginRight: 6 }} />
+          <Text style={styles.title}>Your Favorites</Text>
+        </View>
         <Text style={styles.subtitle}>{favorites.length} rivers</Text>
       </View>
       
@@ -47,7 +51,7 @@ const FavoritesList = ({ navigation }) => {
               style={styles.removeButton}
               onPress={() => removeFromFavorites(item)}
             >
-              <Text style={styles.removeText}>✕</Text>
+              <MaterialCommunityIcons name="close" size={14} color="#fff" />
             </TouchableOpacity>
           </TouchableOpacity>
         )}

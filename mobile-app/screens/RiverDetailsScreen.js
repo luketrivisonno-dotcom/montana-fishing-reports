@@ -6,6 +6,7 @@ import {
 import { isFavorite, addFavorite, removeFavorite } from '../utils/storage';
 import { scheduleFishingReportNotification, cancelRiverNotifications, sendTestNotification } from '../utils/notifications';
 import { getAccessPoints } from '../data/accessPoints';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
@@ -31,9 +32,11 @@ const RiverDetailsScreen = ({ route, navigation }) => {
           style={styles.headerFavoriteButton}
           onPress={toggleFavorite}
         >
-          <Text style={styles.headerFavoriteIcon}>
-            {isFav ? '⭐' : '☆'}
-          </Text>
+          <MaterialCommunityIcons 
+            name={isFav ? "star" : "star-outline"} 
+            size={24} 
+            color={isFav ? '#e74c3c' : '#7f8c8d'} 
+          />
         </TouchableOpacity>
       ),
     });
@@ -143,7 +146,7 @@ const RiverDetailsScreen = ({ route, navigation }) => {
         onPress={toggleFavorite}
       >
         <Text style={styles.favoriteBannerText}>
-          {isFav ? '⭐ In Your Favorites (Tap to Remove)' : '☆ Add to Favorites'}
+          {isFav ? 'In Your Favorites (Tap to Remove)' : 'Add to Favorites'}
         </Text>
       </TouchableOpacity>
 
@@ -172,13 +175,19 @@ const RiverDetailsScreen = ({ route, navigation }) => {
 
       {/* Fishing Report */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎣 Fishing Report</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialCommunityIcons name="hook" size={18} color="#2d4a3e" style={{ marginRight: 8 }} />
+          <Text style={styles.cardTitle}>Fishing Report</Text>
+        </View>
         <Text style={styles.reportText}>{data?.report || 'No report available'}</Text>
       </View>
 
       {/* Hatches */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🦟 Current Hatches</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialCommunityIcons name="bug" size={18} color="#2d4a3e" style={{ marginRight: 8 }} />
+          <Text style={styles.cardTitle}>Current Hatches</Text>
+        </View>
         <Text style={styles.hatchText}>{data?.hatches || 'Not reported'}</Text>
       </View>
 
@@ -250,8 +259,9 @@ const styles = StyleSheet.create({
     marginRight: 16,
     padding: 8,
   },
-  headerFavoriteIcon: {
-    fontSize: 28,
+  headerFavoriteButton: {
+    padding: 8,
+    marginRight: 8,
   },
   favoriteBanner: {
     backgroundColor: '#ecf0f1',

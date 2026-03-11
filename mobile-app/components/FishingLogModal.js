@@ -4,7 +4,7 @@ import {
   TextInput, ScrollView, Alert, ActivityIndicator,
   KeyboardAvoidingView, Platform, Keyboard
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -76,7 +76,10 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
         >
           <View style={styles.container}>
             <View style={styles.header}>
-              <Text style={styles.title}>🎣 Log Your Catch</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialCommunityIcons name="hook" size={22} color={COLORS.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.title}>Log Your Catch</Text>
+              </View>
               <TouchableOpacity onPress={onClose}>
                 <Ionicons name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>

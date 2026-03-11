@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Marker, Callout } from 'react-native-maps';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { isFavorite, addFavorite, removeFavorite } from '../utils/storage';
 import { scheduleFishingReportNotification, cancelRiverNotifications } from '../utils/notifications';
 
@@ -39,11 +40,18 @@ const RiverMarker = ({ river, coords, onPress, onFavoriteChange }) => {
           <View style={styles.header}>
             <Text style={styles.title}>{river}</Text>
             <TouchableOpacity onPress={toggleFavorite} style={styles.favButton}>
-              <Text style={styles.favIcon}>{isFav ? '⭐' : '☆'}</Text>
+              <MaterialCommunityIcons 
+                name={isFav ? "star" : "star-outline"} 
+                size={24} 
+                color={isFav ? '#e74c3c' : '#7f8c8d'} 
+              />
             </TouchableOpacity>
           </View>
           
-          <Text style={styles.location}>📍 {coords.location}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+            <MaterialCommunityIcons name="map-marker" size={14} color="#1a5f7a" style={{ marginRight: 4 }} />
+            <Text style={styles.location}>{coords.location}</Text>
+          </View>
           <Text style={styles.region}>{coords.region}</Text>
           {coords.note && <Text style={styles.note}>{coords.note}</Text>}
           

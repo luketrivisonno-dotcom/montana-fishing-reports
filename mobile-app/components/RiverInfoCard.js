@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const RIVER_INFO = {
   'Madison River': {
@@ -114,7 +115,7 @@ const RIVER_INFO = {
     difficulty: 'Advanced',
     bestSeasons: ['Year-round'],
     species: ['Rainbow Trout', 'Brown Trout'],
-    description: 'Private spring creeks in Paradise Valley. Technical fishing, advance booking required.'
+    description: 'Private spring creeks (DePuy, Armstrong, Nelsons) near Livingston in Paradise Valley. Technical fishing, rod fees required.'
   },
   'Boulder River': {
     difficulty: 'Intermediate to Advanced',
@@ -143,7 +144,10 @@ const RiverInfoCard = ({ riverName }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ℹ️ River Info</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+        <MaterialCommunityIcons name="information" size={18} color="#2c3e50" style={{ marginRight: 8 }} />
+        <Text style={styles.title}>River Info</Text>
+      </View>
       
       <View style={styles.row}>
         <View style={styles.item}>

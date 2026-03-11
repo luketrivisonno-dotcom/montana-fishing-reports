@@ -10,7 +10,7 @@ const MONTANA_ANGLER_URLS = {
   'Jefferson River': 'https://www.montanaangler.com/montana-fishing-report/jefferson-river-fishing-report',
   'Stillwater River': 'https://www.montanaangler.com/montana-fishing-report/stillwater-river-fishing-report',
   'Ruby River': 'https://www.montanaangler.com/montana-fishing-report/ruby-river-fishing-report',
-  'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-fishing-report',
+  'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-report',
   'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
   'Yellowstone National Park': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
 };

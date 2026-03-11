@@ -35,8 +35,8 @@ const SEASONAL_GAUGES = [
 const NEARBY_RIVERS = {
   'Jefferson River': ['Upper Madison River', 'Missouri River', 'Ruby River'],
   'Beaverhead River': ['Ruby River', 'Big Hole River', 'Jefferson River'],
-  'Spring Creeks': ['Missouri River', 'Upper Madison River'],
-  'Stillwater River': ['Yellowstone River', 'Rock Creek'],
+  'Spring Creeks': ['Yellowstone River', 'Stillwater River'],
+  'Stillwater River': ['Yellowstone River', 'Boulder River'],
   'Boulder River': ['Yellowstone River', 'Stillwater River'],
   'Little Blackfoot River': ['Blackfoot River', 'Clark Fork River'],
   'Smith River': ['Missouri River', 'Big Hole River'],

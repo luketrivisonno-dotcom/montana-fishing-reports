@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
@@ -134,6 +135,36 @@ const STATIC_HATCHES = {
     'Aug': ['Hoppers', 'Tricos'], 'Sep': ['Tricos', 'Baetis'],
     'Oct': ['Baetis', 'October Caddis']
   }
+};
+
+// Go-To Flies for each river (always work)
+const RIVER_GO_TO_FLIES = {
+  'Madison River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16'],
+  'Upper Madison River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16'],
+  'Lower Madison River': ['Woolly Bugger #6-8', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Scuds #14-16', 'San Juan Worm #12-14'],
+  'Yellowstone River': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Zebra Midge #18-20', 'Hare\'s Ear #12-14', 'Prince Nymph #12-14'],
+  'Gallatin River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Copper John #14-16', 'Woolly Bugger #6-8'],
+  'Missouri River': ['Zebra Midge #18-22', 'RS2 #20-22', 'Pheasant Tail #16-18', 'San Juan Worm #12-14', 'Scuds #16-18'],
+  'Bighorn River': ['Zebra Midge #18-20', 'RS2 #18-20', 'Pheasant Tail #16-18', 'San Juan Worm #12-14', 'Rainbow Warrior #16-18'],
+  'Bitterroot River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #6-8', 'Prince Nymph #12-14', 'Copper John #14-16', 'Zebra Midge #18-20'],
+  'Blackfoot River': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Golden Stone Nymph #8-10', 'Prince Nymph #10-12', 'Woolly Bugger #4-6'],
+  'Rock Creek': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Stimulator #10-12', 'Elk Hair Caddis #14-16', 'Prince Nymph #12-14'],
+  'Beaverhead River': ['Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Copper John #14-16', 'Woolly Bugger #6-8'],
+  'Big Hole River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Prince Nymph #12-14'],
+  'Clark Fork River': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Prince Nymph #10-12', 'Hare\'s Ear #12-14', 'Woolly Bugger #4-6'],
+  'Flathead River': ['Chubby Chernobyl #6-8', 'Golden Stone Dry #8-10', 'Kaufmann Stone #8-10', 'Prince Nymph #10-12', 'Woolly Bugger #4-6'],
+  'Jefferson River': ['Woolly Bugger #6-8', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Prince Nymph #12-14'],
+  'Ruby River': ['Zebra Midge #18-20', 'Pheasant Tail #16-18', 'RS2 #18-20', 'Hare\'s Ear #14-16', 'San Juan Worm #12-14'],
+  'Stillwater River': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Prince Nymph #10-12', 'Copper John #14-16', 'Zebra Midge #18-20'],
+  'Spring Creeks': ['Zebra Midge #20-22', 'RS2 #20-22', 'Pheasant Tail #18-20', 'Barr Emerger #18-20', 'Scuds #16-18'],
+  'Boulder River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Prince Nymph #12-14'],
+  'Bighorn River': ['Zebra Midge #18-20', 'RS2 #18-20', 'Pheasant Tail #16-18', 'San Juan Worm #12-14', 'Rainbow Warrior #16-18'],
+  'Slough Creek': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
+  'Soda Butte Creek': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
+  'Lamar River': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
+  'Gardner River': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Prince Nymph #12-14', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
+  'Firehole River': ['Zebra Midge #20-22', 'RS2 #18-20', 'Pheasant Tail #18-20', 'Elk Hair Caddis #16-18', 'Woolly Bugger #6-8'],
+  'Yellowstone National Park': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
 };
 
 // Fly recommendations
@@ -285,7 +316,10 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🦟 Current Hatches</Text>
+      <View style={styles.headerRow}>
+        <MaterialCommunityIcons name="bug" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+        <Text style={styles.title}>Current Hatches</Text>
+      </View>
       
       {/* Water temp - subtle inline display */}
       {hatchData.waterTemp && (
@@ -315,7 +349,10 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       {seasonalHatches.length > 0 && 
        JSON.stringify(seasonalHatches.sort()) !== JSON.stringify(displayHatches.sort()) && (
         <>
-          <Text style={styles.seasonalLabel}>📅 Seasonal Hatches Also Expected:</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, marginBottom: 8 }}>
+            <MaterialCommunityIcons name="calendar-month" size={14} color={COLORS.textLight} style={{ marginRight: 6 }} />
+            <Text style={styles.seasonalLabel}>Seasonal Hatches Also Expected:</Text>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
             {seasonalHatches
               .filter(h => !displayHatches.includes(h))
@@ -331,11 +368,31 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       {/* Fly recommendations */}
       {hatchData.flies && hatchData.flies.length > 0 && (
         <>
-          <Text style={styles.subtitle}>🎣 Recommended Flies</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, marginBottom: 10 }}>
+            <MaterialCommunityIcons name="hook" size={16} color={COLORS.primary} style={{ marginRight: 8 }} />
+            <Text style={styles.subtitle}>Recommended Flies</Text>
+          </View>
           <View style={styles.flyContainer}>
             {hatchData.flies.map((fly, index) => (
               <View key={index} style={styles.flyBadge}>
                 <Text style={styles.flyText}>{fly}</Text>
+              </View>
+            ))}
+          </View>
+        </>
+      )}
+      
+      {/* Go-To Flies - Always work on this river */}
+      {RIVER_GO_TO_FLIES[riverName] && (
+        <>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, marginBottom: 10 }}>
+            <MaterialCommunityIcons name="star" size={16} color={COLORS.primary} style={{ marginRight: 8 }} />
+            <Text style={styles.subtitle}>Go-To Flies Year Round</Text>
+          </View>
+          <View style={styles.flyContainer}>
+            {RIVER_GO_TO_FLIES[riverName].map((fly, index) => (
+              <View key={index} style={[styles.flyBadge, styles.goToFlyBadge]}>
+                <Text style={[styles.flyText, styles.goToFlyText]}>{fly}</Text>
               </View>
             ))}
           </View>
@@ -356,11 +413,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e8e4da',
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   title: {
     fontSize: 17,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 12,
   },
   subtitle: {
     fontSize: 15,
@@ -445,6 +506,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: COLORS.text,
+  },
+  goToFlyBadge: {
+    backgroundColor: COLORS.primary + '15',
+    borderColor: COLORS.primary,
+  },
+  goToFlyText: {
+    fontWeight: '600',
+    color: COLORS.primary,
   },
   sourceText: {
     fontSize: 11,

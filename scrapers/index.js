@@ -43,13 +43,13 @@ function parseDate(dateString) {
   // Common date formats to try
   const formats = [
     // March 10, 2026
-    { regex: /([A-Za]+)\s+(\d{1,2}),?\s+(\d{4})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${m[3]}`) },
+    { regex: /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${m[3]}`) },
     // 03/10/2026
     { regex: /(\d{1,2})\/(\d{1,2})\/(\d{4})/, fn: (m) => new Date(`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`) },
     // 2026-03-10
     { regex: /(\d{4})-(\d{2})-(\d{2})/, fn: (m) => new Date(`${m[1]}-${m[2]}-${m[3]}`) },
     // Mar 10
-    { regex: /([A-Za]{3})\s+(\d{1,2})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${new Date().getFullYear()}`) }
+    { regex: /([A-Za-z]{3})\s+(\d{1,2})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${new Date().getFullYear()}`) }
   ];
   
   for (const format of formats) {

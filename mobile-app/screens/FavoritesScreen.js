@@ -4,6 +4,7 @@ import {
   Alert, RefreshControl 
 } from 'react-native';
 import { getFavorites, removeFavorite, getFavoriteAccessPoints, removeFavoriteAccessPoint } from '../utils/storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { cancelRiverNotifications } from '../utils/notifications';
 
 const FavoritesScreen = ({ navigation }) => {
@@ -98,7 +99,7 @@ const FavoritesScreen = ({ navigation }) => {
           style={styles.removeBtn}
           onPress={() => removeAccessFavorite(item)}
         >
-          <Text style={styles.removeText}>✕</Text>
+          <MaterialCommunityIcons name="close" size={16} color="#fff" />
         </TouchableOpacity>
       </View>
     );
@@ -106,7 +107,10 @@ const FavoritesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>⭐ My Favorites</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+        <MaterialCommunityIcons name="star" size={24} color="#2d4a3e" style={{ marginRight: 8 }} />
+        <Text style={styles.header}>My Favorites</Text>
+      </View>
       
       <Text style={styles.sectionTitle}>Rivers ({riverFavorites.length})</Text>
       <FlatList

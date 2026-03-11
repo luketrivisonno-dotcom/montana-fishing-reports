@@ -96,19 +96,13 @@ const SolunarTimes = ({ riverName }) => {
   const periods = getSolunarPeriods(today);
   const quality = getFishingQuality(moonPhase);
   
-  const renderStars = (count) => {
-    return '★'.repeat(count) + '☆'.repeat(5 - count);
-  };
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🌙 Best Fishing Times</Text>
-      
-      {/* Quality Rating */}
-      <View style={styles.qualityBox}>
-        <Text style={styles.qualityLabel}>Today's Rating</Text>
-        <Text style={styles.stars}>{renderStars(quality.score)}</Text>
-        <Text style={styles.qualityText}>{quality.label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+        <Ionicons name="moon" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+        <Text style={styles.title}>Sun & Moon</Text>
       </View>
       
       {/* Moon Phase */}
@@ -117,19 +111,6 @@ const SolunarTimes = ({ riverName }) => {
         <View>
           <Text style={styles.moonPhase}>{moonName}</Text>
           <Text style={styles.moonSubtext}>Moon Phase</Text>
-        </View>
-      </View>
-      
-      {/* Major Feeding Times */}
-      <Text style={styles.sectionLabel}>🎯 Major Feeding Times</Text>
-      <View style={styles.timeRow}>
-        <View style={styles.timeBox}>
-          <Text style={styles.timeValue}>{periods.major1}</Text>
-          <Text style={styles.timeLabel}>Morning</Text>
-        </View>
-        <View style={styles.timeBox}>
-          <Text style={styles.timeValue}>{periods.major2}</Text>
-          <Text style={styles.timeLabel}>Evening</Text>
         </View>
       </View>
       
@@ -179,11 +160,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  stars: {
-    fontSize: 20,
-    color: COLORS.accent,
-    marginVertical: 4,
-  },
+
   qualityText: {
     fontSize: 14,
     fontWeight: '600',
@@ -201,6 +178,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     marginRight: 12,
   },
+
   moonPhase: {
     fontSize: 14,
     fontWeight: '600',

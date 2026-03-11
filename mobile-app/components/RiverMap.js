@@ -40,7 +40,6 @@ const INITIAL_REGION = {
 export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
   const [mapType, setMapType] = useState('hybrid');
-  const [showUSGS, setShowUSGS] = useState(true);
   const mapRef = React.useRef(null);
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
@@ -48,6 +47,7 @@ export default function RiverMap({ isPremium }) {
 
   const filteredPoints = useMemo(() => {
     console.log('Filtering by type:', selectedType, 'Total points:', allPoints.length);
+    if (selectedType === 'usgs') return []; // No access points when USGS selected
     if (selectedType === 'all') return allPoints;
     const filtered = allPoints.filter(point => {
       if (selectedType === 'boat') return point.type === 'boat' || point.type === 'both';
@@ -130,15 +130,15 @@ export default function RiverMap({ isPremium }) {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.filterButton, showUSGS && styles.filterButtonActive]}
-            onPress={() => setShowUSGS(!showUSGS)}
+            style={[styles.filterButton, selectedType === 'usgs' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('usgs')}
           >
             <MaterialCommunityIcons 
               name="gauge" 
               size={16} 
-              color={showUSGS ? '#f5f1e8' : COLORS.textLight} 
+              color={selectedType === 'usgs' ? '#f5f1e8' : COLORS.textLight} 
             />
-            <Text style={[styles.filterText, showUSGS && styles.filterTextActive]}>
+            <Text style={[styles.filterText, selectedType === 'usgs' && styles.filterTextActive]}>
               USGS
             </Text>
           </TouchableOpacity>
@@ -156,7 +156,7 @@ export default function RiverMap({ isPremium }) {
         showsScale={true}
         moveOnMarkerPress={false}
       >
-        {showUSGS && usgsStations.map((station, index) => (
+        {(selectedType === 'all' || selectedType === 'usgs') && usgsStations.map((station, index) => (
           <Marker
             key={`usgs-${index}`}
             coordinate={{ 
@@ -202,25 +202,25 @@ export default function RiverMap({ isPremium }) {
                       color={COLORS.textSecondary} 
                     />
                     <Text style={styles.calloutText}>
-                      {point.type === 'both' ? 'Boat & Wade' : point.type === 'boat' ? 'Boat Launch' : 'Wade Access'}
+                      {point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access'}
                     </Text>
                   </View>
                   {point.parking && (
                     <View style={styles.calloutRow}>
-                      <Ionicons name="car" size={14} color={COLORS.textSecondary} />
+                      <MaterialCommunityIcons name="parking" size={14} color={COLORS.textSecondary} />
                       <Text style={styles.calloutText}>Parking</Text>
                     </View>
                   )}
                   {point.restrooms && (
                     <View style={styles.calloutRow}>
-                      <Ionicons name="business" size={14} color={COLORS.textSecondary} />
+                      <MaterialCommunityIcons name="human-male-female" size={14} color={COLORS.textSecondary} />
                       <Text style={styles.calloutText}>Restrooms</Text>
                     </View>
                   )}
-                  {point.boatRamp && (
+                  {point.camping && (
                     <View style={styles.calloutRow}>
-                      <MaterialCommunityIcons name="sail-boat" size={14} color={COLORS.textSecondary} />
-                      <Text style={styles.calloutText}>Boat Ramp</Text>
+                      <MaterialCommunityIcons name="tent" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>Camping</Text>
                     </View>
                   )}
                 </View>

@@ -14,6 +14,7 @@ import {
   MaterialIcons 
 } from '@expo/vector-icons';
 import { cacheRiverData, getCachedRiverData, clearOldCache } from './utils/offlineStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HatchChart from './components/HatchChart';
 import SolunarTimes from './components/SolunarTimes';
 import FlowChart from './components/FlowChart';
@@ -159,7 +160,12 @@ function RiversScreen({ navigation }) {
   const [isOffline, setIsOffline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => { fetchRivers(); clearOldCache(); }, []);
+  useEffect(() => { 
+    // Clear river list cache on app load to ensure fresh data
+    AsyncStorage.removeItem('river_river_list');
+    fetchRivers(); 
+    clearOldCache(); 
+  }, []);
 
   useEffect(() => {
     if (searchQuery) {
@@ -170,12 +176,19 @@ function RiversScreen({ navigation }) {
     }
   }, [searchQuery, rivers]);
 
+  // Ensure these rivers always appear even if API doesn't return them
+  const ESSENTIAL_RIVERS = ['Boulder River'];
+
   const fetchRivers = async () => {
     try {
       const response = await fetch(`${API_URL}/api/rivers`);
       if (!response.ok) throw new Error('Network failed');
       const data = await response.json();
-      const sortedRivers = data.rivers.sort((a, b) => a.localeCompare(b));
+      
+      // Merge with essential rivers to ensure they always appear
+      const mergedRivers = [...new Set([...data.rivers, ...ESSENTIAL_RIVERS])];
+      const sortedRivers = mergedRivers.sort((a, b) => a.localeCompare(b));
+      
       setRivers(sortedRivers);
       setFilteredRivers(sortedRivers);
       setIsOffline(false);
@@ -183,7 +196,13 @@ function RiversScreen({ navigation }) {
     } catch (error) {
       setIsOffline(true);
       const cachedRivers = await getCachedRiverData('river_list');
-      if (cachedRivers) setRivers(cachedRivers);
+      if (cachedRivers) {
+        setRivers(cachedRivers);
+      } else {
+        // Fallback to essential rivers if no cache
+        setRivers(ESSENTIAL_RIVERS.sort());
+        setFilteredRivers(ESSENTIAL_RIVERS.sort());
+      }
     } finally {
       setLoading(false);
     }
@@ -477,6 +496,26 @@ function RiverDetailsScreen({ route, navigation }) {
       </ImageBackground>
 
       <ScrollView style={styles.detailScroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}>
+        
+        {/* FISHING REPORTS - NOW AT TOP */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Fishing Reports</Text>
+          <Text style={styles.sectionCount}>{data?.reports?.length || 0} sources</Text>
+        </View>
+
+        {data?.reports?.map((report, index) => (
+          <ReportCard key={report.id || index} report={report} />
+        ))}
+
+        {(!data?.reports || data.reports.length === 0) && (
+          <View style={styles.emptyState}>
+            <MaterialCommunityIcons name="fish-off" size={48} color={COLORS.textLight} />
+            <Text style={styles.emptyTitle}>No reports available</Text>
+            <Text style={styles.emptyText}>Check back later for updates</Text>
+          </View>
+        )}
+
+        {/* CONDITIONS GRID - Weather & Flow side by side */}
         <View style={styles.conditionsGrid}>
           {data?.weather && (
             <TouchableOpacity 
@@ -511,7 +550,8 @@ function RiverDetailsScreen({ route, navigation }) {
             </TouchableOpacity>
           )}
 
-          {data?.usgs ? (
+          {/* Only show flow card if there's actual USGS data (not 'No USGS Station') */}
+          {data?.usgs && data.usgs.flow && !data.usgs.flow.includes('No USGS') && !data.usgs.flow.includes('Seasonal') ? (
             <TouchableOpacity style={styles.conditionCard} onPress={() => openReport(data.usgs.url)}>
               <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.primary + '15' }]}>
                 <MaterialCommunityIcons name="waves" size={22} color={COLORS.primary} />
@@ -533,53 +573,22 @@ function RiverDetailsScreen({ route, navigation }) {
               </View>
               <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />
             </TouchableOpacity>
-          ) : (
-            <View style={[styles.conditionCard, { opacity: 0.7 }]}>
-              <View style={[styles.conditionIconContainer, { backgroundColor: COLORS.textLight + '15' }]}>
-                <MaterialCommunityIcons name="waves" size={22} color={COLORS.textLight} />
-              </View>
-              <View style={styles.conditionInfo}>
-                <Text style={styles.conditionLabel}>Flow</Text>
-                <Text style={[styles.conditionValue, { color: COLORS.textLight }]}>No USGS Station</Text>
-                <Text style={styles.conditionSubtext}>Check local reports below</Text>
-              </View>
-            </View>
-          )}
-
-
+          ) : null}
         </View>
 
-        {/* DYNAMIC HATCH CHART with live conditions */}
+        {/* HATCH CHART */}
         <HatchChart riverName={river} isPremium={true} hatchData={data?.hatchData} />
-
-        {/* 7-DAY FLOW HISTORY - Only show for rivers with USGS data */}
-        {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && river !== 'Slough Creek' && river !== 'Soda Butte Creek' && river !== 'Lamar River' && river !== 'Gardner River' && river !== 'Firehole River' && (
-          <FlowChart riverName={river} />
-        )}
 
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
 
+        {/* 7-DAY FLOW HISTORY */}
+        {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && river !== 'Slough Creek' && river !== 'Soda Butte Creek' && river !== 'Lamar River' && river !== 'Gardner River' && river !== 'Firehole River' && (
+          <FlowChart riverName={river} />
+        )}
+
         {/* AD BANNER */}
         <AdBanner size="banner" />
-
-        {/* FISHING REPORTS */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Fishing Reports</Text>
-          <Text style={styles.sectionCount}>{data?.reports?.length || 0} sources</Text>
-        </View>
-
-        {data?.reports?.map((report, index) => (
-          <ReportCard key={report.id || index} report={report} />
-        ))}
-
-        {(!data?.reports || data.reports.length === 0) && (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="fish-off" size={48} color={COLORS.textLight} />
-            <Text style={styles.emptyTitle}>No reports available</Text>
-            <Text style={styles.emptyText}>Check back later for updates</Text>
-          </View>
-        )}
 
         {/* PERSONAL FISHING LOG */}
         <FishingLogList 
@@ -595,7 +604,7 @@ function RiverDetailsScreen({ route, navigation }) {
           onSave={saveCatch}
         />
 
-        {/* REGULATIONS & SEASONS - Moved to bottom */}
+        {/* REGULATIONS & SEASONS - At bottom */}
         <RegulationsInfo riverName={river} />
       </ScrollView>
 
@@ -834,6 +843,7 @@ const styles = StyleSheet.create({
   conditionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 14, borderRadius: 12, gap: 10, elevation: 2, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 },
   conditionIconContainer: { width: 44, height: 44, borderRadius: 10, backgroundColor: COLORS.accent + '20', justifyContent: 'center', alignItems: 'center' },
   weatherEmoji: { fontSize: 26 },
+
   conditionInfo: { flex: 1 },
   conditionLabel: { fontSize: 11, color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 0.5 },
   conditionValue: { fontSize: 18, fontWeight: '700', color: COLORS.text, marginTop: 1 },

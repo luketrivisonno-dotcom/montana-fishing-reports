@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Marker, Callout } from 'react-native-maps';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { isAccessPointFavorite, addFavoriteAccessPoint, removeFavoriteAccessPoint } from '../utils/storage';
 
 const AccessPointMarker = ({ point, riverName, onFavoriteChange }) => {
@@ -25,13 +26,13 @@ const AccessPointMarker = ({ point, riverName, onFavoriteChange }) => {
     if (onFavoriteChange) onFavoriteChange();
   };
 
-  // Get icon based on access type
-  const getIcon = () => {
+  // Get icon name based on access type
+  const getIconName = () => {
     switch(point.type) {
-      case 'boat': return '🚤';
-      case 'both': return '🚤🚶';
-      case 'wade': return '🚶';
-      default: return '📍';
+      case 'boat': return 'sail-boat';
+      case 'both': return 'swap-horizontal';
+      case 'wade': return 'walk';
+      default: return 'map-marker';
     }
   };
 
@@ -53,10 +54,14 @@ const AccessPointMarker = ({ point, riverName, onFavoriteChange }) => {
       <Callout tooltip>
         <View style={styles.callout}>
           <View style={styles.header}>
-            <Text style={styles.icon}>{getIcon()}</Text>
+            <MaterialCommunityIcons name={getIconName()} size={20} color={getColor()} style={{ marginRight: 6 }} />
             <Text style={styles.title} numberOfLines={2}>{point.name}</Text>
             <TouchableOpacity onPress={toggleFavorite} style={styles.favButton}>
-              <Text style={styles.favIcon}>{isFav ? '⭐' : '☆'}</Text>
+              <MaterialCommunityIcons 
+                name={isFav ? "star" : "star-outline"} 
+                size={20} 
+                color={isFav ? '#e74c3c' : '#7f8c8d'} 
+              />
             </TouchableOpacity>
           </View>
           
@@ -66,8 +71,24 @@ const AccessPointMarker = ({ point, riverName, onFavoriteChange }) => {
              'Wade Access Only'}
           </Text>
           
-          {point.parking && <Text style={styles.amenity}>🅿️ Parking Available</Text>}
-          {point.restrooms && <Text style={styles.amenity}>🚻 Restrooms</Text>}
+          {point.parking && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+              <MaterialCommunityIcons name="parking" size={12} color="#27ae60" style={{ marginRight: 4 }} />
+              <Text style={styles.amenity}>Parking Available</Text>
+            </View>
+          )}
+          {point.restrooms && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+              <MaterialCommunityIcons name="human-male-female" size={12} color="#27ae60" style={{ marginRight: 4 }} />
+              <Text style={styles.amenity}>Restrooms</Text>
+            </View>
+          )}
+          {point.camping && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+              <MaterialCommunityIcons name="tent" size={12} color="#27ae60" style={{ marginRight: 4 }} />
+              <Text style={styles.amenity}>Camping</Text>
+            </View>
+          )}
           {point.note && <Text style={styles.note}>{point.note}</Text>}
           
           <Text style={styles.tip}>Tap for directions</Text>
@@ -90,10 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  icon: {
-    fontSize: 20,
-    marginRight: 6,
-  },
+
   title: {
     fontSize: 14,
     fontWeight: 'bold',

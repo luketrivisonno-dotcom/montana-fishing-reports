@@ -181,7 +181,6 @@ export default function App() {
                   <Text style={styles.weatherLabel}>Low</Text>
                 </View>
                 <View style={styles.weatherItemWide}>
-                  <Text style={styles.weatherIcon}>{riverData.weather.icon || '🌤️'}</Text>
                   <Text style={styles.weatherCondition}>{riverData.weather.condition}</Text>
                 </View>
               </View>
@@ -493,10 +492,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     marginTop: 4,
   },
-  weatherIcon: {
-    fontSize: 48,
-    marginBottom: 4,
-  },
+
   weatherCondition: {
     fontSize: 14,
     color: COLORS.secondary,
