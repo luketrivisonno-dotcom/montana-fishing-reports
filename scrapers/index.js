@@ -1,5 +1,46 @@
 const db = require('../db');
 const { notifyNewReports } = require('../utils/pushNotifications');
+const { extractHatches, getFlyRecommendations } = require('./hatchScraper');
+
+// Hatch patterns to extract from any report content
+const HATCH_PATTERNS = [
+  { name: 'Midges', patterns: [/\bmidge/i, /\bmidges/i] },
+  { name: 'Blue Winged Olives', patterns: [/\bbwo\b/i, /\bblue.?winged/i, /\bbaetis/i] },
+  { name: 'March Browns', patterns: [/\bmarch brown/i] },
+  { name: 'Salmonflies', patterns: [/\bsalmonfly/i, /\bsalmon fly/i] },
+  { name: 'Golden Stones', patterns: [/\bgolden stone/i] },
+  { name: 'PMDs', patterns: [/\bpmd\b/i, /\bpale morning dun/i] },
+  { name: 'Yellow Sallies', patterns: [/\byellow sall/i, /\bisoperla/i] },
+  { name: 'Caddis', patterns: [/\bcaddis/i] },
+  { name: 'Hoppers', patterns: [/\bhopper/i] },
+  { name: 'Tricos', patterns: [/\btrico/i] },
+  { name: 'Mahogany Duns', patterns: [/\bmahogany/i] },
+  { name: 'October Caddis', patterns: [/\boctober caddis/i] },
+  { name: 'Skwalas', patterns: [/\bskwala/i] },
+  { name: 'Green Drakes', patterns: [/\bgreen drake/i] },
+  { name: 'Gray Drakes', patterns: [/\bgray drake/i] },
+  { name: 'Callibaetis', patterns: [/\bcallibaetis/i] },
+  { name: 'Pseudos', patterns: [/\bpseudo/i] },
+  { name: 'Ants', patterns: [/\bants?\b/i] },
+  { name: 'Beetles', patterns: [/\bbeetles?\b/i] },
+];
+
+function extractHatchesFromText(text) {
+  if (!text) return [];
+  const foundHatches = [];
+  const lowerText = text.toLowerCase();
+  
+  for (const hatch of HATCH_PATTERNS) {
+    for (const pattern of hatch.patterns) {
+      if (pattern.test(lowerText)) {
+        foundHatches.push(hatch.name);
+        break;
+      }
+    }
+  }
+  
+  return [...new Set(foundHatches)];
+}
 
 // Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
@@ -215,6 +256,27 @@ async function runAllScrapers() {
   console.log('\n========================================');
   console.log(`Complete: ${successCount} succeeded, ${failCount} failed`);
   console.log('========================================\n');
+  
+  // Process hatch alerts from new reports that include hatch data
+  // (Scrapers that extract hatches will include them in the report)
+  const reportsWithHatches = newReports.filter(r => r.hatches && r.hatches.length > 0);
+  
+  if (reportsWithHatches.length > 0) {
+    console.log(`\nProcessing ${reportsWithHatches.length} reports with hatch data for alerts...`);
+    
+    const { processHatchAlerts } = require('../utils/hatchNotifications');
+    
+    // Convert to hatch report format
+    const hatchReports = reportsWithHatches.map(r => ({
+      river: r.river,
+      source: r.source,
+      hatches: r.hatches,
+      url: r.url,
+      report_date: r.last_updated
+    }));
+    
+    await processHatchAlerts(hatchReports);
+  }
   
   // Send push notifications for new reports
   if (newReports.length > 0) {
