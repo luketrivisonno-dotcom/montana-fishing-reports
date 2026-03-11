@@ -10,20 +10,25 @@ const images = {
   Bitterroot: require('./Bitterroot.jpg'),
   Blackfoot: require('./Blackfoot.jpg'),
   ClarkFork: require('./Clark fork.jpeg'),
-  Gallatin: require('./Gallatin.jpeg'),
+  Gallatin: require('./Gallatin 2.jpeg'),
   Jefferson: require('./Jefferson.jpeg'),
-  LowerMadison: require('./Lower madison.jpeg'),
+  LowerMadison: require('./Lower Madison 2.jpeg'),
   Missouri: require('./Missouri.jpeg'),
   RockCreek: require('./Rock Creek.jpeg'),
   Ruby: require('./Ruby.jpeg'),
   SpringCreeks: require('./spring creeks.jpeg'),
   Stillwater: require('./stillwater.jpeg'),
   Swan: require('./Swan.jpeg'),
-  UpperMadison: require('./Upper Madison.jpg'),
+  UpperMadison: require('./Upper Madison 2.jpg'),
   Yellowstone: require('./yellowstone.jpg'),
   YellowstoneNP: require('./yellowstone national park.jpeg'),
   Flathead: require('./Flathead.jpg'),
   Boulder: require('./282AC285-4027-4FD9-98E9-74051B5CA5CE_1_105_c.jpeg'),
+  
+  // YNP Rivers - new photos
+  Firehole: require('./Firehole.jpeg'),
+  SodaButte: require('./Soda Butte.jpeg'),
+  Lamar: require('./Lamar.jpg'),
   
   // Keep numbered images as fallbacks
   river1: require('./river1.jpg'),
@@ -74,14 +79,15 @@ const RIVER_IMAGE_MAP = {
   'Swan River': images.Swan,
   'Upper Madison River': images.UpperMadison,
   'Yellowstone River': images.Yellowstone,
-  // YNP Rivers
-  'Slough Creek': images.river19,
-  'Soda Butte Creek': images.river20,
-  'Lamar River': images.river21,
-  'Gardner River': images.river22,
-  'Firehole River': images.river23,
   'Flathead River': images.Flathead,
   'Boulder River': images.Boulder,
+  
+  // YNP Rivers - now with proper photos
+  'Slough Creek': images.river19,
+  'Soda Butte Creek': images.SodaButte,
+  'Lamar River': images.Lamar,
+  'Gardner River': images.river22,
+  'Firehole River': images.Firehole,
   
   // Regional categories
   'Prairie': images.Missouri,

@@ -337,3 +337,21 @@ export const ACCESS_POINTS = {
     { name: 'Skyles Lake', lat: 48.40453, lon: -114.40189, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754035' },
   ],
 };
+// Helper function to get all access points as a flat array
+export function getAllAccessPoints() {
+  const allPoints = [];
+  Object.entries(ACCESS_POINTS).forEach(([river, points]) => {
+    points.forEach(point => {
+      allPoints.push({
+        ...point,
+        river
+      });
+    });
+  });
+  return allPoints;
+}
+
+// Helper function to get access points for a specific river
+export function getAccessPointsForRiver(riverName) {
+  return ACCESS_POINTS[riverName] || [];
+}
