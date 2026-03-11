@@ -44,7 +44,7 @@ const FavoritesList = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={styles.favoriteCard}
-            onPress={() => navigation.navigate('RiverDetails', { river: item })}
+            onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })}
           >
             <Text style={styles.riverName}>{item}</Text>
             <TouchableOpacity 

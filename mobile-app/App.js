@@ -695,7 +695,7 @@ function FavoritesScreen({ navigation }) {
         keyExtractor={(item) => item}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('RiverDetails', { river: item })} activeOpacity={0.9}>
+          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })} activeOpacity={0.9}>
             <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
               <View style={styles.riverCardOverlay}>
                 <View style={styles.riverCardContent}>
