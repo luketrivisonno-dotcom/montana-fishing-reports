@@ -1220,7 +1220,8 @@ app.get('/api/premium/status', async (req, res) => {
             'weather',
             'flows',
             'map',
-            '1_favorite'
+            '1_favorite',
+            'ads'
         ],
         premiumFeatures: isPremium ? [
             'ad_free',
@@ -1230,13 +1231,20 @@ app.get('/api/premium/status', async (req, res) => {
             'detailed_hatch_charts',
             '7_day_forecast',
             'offline_mode',
-            'access_points'
+            'access_points',
+            'river_mile_calculator',
+            'regulations'
         ] : [
             'ad_free',
             'unlimited_favorites', 
             'push_notifications',
             'hatch_alerts',
-            'detailed_hatch_charts'
+            'detailed_hatch_charts',
+            '7_day_forecast',
+            'offline_mode',
+            'access_points',
+            'river_mile_calculator',
+            'regulations'
         ],
         limits: {
             favorites: isPremium ? 'unlimited' : 1

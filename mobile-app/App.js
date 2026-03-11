@@ -608,8 +608,19 @@ function RiverDetailsScreen({ route, navigation }) {
         {/* AD BANNER */}
         <AdBanner size="banner" />
 
-        {/* RIVER MILE CALCULATOR */}
-        <RiverMileCalculator riverName={river} />
+        {/* RIVER MILE CALCULATOR - PREMIUM ONLY */}
+        {globalIsPremium ? (
+          <RiverMileCalculator riverName={river} />
+        ) : (
+          <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
+            <MaterialIcons name="straighten" size={24} color={COLORS.premium} />
+            <View style={styles.premiumFeatureText}>
+              <Text style={styles.premiumFeatureTitle}>River Mile Calculator</Text>
+              <Text style={styles.premiumFeatureSubtitle}>Calculate distances between access points</Text>
+            </View>
+            <MaterialIcons name="lock" size={20} color={COLORS.premium} />
+          </TouchableOpacity>
+        )}
 
         {/* PERSONAL FISHING LOG */}
         <FishingLogList 
@@ -625,8 +636,19 @@ function RiverDetailsScreen({ route, navigation }) {
           onSave={saveCatch}
         />
 
-        {/* REGULATIONS & SEASONS - At bottom */}
-        <RegulationsInfo riverName={river} />
+        {/* REGULATIONS & SEASONS - PREMIUM ONLY */}
+        {globalIsPremium ? (
+          <RegulationsInfo riverName={river} />
+        ) : (
+          <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
+            <MaterialIcons name="gavel" size={24} color={COLORS.premium} />
+            <View style={styles.premiumFeatureText}>
+              <Text style={styles.premiumFeatureTitle}>Regulations & Seasons</Text>
+              <Text style={styles.premiumFeatureSubtitle}>Detailed fishing regulations and season dates</Text>
+            </View>
+            <MaterialIcons name="lock" size={20} color={COLORS.premium} />
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <Modal visible={showPremiumModal} transparent={true} animationType="slide" onRequestClose={() => setShowPremiumModal(false)}>
@@ -638,9 +660,14 @@ function RiverDetailsScreen({ route, navigation }) {
               <Text style={styles.modalSubtitle}>Unlock everything</Text>
             </View>
             <View style={styles.featuresList}>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>Detailed hatch charts</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>Fly recommendations</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>Save favorite rivers</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>✨ Ad-free experience</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>🔔 Push notifications for new reports</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>🦋 Hatch alerts (Salmonflies, PMDs, etc.)</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📊 Detailed hatch charts & flies</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>⭐ Unlimited favorite rivers</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📏 River mile calculator</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📜 Detailed regulations & seasons</Text></View>
+              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📶 Offline mode</Text></View>
             </View>
             <TouchableOpacity style={styles.subscribeButton}><Text style={styles.subscribeButtonText}>Subscribe $4.99/mo</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => setShowPremiumModal(false)}><Text style={styles.modalClose}>Maybe Later</Text></TouchableOpacity>
@@ -929,4 +956,8 @@ const styles = StyleSheet.create({
   yearlySave: { fontSize: 13, color: COLORS.success, fontWeight: '600', marginTop: 4 },
   tabBar: { backgroundColor: COLORS.surface, borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? 24 : 12, height: Platform.OS === 'ios' ? 88 : 68 },
   tabLabel: { fontSize: 11, fontWeight: '500', marginTop: 4 },
+  premiumFeatureCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, marginHorizontal: 16, marginVertical: 8, padding: 16, borderRadius: 12, borderWidth: 1, borderColor: COLORS.premium, gap: 12 },
+  premiumFeatureText: { flex: 1 },
+  premiumFeatureTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
+  premiumFeatureSubtitle: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
 });
