@@ -1519,12 +1519,13 @@ async function getDynamicHatchData(riverName) {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
     
     // FIRST: Try to get REAL scraped hatch data from fly shop reports
+    // Get the MOST RECENT hatch report across ALL sources
     try {
         const scrapedResult = await db.query(
             `SELECT hatches, fly_recommendations, water_temp, water_conditions, source, report_date 
              FROM hatch_reports 
-             WHERE river = $1 AND is_current = true 
-             ORDER BY scraped_at DESC 
+             WHERE river = $1 
+             ORDER BY report_date DESC, scraped_at DESC 
              LIMIT 1`,
             [riverName]
         );
