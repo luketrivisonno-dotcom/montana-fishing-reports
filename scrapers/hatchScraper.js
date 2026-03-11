@@ -283,6 +283,7 @@ async function runHatchScraper() {
   console.log('\n=== Starting Hatch Scraper ===\n');
   
   let totalSaved = 0;
+  const allReports = [];
   
   try {
     // Scrape from Montana Angler
@@ -293,6 +294,7 @@ async function runHatchScraper() {
       const saved = await saveHatchReports(montanaAnglerHatches);
       console.log(`✓ Saved ${saved.length} Montana Angler reports`);
       totalSaved += saved.length;
+      allReports.push(...montanaAnglerHatches);
     }
     
     // Scrape from Blue Ribbon Flies
@@ -303,9 +305,21 @@ async function runHatchScraper() {
       const saved = await saveHatchReports(blueRibbonHatches);
       console.log(`✓ Saved ${saved.length} Blue Ribbon Flies reports`);
       totalSaved += saved.length;
+      allReports.push(...blueRibbonHatches);
     }
     
     console.log(`\n✓ Total: ${totalSaved} hatch reports saved`);
+    
+    // Process hatch alerts for premium subscribers
+    if (allReports.length > 0) {
+      try {
+        const { processHatchAlerts } = require('../utils/hatchNotifications');
+        await processHatchAlerts(allReports);
+      } catch (alertError) {
+        console.error('Hatch alert processing error:', alertError.message);
+        // Don't fail the whole scraper if alerts fail
+      }
+    }
     
   } catch (error) {
     console.error('Hatch scraper error:', error);

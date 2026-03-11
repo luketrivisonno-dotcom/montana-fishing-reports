@@ -199,3 +199,96 @@ export function setupNotificationListeners(onNotificationReceived, onNotificatio
     responseSubscription.remove();
   };
 }
+
+// ============================================
+// HATCH ALERT SUBSCRIPTIONS (Premium Feature)
+// ============================================
+
+// Subscribe to hatch alerts for a river
+export async function subscribeToHatchAlerts(riverName, hatchType = 'all') {
+  try {
+    const token = await AsyncStorage.getItem('pushToken');
+    if (!token) return { success: false, error: 'No push token' };
+    
+    const response = await fetch(`${API_URL}/api/hatch-alerts/subscribe`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': await getApiKey(), // Premium users have API key
+      },
+      body: JSON.stringify({ token, river: riverName, hatch: hatchType }),
+    });
+    
+    if (response.status === 403) {
+      return { success: false, error: 'premium_required' };
+    }
+    
+    if (response.ok) {
+      // Save locally
+      const key = `hatchAlerts_${riverName}`;
+      await AsyncStorage.setItem(key, JSON.stringify({ hatch: hatchType, subscribed: true }));
+      return { success: true };
+    }
+    
+    return { success: false, error: 'Failed to subscribe' };
+  } catch (error) {
+    console.error('Error subscribing to hatch alerts:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Unsubscribe from hatch alerts
+export async function unsubscribeFromHatchAlerts(riverName, hatchType = null) {
+  try {
+    const token = await AsyncStorage.getItem('pushToken');
+    if (!token) return false;
+    
+    const response = await fetch(`${API_URL}/api/hatch-alerts/unsubscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, river: riverName, hatch: hatchType }),
+    });
+    
+    if (response.ok) {
+      const key = `hatchAlerts_${riverName}`;
+      await AsyncStorage.removeItem(key);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error unsubscribing from hatch alerts:', error);
+    return false;
+  }
+}
+
+// Check if subscribed to hatch alerts for a river
+export async function isSubscribedToHatchAlerts(riverName) {
+  try {
+    const key = `hatchAlerts_${riverName}`;
+    const data = await AsyncStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Get available hatch types
+export async function getHatchTypes() {
+  try {
+    const response = await fetch(`${API_URL}/api/hatch-alerts/types`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.hatches;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching hatch types:', error);
+    return [];
+  }
+}
+
+// Helper to get API key (for premium check)
+async function getApiKey() {
+  // This would be set during premium subscription
+  return await AsyncStorage.getItem('apiKey') || '';
+}

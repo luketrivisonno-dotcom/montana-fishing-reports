@@ -264,8 +264,21 @@ async function initDatabase() {
             UNIQUE(token, river)
         )`);
         
+        // Hatch alert subscriptions (premium feature)
+        await db.query(`CREATE TABLE IF NOT EXISTS hatch_subscriptions (
+            id SERIAL PRIMARY KEY,
+            token VARCHAR(255) NOT NULL,
+            river VARCHAR(100) NOT NULL,
+            hatch VARCHAR(50) NOT NULL DEFAULT 'all',
+            subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(token, river, hatch)
+        )`);
+        
         await db.query(`CREATE INDEX IF NOT EXISTS idx_subscriptions_token ON notification_subscriptions(token)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_subscriptions_river ON notification_subscriptions(river)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_subs_token ON hatch_subscriptions(token)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_subs_river ON hatch_subscriptions(river)`);
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_hatch_subs_hatch ON hatch_subscriptions(hatch)`);
         
         await db.query(`CREATE INDEX IF NOT EXISTS idx_river ON reports(river)`);
         await db.query(`CREATE INDEX IF NOT EXISTS idx_scraped_at ON reports(scraped_at)`);
@@ -956,6 +969,105 @@ app.post('/api/notifications/test', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Hatch Alert Subscriptions (Premium Feature)
+// ============================================
+
+// Subscribe to hatch alerts for a river
+app.post('/api/hatch-alerts/subscribe', checkPremium, async (req, res) => {
+    try {
+        if (!req.isPremium) {
+            return res.status(403).json({ error: 'Premium subscription required for hatch alerts' });
+        }
+        
+        const { token, river, hatch = 'all' } = req.body;
+        if (!token || !river) {
+            return res.status(400).json({ error: 'Token and river required' });
+        }
+        
+        const { subscribeToHatchAlerts } = require('./utils/hatchNotifications');
+        const success = await subscribeToHatchAlerts(token, river, hatch);
+        
+        if (success) {
+            res.json({ 
+                success: true, 
+                message: `Subscribed to ${hatch === 'all' ? 'all hatches' : hatch} alerts for ${river}`,
+                river,
+                hatch
+            });
+        } else {
+            res.status(500).json({ error: 'Failed to subscribe' });
+        }
+    } catch (error) {
+        console.error('Hatch subscription error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Unsubscribe from hatch alerts
+app.post('/api/hatch-alerts/unsubscribe', async (req, res) => {
+    try {
+        const { token, river, hatch } = req.body;
+        if (!token || !river) {
+            return res.status(400).json({ error: 'Token and river required' });
+        }
+        
+        const { unsubscribeFromHatchAlerts } = require('./utils/hatchNotifications');
+        const success = await unsubscribeFromHatchAlerts(token, river, hatch);
+        
+        res.json({ success, message: 'Unsubscribed from hatch alerts' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get user's hatch subscriptions
+app.get('/api/hatch-alerts/subscriptions/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        const result = await db.query(`
+            SELECT river, hatch, subscribed_at 
+            FROM hatch_subscriptions 
+            WHERE token = $1
+            ORDER BY river, hatch
+        `, [token]);
+        
+        res.json({ subscriptions: result.rows });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get available hatch types for subscription
+app.get('/api/hatch-alerts/types', async (req, res) => {
+    const { MAJOR_HATCHES, HATCH_EMOJIS } = require('./utils/hatchNotifications');
+    
+    res.json({
+        hatches: MAJOR_HATCHES.map(hatch => ({
+            name: hatch,
+            emoji: HATCH_EMOJIS[hatch] || '🎣',
+            description: getHatchDescription(hatch)
+        }))
+    });
+});
+
+function getHatchDescription(hatch) {
+    const descriptions = {
+        'Salmonflies': 'The big one! Size #4-6 stoneflies, late June-July',
+        'Golden Stones': 'Slightly smaller cousin of Salmonflies, summer',
+        'PMDs': 'Pale Morning Duns, reliable summer mayfly hatch',
+        'Caddis': 'Evening caddis hatches, spring through fall',
+        'Blue Winged Olives': 'Small mayflies, spring and fall',
+        'Hoppers': 'Terrestrial action, late July through September',
+        'Tricos': 'Tiny morning mayflies, technical dry fly fishing',
+        'Midges': 'Year-round, especially important in winter',
+        'October Caddis': 'Large fall caddis, aggressive strikes',
+        'Skwalas': 'Early season stoneflies, March-April',
+        'Green Drakes': 'Large mayflies, exciting dry fly action',
+        'Gray Drakes': 'Spinner falls in the evenings',
+    };
+    return descriptions[hatch] || 'Seasonal hatch activity';
+}
 
 // Get notification stats (admin)
 app.get('/api/admin/notifications/stats', async (req, res) => {

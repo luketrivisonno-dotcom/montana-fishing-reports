@@ -4,12 +4,16 @@ import {
   ActivityIndicator, RefreshControl, Alert, Linking
 } from 'react-native';
 import { isFavorite, addFavorite, removeFavorite } from '../utils/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   subscribeToRiverNotifications, 
   unsubscribeFromRiverNotifications,
   isSubscribedToRiver,
   registerForPushNotificationsAsync,
-  scheduleLocalNotification
+  scheduleLocalNotification,
+  subscribeToHatchAlerts,
+  unsubscribeFromHatchAlerts,
+  isSubscribedToHatchAlerts,
 } from '../utils/notifications';
 import { getAccessPoints } from '../data/accessPoints';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -24,11 +28,15 @@ const RiverDetailsScreen = ({ route, navigation }) => {
   const [isOffline, setIsOffline] = useState(false);
   const [isFav, setIsFav] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [hatchAlertSub, setHatchAlertSub] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
   const [accessPoints, setAccessPoints] = useState([]);
 
   useEffect(() => {
     checkFavoriteStatus();
     checkSubscriptionStatus();
+    checkHatchAlertStatus();
+    checkPremiumStatus();
     fetchRiverData();
     loadAccessPoints();
   }, []);
@@ -72,6 +80,17 @@ const RiverDetailsScreen = ({ route, navigation }) => {
   const checkSubscriptionStatus = async () => {
     const subscribed = await isSubscribedToRiver(river);
     setIsSubscribed(subscribed);
+  };
+
+  const checkHatchAlertStatus = async () => {
+    const sub = await isSubscribedToHatchAlerts(river);
+    setHatchAlertSub(sub);
+  };
+
+  const checkPremiumStatus = async () => {
+    // Check if user has premium subscription
+    const apiKey = await AsyncStorage.getItem('apiKey');
+    setIsPremium(!!apiKey);
   };
 
   const toggleFavorite = async () => {
@@ -122,6 +141,61 @@ const RiverDetailsScreen = ({ route, navigation }) => {
           'Please enable push notifications in your device settings to receive fishing report alerts.',
           [{ text: 'OK' }]
         );
+      }
+    }
+  };
+
+  const toggleHatchAlerts = async () => {
+    if (!isPremium) {
+      Alert.alert(
+        '🔒 Premium Feature',
+        'Get instant alerts when Salmonflies, PMDs, or other major hatches are reported on this river. Upgrade to Premium to unlock hatch alerts!',
+        [
+          { text: 'Not Now', style: 'cancel' },
+          { 
+            text: 'Upgrade to Premium', 
+            style: 'default',
+            onPress: () => {
+              // Navigate to premium screen or show upgrade modal
+              Alert.alert('Coming Soon', 'Premium upgrade will be available shortly!');
+            }
+          }
+        ]
+      );
+      return;
+    }
+
+    if (hatchAlertSub) {
+      const success = await unsubscribeFromHatchAlerts(river);
+      if (success) {
+        setHatchAlertSub(null);
+        Alert.alert('Unsubscribed', `You'll no longer receive hatch alerts for ${river}`);
+      }
+    } else {
+      const result = await subscribeToHatchAlerts(river, 'all');
+      if (result.success) {
+        setHatchAlertSub({ hatch: 'all', subscribed: true });
+        Alert.alert(
+          '🦋 Hatch Alerts Enabled!', 
+          `You'll get notified when major hatches (Salmonflies, PMDs, Caddis, etc.) are reported on ${river}.`,
+          [
+            { text: 'Great!', style: 'default' },
+            { 
+              text: 'Send Test', 
+              onPress: async () => {
+                await scheduleLocalNotification(
+                  `🦋 Salmonflies on ${river}!`,
+                  'This is a test: Salmonflies are coming off strong from Varney to Ennis!',
+                  { river, type: 'hatch_test', hatch: 'Salmonflies' }
+                );
+              }
+            }
+          ]
+        );
+      } else if (result.error === 'premium_required') {
+        Alert.alert('Premium Required', 'Hatch alerts are a premium feature. Please upgrade your subscription.');
+      } else {
+        Alert.alert('Error', 'Failed to subscribe to hatch alerts. Please try again.');
       }
     }
   };
@@ -243,6 +317,25 @@ const RiverDetailsScreen = ({ route, navigation }) => {
           <Text style={styles.cardTitle}>Current Hatches</Text>
         </View>
         <Text style={styles.hatchText}>{data?.hatches || 'Not reported'}</Text>
+        
+        {/* Hatch Alert Subscription - Premium Feature */}
+        <TouchableOpacity 
+          style={[styles.hatchAlertButton, hatchAlertSub && styles.hatchAlertButtonActive]}
+          onPress={toggleHatchAlerts}
+        >
+          <MaterialCommunityIcons 
+            name={hatchAlertSub ? "bell" : "bell-outline"} 
+            size={16} 
+            color={hatchAlertSub ? '#fff' : '#f39c12'} 
+          />
+          <Text style={[styles.hatchAlertText, hatchAlertSub && styles.hatchAlertTextActive]}>
+            {hatchAlertSub 
+              ? `🔔 Hatch alerts enabled` 
+              : isPremium 
+                ? 'Get hatch alerts 🦋' 
+                : '🔒 Premium: Get hatch alerts'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Recommended Patterns */}
@@ -312,6 +405,30 @@ const styles = StyleSheet.create({
   headerButton: {
     padding: 8,
     marginRight: 8,
+  },
+  hatchAlertButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff3cd',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#ffc107',
+  },
+  hatchAlertButtonActive: {
+    backgroundColor: '#f39c12',
+    borderColor: '#f39c12',
+  },
+  hatchAlertText: {
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#856404',
+  },
+  hatchAlertTextActive: {
+    color: '#fff',
   },
   favoriteBanner: {
     backgroundColor: '#ecf0f1',
