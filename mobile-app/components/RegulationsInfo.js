@@ -120,10 +120,10 @@ const REGULATIONS_DATA = {
   'Spring Creeks': {
     season: 'Varies by creek',
     restrictions: [
-      'Trio Creek: Private water, rod fees required',
-      'DePuy Spring Creek: Private water, rod fees required', 
+      'DePuy Spring Creek: Private water, rod fees required',
       'Armstrong Spring Creek: Private water, rod fees required',
       'Nelsons Spring Creek: Private water, rod fees required',
+      '(Known as "The Trio" - three famous spring creeks)',
       'All spring creeks: Check with individual landowner for access',
       'Catch and release strongly encouraged',
     ],
