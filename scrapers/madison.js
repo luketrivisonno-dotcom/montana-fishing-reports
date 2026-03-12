@@ -36,25 +36,6 @@ async function scrapeMadisonOrvis() {
     ];
 }
 
-async function scrapeMadisonBozemanFlySupply() {
-    return [
-        {
-            source: 'Bozeman Fly Supply',
-            river: 'Upper Madison River',
-            url: 'https://www.bozemanflysupply.com/river-report/upper-madison',
-            last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString()
-        },
-        {
-            source: 'Bozeman Fly Supply',
-            river: 'Lower Madison River',
-            url: 'https://www.bozemanflysupply.com/river-report/lower-madison',
-            last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString()
-        }
-    ];
-}
-
 async function scrapeMadisonYellowDog() {
     return [
         {
@@ -77,6 +58,5 @@ async function scrapeMadisonYellowDog() {
 module.exports = {
     scrapeMadisonMontanaAngler,
     scrapeMadisonOrvis,
-    scrapeMadisonBozemanFlySupply,
     scrapeMadisonYellowDog
 };
