@@ -175,12 +175,21 @@ async function runAllScrapers() {
             // 1. New date is valid and newer than existing
             // 2. Existing has no date but new has a date
             // 3. Same date but scraped more recently (content refresh)
+            // 4. FORCE_UPDATE mode: always update (for fixing old bad data)
+            // 5. Existing date is suspiciously recent (likely fake) - replace with real date
+            const isExistingFake = existingDate && existingDate > new Date(Date.now() + 24 * 60 * 60 * 1000); // Future date = fake
+            const isExistingVeryRecent = existingDate && 
+              (new Date() - existingDate) < (7 * 24 * 60 * 60 * 1000) && // Within last 7 days
+              (!newDate || newDate < existingDate); // But new date is older (suspicious)
+            
             const shouldUpdate = 
+              process.env.FORCE_UPDATE === 'true' ||  // Force update mode
               (newDate && !existingDate) ||  // New date found where none existed
               (newDate && existingDate && newDate > existingDate) ||  // Newer date
               (newDate && existingDate && newDate.getTime() === existingDate.getTime() && 
                new Date(item.scraped_at) > new Date(existing.rows[0].scraped_at)) ||  // Same date, newer scrape
-              (!newDate && !existingDate);  // Both have no date, allow refresh
+              (!newDate && !existingDate) ||  // Both have no date, allow refresh
+              isExistingVeryRecent;  // Existing date is suspiciously recent (likely fake)
             
             if (shouldUpdate) {
               await db.query(
