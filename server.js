@@ -539,6 +539,35 @@ app.post('/api/scrape', scrapeLimiter, async (req, res) => {
     }
 });
 
+// Clear all reports endpoint (admin only - no auth for now, add if needed)
+app.post('/api/admin/clear-reports', async (req, res) => {
+    try {
+        console.log('=== MANUAL DATABASE CLEAR ===');
+        
+        const before = await db.query('SELECT COUNT(*) FROM reports');
+        console.log(`Reports before: ${before.rows[0].count}`);
+        
+        await db.query('DELETE FROM reports');
+        console.log('✓ All reports deleted');
+        
+        // Clear cache
+        const keys = cache.keys();
+        const apiKeys = keys.filter(k => k.includes('/api/'));
+        apiKeys.forEach(k => cache.del(k));
+        console.log(`✓ Cache cleared: ${apiKeys.length} keys`);
+        
+        res.json({ 
+            success: true, 
+            message: 'All reports cleared. Run scraper to rebuild.',
+            deleted: parseInt(before.rows[0].count)
+        });
+        
+    } catch (error) {
+        console.error('Clear failed:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Cleanup endpoint
 app.post('/api/cleanup', async (req, res) => {
     try {
