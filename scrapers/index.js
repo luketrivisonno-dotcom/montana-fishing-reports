@@ -72,7 +72,9 @@ const blackfoot = require('./blackfoot');
 const bighorn = require('./bighorn');
 const bitterroot = require('./bitterroot');
 const rockcreek = require('./rockcreek');
+const missoulianangler = require('./missoulianangler');
 const gallatin = require('./gallatin');
+const missoulianangler = require('./missoulianangler');
 
 // Helper function to parse date strings
 function parseDate(dateString) {
@@ -150,15 +152,18 @@ async function runAllScrapers() {
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
     { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
     { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
+    { name: 'Sweetcast Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetcast },
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
-    { name: 'Trout Shop (Missouri)', fn: missouri.scrapeMissouriTroutShop },
+
     { name: 'Montana Angler (Gallatin)', fn: gallatin.scrapeMontanaAngler },
     { name: 'Missoulian Angler (Clark Fork)', fn: clarkfork.scrapeClarkForkMissoulian },
-    { name: 'Bigfork Anglers (Clark Fork)', fn: clarkfork.scrapeClarkForkBigfork },
+
     { name: 'Missoulian Angler (Blackfoot)', fn: blackfoot.scrapeBlackfootMissoulian },
-    { name: 'Bigfork Anglers (Blackfoot)', fn: blackfoot.scrapeBlackfootBigfork },
+
     { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
-    { name: 'Trout Shop (Bighorn)', fn: bighorn.scrapeBighornTroutShop },
+    { name: 'Missoulian Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMissoulian },
+    { name: 'Orvis (Rock Creek)', fn: rockcreek.scrapeRockCreekOrvis },
+
   ];
   
   let successCount = 0;

@@ -2,11 +2,10 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const BOZEMAN_FLY_SUPPLY_URLS = {
-  'Gallatin River': 'https://www.bozemanflysupply.com/fishing-reports/gallatin-river',
-  'Upper Madison River': 'https://www.bozemanflysupply.com/fishing-reports/upper-madison',
-  'Lower Madison River': 'https://www.bozemanflysupply.com/fishing-reports/lower-madison',
-  'Yellowstone River': 'https://www.bozemanflysupply.com/fishing-reports/yellowstone-river',
-  'Missouri River': 'https://www.bozemanflysupply.com/fishing-reports/missouri-river'
+  'Gallatin River': 'https://www.bozemanflysupply.com/river-report/gallatin',
+  'Upper Madison River': 'https://www.bozemanflysupply.com/river-report/upper-madison',
+  'Lower Madison River': 'https://www.bozemanflysupply.com/river-report/lower-madison',
+  'Yellowstone River': 'https://www.bozemanflysupply.com/river-report/yellowstone'
 };
 
 async function scrapeBozemanFlySupply() {

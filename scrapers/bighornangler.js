@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 async function scrapeBighornAngler() {
-  const url = 'https://bighornangler.com/fishing';
+  const url = 'https://bighornangler.com/reports';
   
   try {
     const { data } = await axios.get(url, {
