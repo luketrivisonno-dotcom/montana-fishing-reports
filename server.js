@@ -497,12 +497,32 @@ app.get('/api/admin/cache/stats', async (req, res) => {
     });
 });
 
+// Test endpoint - verify routing works
+app.get('/test', (req, res) => {
+    res.json({ test: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Clear reports endpoint
+app.get('/clear', async (req, res) => {
+    try {
+        await db.query('DELETE FROM reports');
+        res.json({ success: true, message: 'All reports cleared' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // API root
 app.get('/', (req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Montana Fishing Reports API', 
-        version: '2.3.2', 
+        version: '2.3.3',
+        endpoints: {
+            test: '/test',
+            clear: '/clear',
+            adminClear: '/api/admin/clear-reports'
+        }, 
         timestamp: new Date().toISOString(),
         endpoints: {
             rivers: '/api/rivers',
