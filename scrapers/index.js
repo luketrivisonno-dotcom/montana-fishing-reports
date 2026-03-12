@@ -74,7 +74,6 @@ const bitterroot = require('./bitterroot');
 const rockcreek = require('./rockcreek');
 const missoulianangler = require('./missoulianangler');
 const gallatin = require('./gallatin');
-const missoulianangler = require('./missoulianangler');
 
 // Helper function to parse date strings
 function parseDate(dateString) {
