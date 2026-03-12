@@ -188,12 +188,12 @@ export default function RiverMap({ isPremium }) {
             }}
             pinColor={getMarkerColor(point.type)}
             title={point.name}
-            description={`${point.river} - ${point.type}`}
+            description={point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access'}
           >
             <Callout onPress={() => openFWP(point.fwpUrl)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{point.name}</Text>
-                <Text style={styles.calloutRiver}>{point.river}</Text>
+
                 <View style={styles.calloutDetails}>
                   <View style={styles.calloutRow}>
                     <Ionicons 
