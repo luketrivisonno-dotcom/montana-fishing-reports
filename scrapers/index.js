@@ -1,6 +1,7 @@
 const db = require('../db');
 const { notifyNewReports } = require('../utils/pushNotifications');
 const { extractHatches, getFlyRecommendations } = require('./hatchScraper');
+const { standardizeDate, formatForDisplay } = require('../utils/dateStandardizer');
 
 // Hatch patterns to extract from any report content
 const HATCH_PATTERNS = [
@@ -73,41 +74,11 @@ const rockcreek = require('./rockcreek');
 const missoulianangler = require('./missoulianangler');
 const gallatin = require('./gallatin');
 
-// Helper function to parse date strings
+// DEPRECATED: Use standardizeDate() from utils/dateStandardizer instead
+// Keeping for backwards compatibility during transition
 function parseDate(dateString) {
-  if (!dateString) return new Date();
-  
-  // Try parsing the date string directly first
-  let parsed = new Date(dateString);
-  if (!isNaN(parsed.getTime())) {
-    return parsed;
-  }
-  
-  // Common date formats to try
-  const formats = [
-    // March 10, 2026
-    { regex: /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${m[3]}`) },
-    // 03/10/2026
-    { regex: /(\d{1,2})\/(\d{1,2})\/(\d{4})/, fn: (m) => new Date(`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`) },
-    // 2026-03-10
-    { regex: /(\d{4})-(\d{2})-(\d{2})/, fn: (m) => new Date(`${m[1]}-${m[2]}-${m[3]}`) },
-    // Mar 10
-    { regex: /([A-Za-z]{3})\s+(\d{1,2})/, fn: (m) => new Date(`${m[1]} ${m[2]}, ${new Date().getFullYear()}`) }
-  ];
-  
-  for (const format of formats) {
-    const match = dateString.match(format.regex);
-    if (match) {
-      try {
-        const date = format.fn(match);
-        if (!isNaN(date.getTime())) return date;
-      } catch (e) {
-        continue;
-      }
-    }
-  }
-  
-  return new Date();
+  const standardized = standardizeDate(dateString);
+  return standardized ? new Date(standardized) : new Date();
 }
 
 async function runAllScrapers() {
@@ -167,11 +138,13 @@ async function runAllScrapers() {
       
       for (const item of results) {
         if (item && item.url) {
-          const parsedDate = parseDate(item.last_updated);
-          // Store full ISO string for proper date comparison, but keep the date-only format for the field
-          // Also store the original text for display purposes
-          const dateString = parsedDate.toISOString(); // Full timestamp
-          const displayDate = item.last_updated_text || item.last_updated || parsedDate.toLocaleDateString();
+          // Use centralized date standardizer - returns null if no valid date found
+          const standardizedDate = standardizeDate(item.last_updated);
+          const parsedDate = standardizedDate ? new Date(standardizedDate) : null;
+          
+          // ISO string for DB storage, display text for UI
+          const dateString = standardizedDate; // Can be null
+          const displayDate = standardizedDate ? formatForDisplay(standardizedDate) : 'Date unknown';
           
           const existing = await db.query(
             'SELECT * FROM reports WHERE source = $1 AND river = $2 ORDER BY scraped_at DESC LIMIT 1',
@@ -194,15 +167,22 @@ async function runAllScrapers() {
             });
             successCount++;
           } else {
-            const existingDate = new Date(existing.rows[0].last_updated);
+            const existingDateStr = existing.rows[0].last_updated;
+            const existingDate = existingDateStr ? new Date(existingDateStr) : null;
             const newDate = parsedDate;
             
-            // Only update if new date is newer or same day but scraped more recently
-            const shouldUpdate = newDate > existingDate || 
-                                 (newDate.getTime() === existingDate.getTime() && 
-                                  new Date(item.scraped_at) > new Date(existing.rows[0].scraped_at));
+            // Determine if we should update:
+            // 1. New date is valid and newer than existing
+            // 2. Existing has no date but new has a date
+            // 3. Same date but scraped more recently (content refresh)
+            const shouldUpdate = 
+              (newDate && !existingDate) ||  // New date found where none existed
+              (newDate && existingDate && newDate > existingDate) ||  // Newer date
+              (newDate && existingDate && newDate.getTime() === existingDate.getTime() && 
+               new Date(item.scraped_at) > new Date(existing.rows[0].scraped_at)) ||  // Same date, newer scrape
+              (!newDate && !existingDate);  // Both have no date, allow refresh
             
-            if (shouldUpdate || isNaN(existingDate.getTime())) {
+            if (shouldUpdate) {
               await db.query(
                 `UPDATE reports 
                  SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6
@@ -210,8 +190,8 @@ async function runAllScrapers() {
                 [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
               );
               console.log(`✓ Updated: ${item.source} (${item.river}) - ${displayDate}`);
-              // Track for push notification (only if actually new content)
-              if (newDate > existingDate) {
+              // Track for push notification (only if actually new content with newer date)
+              if (newDate && (!existingDate || newDate > existingDate)) {
                 newReports.push({
                   source: item.source,
                   river: item.river,

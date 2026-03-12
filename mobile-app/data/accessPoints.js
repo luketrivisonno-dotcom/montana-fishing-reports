@@ -343,13 +343,13 @@ export const ACCESS_POINTS = {
   'Boulder River': [
     { name: 'Boulder Forks', lat: 45.65769, lon: -110.10872, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753682' },
     
-    { name: 'Boulder River Access', lat: 45.657690, lon: -110.108720, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
+    { name: 'Boulder Forks', lat: 45.657690, lon: -110.108720, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
   ],
   'Stillwater River': [
     { name: 'Absaroka', lat: 45.52886, lon: -109.46838, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754513' },
     { name: 'Cliff Swallow', lat: 45.51492, lon: -109.63208, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754515' },
     
-    { name: 'Stillwater River Access', lat: 45.643330, lon: -109.404440, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
+    { name: 'Absaroka', lat: 45.643330, lon: -109.404440, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
   ],
   'Spring Creeks': [
     { name: 'Sunny Brook Springs', lat: 45.30887, lon: -110.89089, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fas/39754708' },
@@ -373,10 +373,7 @@ export function getAllAccessPoints() {
   const allPoints = [];
   Object.entries(ACCESS_POINTS).forEach(([river, points]) => {
     points.forEach(point => {
-      allPoints.push({
-        ...point,
-        river
-      });
+      allPoints.push(point);
     });
   });
   return allPoints;

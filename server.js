@@ -7,6 +7,7 @@ const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
 const { getUSGSData, RIVER_TYPES } = require('./utils/usgs');
 const { runHatchScraper, getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
+const { formatForDisplay, getRelativeTime } = require('./utils/dateStandardizer');
 
 // Security and rate limiting
 const rateLimit = require('express-rate-limit');
@@ -160,18 +161,13 @@ function normalizeSource(source) {
 }
 
 function formatDateForDisplay(dateString) {
-    if (!dateString) return 'Recently updated';
-    try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Recently updated';
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    } catch (e) {
-        return 'Recently updated';
-    }
+    // Use centralized date formatter - returns 'Date unknown' if invalid
+    return formatForDisplay(dateString);
+}
+
+function getReportFreshness(dateString) {
+    // Returns relative time like "Today", "Yesterday", "3 days ago"
+    return getRelativeTime(dateString);
 }
 
 // Database initialization
@@ -748,8 +744,9 @@ app.get('/api/reports/:river',
             );
             const reports = result.rows.map(report => ({ 
                 ...report, 
-                // Always use consistent date format: "Mar 10, 2024"
+                // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
+                relative_time: getReportFreshness(report.last_updated),
                 original_date: report.last_updated_text || report.last_updated
             }));
             res.json({ river: river, count: reports.length, reports: reports });
@@ -1137,8 +1134,9 @@ app.get('/api/river-details/:river',
             const seenSources = new Set();
             const reports = reportsResult.rows.map(report => ({ 
                 ...report, 
-                // Always use consistent date format: "Mar 10, 2024"
+                // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
+                relative_time: getReportFreshness(report.last_updated),
                 original_date: report.last_updated_text || report.last_updated
             })).filter(report => {
                 const normalized = normalizeSource(report.source);

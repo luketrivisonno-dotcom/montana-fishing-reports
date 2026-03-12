@@ -1,4 +1,5 @@
 const db = require('../db');
+const { standardizeDate, formatForDisplay, extractDateFromText } = require('./dateStandardizer');
 
 function normalizeSource(source) {
     if (!source) return '';
@@ -6,69 +7,6 @@ function normalizeSource(source) {
         .replace(/\([^)]*\)/g, '')
         .replace(/[^a-z0-9]/g, '')
         .trim();
-}
-
-function standardizeDate(dateString) {
-    if (!dateString) return null;
-    
-    try {
-        const isoDate = new Date(dateString);
-        if (!isNaN(isoDate.getTime())) {
-            return isoDate.toISOString();
-        }
-        
-        const formats = [
-            /^(\w{3,})\s+(\d{1,2}),?\s+(\d{4})$/i,
-            /^(\d{1,2})\s+(\w{3,})\s+(\d{4})$/i,
-            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-            /^(\d{4})-(\d{2})-(\d{2})$/
-        ];
-        
-        const months = {
-            'jan': 0, 'january': 0, 'feb': 1, 'february': 1,
-            'mar': 2, 'march': 2, 'apr': 3, 'april': 3,
-            'may': 4, 'jun': 5, 'june': 5, 'jul': 6, 'july': 6,
-            'aug': 7, 'august': 7, 'sep': 8, 'sept': 8, 'september': 8,
-            'oct': 9, 'october': 9, 'nov': 10, 'november': 10,
-            'dec': 11, 'december': 11
-        };
-        
-        for (const regex of formats) {
-            const match = dateString.match(regex);
-            if (match) {
-                let year, month, day;
-                
-                if (regex.source.includes('^\\w')) {
-                    month = months[match[1].toLowerCase()];
-                    day = parseInt(match[2]);
-                    year = parseInt(match[3]);
-                } else if (regex.source.includes('^\\d{4}')) {
-                    year = parseInt(match[1]);
-                    month = parseInt(match[2]) - 1;
-                    day = parseInt(match[3]);
-                } else if (regex.source.includes('\\/')) {
-                    month = parseInt(match[1]) - 1;
-                    day = parseInt(match[2]);
-                    year = parseInt(match[3]);
-                } else {
-                    day = parseInt(match[1]);
-                    month = months[match[2].toLowerCase()];
-                    year = parseInt(match[3]);
-                }
-                
-                if (month !== undefined && !isNaN(day) && !isNaN(year)) {
-                    const date = new Date(year, month, day);
-                    if (!isNaN(date.getTime())) {
-                        return date.toISOString();
-                    }
-                }
-            }
-        }
-        
-        return null;
-    } catch (e) {
-        return null;
-    }
 }
 
 function isValidUrl(url) {
@@ -99,7 +37,10 @@ async function saveReport(report) {
         }
         
         const normalizedSource = normalizeSource(report.source);
+        
+        // Use the centralized date standardizer - does NOT default to today
         const standardizedDate = standardizeDate(report.last_updated);
+        const displayDate = standardizedDate ? formatForDisplay(standardizedDate) : 'Date unknown';
         
         const query = `
             INSERT INTO reports 
@@ -125,20 +66,23 @@ async function saveReport(report) {
             report.river,
             report.url,
             report.title || null,
-            standardizedDate,
-            report.last_updated || null,
+            standardizedDate,      // ISO format for DB
+            displayDate,           // Human readable for display
             report.author || null,
             report.icon_url || null,
             report.water_clarity || null
         ];
         
         const result = await db.query(query, values);
-        console.log(`Saved report: ${report.source} - ${report.river}`);
+        console.log(`Saved report: ${report.source} - ${report.river} (${displayDate})`);
         return result.rows[0];
         
     } catch (error) {
         if (error.message.includes('unique_url')) {
             try {
+                const standardizedDate = standardizeDate(report.last_updated);
+                const displayDate = standardizedDate ? formatForDisplay(standardizedDate) : 'Date unknown';
+                
                 const updateQuery = `
                     UPDATE reports 
                     SET source = $1,
@@ -161,8 +105,8 @@ async function saveReport(report) {
                     normalizeSource(report.source),
                     report.river,
                     report.title || null,
-                    standardizeDate(report.last_updated),
-                    report.last_updated || null,
+                    standardizedDate,  // ISO format for DB
+                    displayDate,       // Human readable for display
                     report.author || null,
                     report.icon_url || null,
                     report.water_clarity || null,
@@ -170,7 +114,7 @@ async function saveReport(report) {
                 ]);
                 
                 if (result.rowCount > 0) {
-                    console.log(`Updated report by URL: ${report.source} - ${report.river}`);
+                    console.log(`Updated report by URL: ${report.source} - ${report.river} (${displayDate})`);
                     return result.rows[0];
                 }
             } catch (updateError) {
