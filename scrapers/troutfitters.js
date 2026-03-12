@@ -8,7 +8,8 @@ const TROUTFITTERS_URLS = {
   'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
   'Upper Madison River': 'https://troutfitters.com/reports/upper-madison',
   'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
-  'Spring Creeks': 'https://troutfitters.com/reports/spring-creeks'
+  'Spring Creeks': 'https://troutfitters.com/reports/spring-creeks',
+  'Bighorn River': 'https://troutfitters.com/reports/bighorn-river'
 };
 
 async function scrapeTroutfitters() {

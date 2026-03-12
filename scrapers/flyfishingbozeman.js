@@ -4,7 +4,8 @@ const cheerio = require('cheerio');
 const FLY_FISHING_BOZEMAN_URLS = {
   'Gallatin River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/gallatin-river-fishing-report',
   'Upper Madison River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/madison-river-fishing-report',
-  'Yellowstone River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/yellowstone-river-fishing-report'
+  'Yellowstone River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/yellowstone-river-fishing-report',
+  'Bighorn River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/bighorn-river-fishing-report'
 };
 
 async function scrapeFlyFishingBozeman() {

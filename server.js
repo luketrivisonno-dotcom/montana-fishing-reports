@@ -328,7 +328,8 @@ async function runDatabaseCleanup() {
             'River\'s Edge',  // Old riversedge.com domain
             'George Anderson\'s Yellowstone Angler',  // Old URL
             'Trout Shop',  // Removed per user request
-            'Bigfork Anglers'  // Removed per user request
+            'Bigfork Anglers',  // Removed per user request
+            'Fins & Feathers'  // Website removed fishing reports (404)
         ];
         
         const defunctResult = await db.query(`
