@@ -82,6 +82,10 @@ export const ACCESS_POINTS = {
     { name: 'Harlowton', lat: 46.42899, lon: -109.83759, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754145' }
   ],
   'Yellowstone River': [
+    { name: 'Loch Leven', lat: 45.45721, lon: -110.62422, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753510' },
+    { name: 'Queen of the Waters', lat: 45.04377, lon: -110.73163, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754545' },
+    { name: 'Dan Bailey', lat: 45.42045, lon: -110.63664, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753424' },
+    
     { name: 'Hatchery', lat: 47.00765, lon: -109.35074, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753470' },
     { name: 'Lazy KB', lat: 47.0739, lon: -109.42728, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753418' },
     { name: 'Reed & Bowles', lat: 47.09463, lon: -109.4653, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753420' },
@@ -349,16 +353,19 @@ export const ACCESS_POINTS = {
   ],
   'Spring Creeks': [
     { name: 'Sunny Brook Springs', lat: 45.30887, lon: -110.89089, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fas/39754708' },
-    { name: 'Loch Leven', lat: 45.45721, lon: -110.62422, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753510' },
-    { name: 'Queen of the Waters', lat: 45.04377, lon: -110.73163, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754545' },
-    { name: 'Dan Bailey', lat: 45.42045, lon: -110.63664, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753424' },
+    
+    
+    
     { name: 'Bull Springs', lat: 45.2785, lon: -109.20959, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753680' }
   ],
   'Rock Creek': [
-    { name: 'Rosebud Isle', lat: 45.45074, lon: -109.50677, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753686' }
+    
   ],
   'Clarks Fork River': [
     { name: 'Clarks Fork Yellowstone', lat: 45.26429, lon: -108.91495, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753674' }
+  ],
+  'Rosebud Creek': [
+    { name: 'Rosebud Isle', lat: 45.45074, lon: -109.50677, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753686' }
   ],
 };
 // Helper function to get all access points as a flat array
