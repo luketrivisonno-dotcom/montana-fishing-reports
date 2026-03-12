@@ -21,9 +21,9 @@ async function scrapeFlyFishingBozeman() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
+      // Fly Fishing Bozeman uses "Last Updated: 03/12/2026" format
       const dateMatch = 
-        pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
+        pageText.match(/Last Updated[:\s]+(\d{1,2}\/\d{1,2}\/\d{4})/i) ||
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
       reports.push({

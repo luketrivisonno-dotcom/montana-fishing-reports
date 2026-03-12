@@ -38,7 +38,12 @@ async function scrapeMontanaAngler() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      const dateMatch = pageText.match(/([A-Za-z]+,\s+)?[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
+      // Look for date patterns like "Thursday, March 13, 2026" or "March 13, 2026"
+      // Try the full pattern first, then fallback to simpler pattern
+      let dateMatch = pageText.match(/[A-Za-z]+,\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
+      if (!dateMatch) {
+        dateMatch = pageText.match(/[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
+      }
       
       // Extract water clarity
       let waterClarity = null;
