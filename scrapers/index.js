@@ -44,7 +44,6 @@ function extractHatchesFromText(text) {
 
 // Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
-const scrapeBlueRibbonFlies = require('./blueribbonflies');
 const scrapeOrvis = require('./orvis');
 const scrapeBighornAngler = require('./bighornangler');
 const scrapeBozemanFlySupply = require('./bozemanflysupply');
@@ -123,7 +122,6 @@ async function runAllScrapers() {
   const allScrapers = [
     // Main multi-river scrapers (with working implementations)
     { name: 'Montana Angler', fn: scrapeMontanaAngler },
-    { name: 'Blue Ribbon Flies', fn: scrapeBlueRibbonFlies },
     { name: 'Orvis', fn: scrapeOrvis },
     { name: 'Bighorn Angler', fn: scrapeBighornAngler },
     { name: 'Bozeman Fly Supply', fn: scrapeBozemanFlySupply },

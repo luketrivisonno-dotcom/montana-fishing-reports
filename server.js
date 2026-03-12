@@ -329,7 +329,8 @@ async function runDatabaseCleanup() {
             'George Anderson\'s Yellowstone Angler',  // Old URL
             'Trout Shop',  // Removed per user request
             'Bigfork Anglers',  // Removed per user request
-            'Fins & Feathers'  // Website removed fishing reports (404)
+            'Fins & Feathers',  // Website removed fishing reports (404)
+            'Blue Ribbon Flies'  // Dates incorrect, removed per user request
         ];
         
         const defunctResult = await db.query(`
