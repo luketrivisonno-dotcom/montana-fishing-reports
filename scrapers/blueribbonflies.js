@@ -4,7 +4,7 @@ const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
 
 async function scrapeBlueRibbonFlies() {
-  const url = 'https://www.blueribbonflies.com/';
+  const url = 'https://www.blueribbonflies.com/fishing-report/';
   
   try {
     const { data } = await axios.get(url, {
