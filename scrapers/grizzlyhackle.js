@@ -29,8 +29,8 @@ async function scrapeGrizzlyHackle() {
             const $ = cheerio.load(data);
             const pageText = $('body').text().toLowerCase();
             
-            // Extract date
-            const dateMatch = $('body').text().match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})|(\d{1,2}\/\d{1,2}\/\d{4})/);
+            // Extract date - use word boundary to avoid capturing text like "belowFebruary"
+            const dateMatch = $('body').text().match(/\b([A-Za-z]+\s+\d{1,2},?\s+\d{4})|\b(\d{1,2}\/\d{1,2}\/\d{4})/);
             
             // Extract water clarity from various patterns
             let waterClarity = null;

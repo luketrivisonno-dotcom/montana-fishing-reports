@@ -31,10 +31,20 @@ async function scrapeYellowDog() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      const dateMatch = 
+      // Yellow Dog pages have fake dates like "January 1, 1988" - need to validate
+      let dateMatch = 
         pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
         pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+      
+      // Validate date is recent (not fake old dates like 1988)
+      if (dateMatch) {
+        const dateStr = dateMatch[1] || dateMatch[0];
+        const year = parseInt(dateStr.match(/\d{4}/)?.[0]);
+        if (year && year < 2020) {
+          dateMatch = null; // Reject old fake dates
+        }
+      }
       
       // Extract water clarity
       let waterClarity = null;

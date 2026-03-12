@@ -1,13 +1,15 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+// NOTE: These URLs redirect to georgeanderson.com which has the actual reports
+// Keeping for reference but georgeanderson.js handles these rivers
 const YELLOWSTONE_ANGLER_URLS = {
-  'Slough Creek': 'https://yellowstoneangler.com/fishing-report/slough-creek',
-  'Soda Butte Creek': 'https://yellowstoneangler.com/fishing-report/soda-butte-creek',
-  'Lamar River': 'https://yellowstoneangler.com/fishing-report/lamar-river',
-  'Gardner River': 'https://yellowstoneangler.com/fishing-report/gardner-river',
-  'Firehole River': 'https://yellowstoneangler.com/fishing-report/firehole-river',
-  'Yellowstone River': 'https://yellowstoneangler.com/fishing-report/yellowstone-river'
+  'Yellowstone River': 'https://www.yellowstoneangler.com/pages/yellowstone-river-fishing-report',
+  'Slough Creek': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Soda Butte Creek': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Lamar River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Gardner River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report',
+  'Firehole River': 'https://www.yellowstoneangler.com/pages/yellowstone-national-park-fishing-report'
 };
 
 async function scrapeYellowstoneAngler() {

@@ -3,13 +3,14 @@ const cheerio = require('cheerio');
 const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
 
+// NOTE: Individual river URLs are 404, using main report page for all YNP rivers
+// The page contains reports for all YNP rivers together
 const PARKS_FLY_SHOP_URLS = {
-  // YNP Rivers only
-  'Slough Creek': 'https://parksflyshop.com/fishing-report/slough-creek',
-  'Soda Butte Creek': 'https://parksflyshop.com/fishing-report/soda-butte-creek',
-  'Lamar River': 'https://parksflyshop.com/fishing-report/lamar-river',
-  'Gardner River': 'https://parksflyshop.com/fishing-report/gardner-river',
-  'Firehole River': 'https://parksflyshop.com/fishing-report/firehole-river'
+  'Slough Creek': 'https://parksflyshop.com/fishing-report',
+  'Soda Butte Creek': 'https://parksflyshop.com/fishing-report',
+  'Lamar River': 'https://parksflyshop.com/fishing-report',
+  'Gardner River': 'https://parksflyshop.com/fishing-report',
+  'Firehole River': 'https://parksflyshop.com/fishing-report'
 };
 
 async function scrapeParksFlyShop() {
