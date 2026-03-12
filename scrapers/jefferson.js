@@ -3,7 +3,7 @@ async function scrapeJeffersonMontanaAngler() {
         source: 'Montana Angler',
         river: 'Jefferson River',
         url: 'https://www.montanaangler.com/jefferson-river-fishing-report',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }
@@ -13,7 +13,7 @@ async function scrapeJeffersonHeadhunters() {
         source: 'Headhunters Fly Shop',
         river: 'Jefferson River',
         url: 'https://www.headhuntersflyshop.com/fishing-report/',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }

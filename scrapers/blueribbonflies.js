@@ -22,7 +22,7 @@ async function scrapeBlueRibbonFlies() {
     
     // Extract hatch data from the page content
     const hatchData = extractHatchData(pageText);
-    const dateStr = dateMatch ? dateMatch[1] : new Date().toLocaleDateString();
+    const dateStr = dateMatch ? dateMatch[1] : null;
     const reportDate = dateMatch ? new Date(dateMatch[1]) : new Date();
     
     // Save hatch data if we found any

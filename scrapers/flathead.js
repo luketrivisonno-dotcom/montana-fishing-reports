@@ -3,7 +3,7 @@ async function scrapeFlatheadMontanaAngler() {
         source: 'Montana Angler',
         river: 'Flathead River',
         url: 'https://www.montanaangler.com/flathead-river-fishing-report',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }
@@ -13,7 +13,7 @@ async function scrapeFlatheadCrown() {
         source: 'Crown of the Continent',
         river: 'Flathead River',
         url: 'https://crownofcontinent.com/fishing-reports/',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }

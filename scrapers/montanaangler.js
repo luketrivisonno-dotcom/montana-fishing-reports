@@ -82,7 +82,7 @@ async function scrapeMontanaAngler() {
               JSON.stringify({ extracted_from: 'Montana Angler fishing report', url }),
               hatchData.water_temp,
               hatchData.water_conditions,
-              dateMatch ? new Date(dateMatch[0]) : new Date()
+              dateMatch ? new Date(dateMatch[0]) : null
             ]
           );
           console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
@@ -95,8 +95,8 @@ async function scrapeMontanaAngler() {
         source: 'Montana Angler',
         river: river,
         url: url,
-        last_updated: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
-        last_updated_text: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
+        last_updated: dateMatch ? dateMatch[0] : null,
+        last_updated_text: dateMatch ? dateMatch[0] : null,
         scraped_at: new Date(),
         icon_url: ICON_URL,
         water_clarity: waterClarity,

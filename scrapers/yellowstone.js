@@ -3,7 +3,7 @@ async function scrapeYellowstoneMontanaAngler() {
         source: 'Montana Angler',
         river: 'Yellowstone River',
         url: 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }
@@ -13,7 +13,7 @@ async function scrapeYellowstoneRiversEdge() {
         source: 'River\'s Edge',
         river: 'Yellowstone River',
         url: 'https://theriversedge.com/fishing-report/',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }
@@ -23,7 +23,7 @@ async function scrapeYellowstoneSweetwater() {
         source: 'Sweetwater Fly Shop',
         river: 'Yellowstone River',
         url: 'https://www.sweetwaterflyshop.com/fishing-reports/',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }

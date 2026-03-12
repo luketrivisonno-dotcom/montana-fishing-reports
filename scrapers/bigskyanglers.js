@@ -3,7 +3,7 @@ async function scrapeBigSkyAnglers() {
         source: 'Big Sky Anglers',
         river: 'Gallatin River',
         url: 'https://bigskyanglers.com/fishing-report',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }

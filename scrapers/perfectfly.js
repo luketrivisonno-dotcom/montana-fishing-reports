@@ -21,7 +21,7 @@ async function scrapePerfectFly() {
       
       // Look for dateModified in JSON-LD schema
       const schemaMatch = data.match(/"dateModified":"([^"]+)"/);
-      let lastUpdated = new Date().toLocaleDateString();
+      let lastUpdated = null;
       
       if (schemaMatch) {
         const date = new Date(schemaMatch[1]);

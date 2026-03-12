@@ -8,14 +8,14 @@ async function scrapeBoulder() {
       source: 'Montana Angler',
       river: 'Boulder River',
       url: 'https://www.montanaangler.com/montana-fishing-report/boulder-river-report',
-      last_updated: new Date().toLocaleDateString(),
+      last_updated: null,
       scraped_at: new Date().toISOString()
     },
     {
       source: 'Sweetwater Fly Shop',
       river: 'Boulder River',
       url: 'https://www.sweetwaterflyshop.com/fishing-reports/',
-      last_updated: new Date().toLocaleDateString(),
+      last_updated: null,
       scraped_at: new Date().toISOString()
     }
   ];

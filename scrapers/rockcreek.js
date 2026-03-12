@@ -6,7 +6,7 @@ async function scrapeRockCreekOrvis() {
         source: 'Orvis',
         river: 'Rock Creek',
         url: 'https://fishingreports.orvis.com/west/montana/rock-creek',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }
@@ -25,7 +25,7 @@ async function scrapeRockCreekMissoulian() {
         const $ = cheerio.load(data);
         const metaDate = $('time').attr('datetime') || '';
         
-        let lastUpdated = new Date().toLocaleDateString();
+        let lastUpdated = null;
         if (metaDate) {
             lastUpdated = new Date(metaDate).toLocaleDateString();
         }

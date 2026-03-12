@@ -19,7 +19,7 @@ async function scrapeYellowstoneCountry() {
       pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
     
     // Return reports for all YNP rivers since this is a general YNP report
-    const dateStr = dateMatch ? dateMatch[1] : new Date().toLocaleDateString();
+    const dateStr = dateMatch ? dateMatch[1] : null;
     return [
       {
         source: 'Yellowstone Country Fly Fishing',

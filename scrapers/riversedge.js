@@ -80,8 +80,8 @@ async function scrapeRiversEdge() {
         source: "The River's Edge",
         river: river,
         url: url,
-        last_updated: lastUpdated || new Date().toLocaleDateString(),
-        last_updated_text: lastUpdated || new Date().toLocaleDateString(),
+        last_updated: lastUpdated || null,
+        last_updated_text: lastUpdated || null,
         scraped_at: new Date(),
         icon_url: RIVERS_EDGE_ICON,
         water_clarity: waterClarity

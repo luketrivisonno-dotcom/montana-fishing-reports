@@ -36,7 +36,7 @@ async function scrapeMissoulianAngler() {
       const titleText = $('h1').first().text() || '';
       const metaDate = $('time').attr('datetime') || '';
       
-      let lastUpdated = new Date().toLocaleDateString();
+      let lastUpdated = null;
       if (metaDate) {
         lastUpdated = new Date(metaDate).toLocaleDateString();
       } else if (dateMatch) {
@@ -95,7 +95,7 @@ async function scrapeSingleRiver(riverName) {
     const $ = cheerio.load(data);
     const metaDate = $('time').attr('datetime') || '';
     
-    let lastUpdated = new Date().toLocaleDateString();
+    let lastUpdated = null;
     if (metaDate) {
       lastUpdated = new Date(metaDate).toLocaleDateString();
     }

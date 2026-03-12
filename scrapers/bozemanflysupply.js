@@ -53,7 +53,7 @@ async function scrapeBozemanFlySupply() {
         source: 'Bozeman Fly Supply',
         river: river,
         url: url,
-        last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
+        last_updated: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
         icon_url: null,
         hatches: hatchData.hatches

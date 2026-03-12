@@ -3,7 +3,7 @@ async function scrapeClarkForkMissoulian() {
         source: 'The Missoulian Angler',
         river: 'Clark Fork River',
         url: 'https://www.missoulianangler.com/fishing-reports',
-        last_updated: new Date().toLocaleDateString(),
+        last_updated: null,
         scraped_at: new Date().toISOString()
     };
 }

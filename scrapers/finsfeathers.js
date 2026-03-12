@@ -31,7 +31,7 @@ async function scrapeFinsFeathers() {
       source: 'Fins & Feathers',
       river: river,
       url: url,
-      last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
+      last_updated: dateMatch ? dateMatch[1] : null,
       scraped_at: new Date()
     }));
     
