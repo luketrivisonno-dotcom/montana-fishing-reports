@@ -28,19 +28,8 @@ async function scrapeYellowstoneSweetwater() {
     };
 }
 
-async function scrapeYellowstoneSweetcast() {
-    return {
-        source: 'Sweetcast Angler',
-        river: 'Yellowstone River',
-        url: 'https://sweetcastangler.com/fishingreport/',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
-}
-
 module.exports = {
     scrapeYellowstoneMontanaAngler,
     scrapeYellowstoneRiversEdge,
-    scrapeYellowstoneSweetwater,
-    scrapeYellowstoneSweetcast
+    scrapeYellowstoneSweetwater
 };

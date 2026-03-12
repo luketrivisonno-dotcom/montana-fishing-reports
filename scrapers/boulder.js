@@ -12,13 +12,6 @@ async function scrapeBoulder() {
       scraped_at: new Date().toISOString()
     },
     {
-      source: 'Sweetcast Angler',
-      river: 'Boulder River',
-      url: 'https://sweetcastangler.com/fishingreport/',
-      last_updated: new Date().toLocaleDateString(),
-      scraped_at: new Date().toISOString()
-    },
-    {
       source: 'Sweetwater Fly Shop',
       river: 'Boulder River',
       url: 'https://www.sweetwaterflyshop.com/fishing-reports/',

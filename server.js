@@ -330,7 +330,8 @@ async function runDatabaseCleanup() {
             'Trout Shop',  // Removed per user request
             'Bigfork Anglers',  // Removed per user request
             'Fins & Feathers',  // Website removed fishing reports (404)
-            'Blue Ribbon Flies'  // Dates incorrect, removed per user request
+            'Blue Ribbon Flies',  // Dates incorrect, removed per user request
+            'Sweetcast Angler'  // Removed per user request
         ];
         
         const defunctResult = await db.query(`
