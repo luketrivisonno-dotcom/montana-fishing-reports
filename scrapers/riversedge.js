@@ -6,7 +6,6 @@ const RIVERS_EDGE_URLS = {
   'Lower Madison River': 'https://theriversedge.com/pages/lower-madison-river-fishing-report',
   'Upper Madison River': 'https://theriversedge.com/pages/upper-madison-river-fishing-report',
   'Yellowstone River': 'https://theriversedge.com/pages/yellowstone-river-fishing-report',
-  'Missouri River': 'https://theriversedge.com/pages/missouri-river-fishing-report',
   'Spring Creeks': 'https://theriversedge.com/pages/spring-creeks-fishing-report'
 };
 
@@ -26,16 +25,17 @@ async function scrapeRiversEdge() {
       });
       
       const $ = cheerio.load(data);
-      
-      // Try to find date in the page
       const pageText = $('body').text();
       
-      // Look for various date patterns
+      // Look for date patterns in the content
+      // The River's Edge doesn't always have explicit report dates,
+      // so we look for various patterns
       const datePatterns = [
         /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
         /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
         /Updated[\s:]+([A-Za-z]+)\s+(\d{1,2})/i,
-        /Report[\s:]+([A-Za-z]+)\s+(\d{1,2})/i
+        /Report[\s:]+([A-Za-z]+)\s+(\d{1,2})/i,
+        /([A-Za-z]+)\s+(\d{1,2})\s*,?\s*(\d{4})/
       ];
       
       let lastUpdated = null;
