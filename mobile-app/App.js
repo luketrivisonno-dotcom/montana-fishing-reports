@@ -92,7 +92,7 @@ let globalIsPremium = DEV_MODE;
 let globalFavorites = [];
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'Recently updated';
+  if (!dateString || dateString === 'null' || dateString === 'Date unknown') return '';
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
