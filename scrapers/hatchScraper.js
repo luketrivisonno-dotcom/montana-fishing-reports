@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('../db');
+const { getUSGSData } = require('../utils/usgs');
 
 // Fly shop URLs that include hatch info
 const HATCH_SOURCES = {
@@ -126,9 +127,22 @@ async function scrapeMontanaAnglerHatches() {
       // Extract hatches from text
       const hatches = extractHatches(contentText);
       
-      // Extract water temp if available - must have degree symbol or F to avoid false matches
-      const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
-      const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
+      // Get water temp from USGS first (most accurate), then fall back to scraped text
+      let waterTemp = null;
+      try {
+        const usgsData = await getUSGSData(river);
+        if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
+          waterTemp = usgsData.temp;
+        }
+      } catch (e) {
+        // USGS failed, will try scraping
+      }
+      
+      // If no USGS temp, try to extract from page text
+      if (!waterTemp) {
+        const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
+        waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
+      }
       
       // Extract water conditions
       let waterConditions = null;
@@ -191,9 +205,23 @@ async function scrapeBlueRibbonFliesHatches() {
     // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Extract water temp - must have degree symbol or F to avoid false matches
-    const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
-    const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
+    // Get water temp from USGS first (most accurate), then fall back to scraped text
+    let waterTemp = null;
+    const riverName = 'Upper Madison River'; // Blue Ribbon is near West Yellowstone
+    try {
+      const usgsData = await getUSGSData(riverName);
+      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
+        waterTemp = usgsData.temp;
+      }
+    } catch (e) {
+      // USGS failed, will try scraping
+    }
+    
+    // If no USGS temp, try to extract from page text
+    if (!waterTemp) {
+      const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
+      waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
+    }
     
     // Blue Ribbon Flies focuses on West Yellowstone area rivers
     // The report covers Madison, Firehole, Gibbon, and YNP rivers
