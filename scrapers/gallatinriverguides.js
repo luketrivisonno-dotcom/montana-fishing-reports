@@ -16,14 +16,12 @@ async function scrapeGallatinRiverGuides() {
         timeout: 10000
       });
       
-      const $ = cheerio.load(data);
-      const pageText = $('body').text();
-      
-      // Gallatin River Guides uses format like "3/6/2026"
+      // Gallatin River Guides uses format like "3/6/2026" in HTML
+      // Search in raw HTML since cheerio text extraction doesn't work well for this site
       const dateMatch = 
-        pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) ||
-        pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
+        data.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) ||
+        data.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
+        data.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
       
       reports.push({
         source: 'Gallatin River Guides',
