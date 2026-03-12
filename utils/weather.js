@@ -77,10 +77,8 @@ async function getWeatherForRiver(riverName) {
     const windSpeed = Math.round(current.windspeed);
     const windDir = getWindDirection(current.winddirection);
     
-    // Build NOAA link if available
-    const noaaLink = location.noaaStation 
-      ? `https://forecast.weather.gov/station.php?id=${location.noaaStation}`
-      : null;
+    // Build NOAA link using lat/lon for proper forecast page
+    const noaaLink = `https://forecast.weather.gov/MapClick.php?lat=${location.lat}&lon=${location.lon}`
     
     return {
       high: Math.round(daily.temperature_2m_max[0]),
@@ -130,7 +128,7 @@ async function getNOAAForecast(riverName) {
       windDirection: current.windDirection,
       icon: current.icon,
       source: 'NOAA',
-      sourceUrl: `https://forecast.weather.gov/station.php?id=${location.noaaStation}`,
+      sourceUrl: `https://forecast.weather.gov/MapClick.php?lat=${location.lat}&lon=${location.lon}`,
       attribution: 'Weather data from NOAA National Weather Service'
     };
   } catch (error) {
