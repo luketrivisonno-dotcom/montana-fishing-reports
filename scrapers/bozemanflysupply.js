@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { extractHatchData } = require('../utils/hatchExtractor');
+const db = require('../db');
 
 const BOZEMAN_FLY_SUPPLY_URLS = {
   'Gallatin River': 'https://www.bozemanflysupply.com/river-report/gallatin',
@@ -26,13 +28,35 @@ async function scrapeBozemanFlySupply() {
         pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
+      // Extract hatch data for Tier 2 hatch source
+      const hatchData = extractHatchData(pageText);
+      
+      // Save hatch data if found (Tier 2 - supplementary)
+      if (hatchData.hatches.length > 0) {
+        try {
+          await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river]);
+          await db.query(
+            `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+            [river, 'Bozeman Fly Supply', hatchData.hatches, hatchData.fly_recommendations,
+             JSON.stringify({ extracted_from: 'Bozeman Fly Supply fishing report', url }),
+             hatchData.water_temp, hatchData.water_conditions,
+             dateMatch ? new Date(dateMatch[1]) : new Date()]
+          );
+          console.log(`  → Bozeman Fly Supply hatches for ${river}: ${hatchData.hatches.join(', ')}`);
+        } catch (dbError) {
+          console.error(`  → Error saving Bozeman Fly Supply hatch data:`, dbError.message);
+        }
+      }
+      
       reports.push({
         source: 'Bozeman Fly Supply',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: null,
+        hatches: hatchData.hatches
       });
       
     } catch (error) {

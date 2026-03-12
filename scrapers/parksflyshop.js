@@ -4,13 +4,12 @@ const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
 
 const PARKS_FLY_SHOP_URLS = {
+  // YNP Rivers only
   'Slough Creek': 'https://parksflyshop.com/fishing-report/slough-creek',
   'Soda Butte Creek': 'https://parksflyshop.com/fishing-report/soda-butte-creek',
   'Lamar River': 'https://parksflyshop.com/fishing-report/lamar-river',
   'Gardner River': 'https://parksflyshop.com/fishing-report/gardner-river',
-  'Firehole River': 'https://parksflyshop.com/fishing-report/firehole-river',
-  'Madison River': 'https://parksflyshop.com/fishing-report/madison-river',
-  'Yellowstone River': 'https://parksflyshop.com/fishing-report/yellowstone-river'
+  'Firehole River': 'https://parksflyshop.com/fishing-report/firehole-river'
 };
 
 async function scrapeParksFlyShop() {

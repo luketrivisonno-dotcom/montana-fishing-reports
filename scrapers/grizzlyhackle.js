@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { extractHatchData } = require('../utils/hatchExtractor');
+const db = require('../db');
 
 const RIVERS = [
     { name: 'Bitterroot River', path: 'bitterroot-river-fishing-report' },
@@ -47,6 +49,27 @@ async function scrapeGrizzlyHackle() {
                 }
             }
             
+            // Extract hatch data for Primary hatch source
+            const hatchData = extractHatchData(pageText);
+            
+            // Save hatch data if found (Primary)
+            if (hatchData.hatches.length > 0) {
+                try {
+                    await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river.name]);
+                    await db.query(
+                        `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+                        [river.name, 'Grizzly Hackle', hatchData.hatches, hatchData.fly_recommendations,
+                         JSON.stringify({ extracted_from: 'Grizzly Hackle fishing report', url }),
+                         hatchData.water_temp, hatchData.water_conditions,
+                         dateMatch ? new Date(dateMatch[0]) : new Date()]
+                    );
+                    console.log(`  → Grizzly Hackle hatches for ${river.name}: ${hatchData.hatches.join(', ')}`);
+                } catch (dbError) {
+                    console.error(`  → Error saving Grizzly Hackle hatch data:`, dbError.message);
+                }
+            }
+            
             reports.push({
                 source: 'Grizzly Hackle',
                 river: river.name,
@@ -55,7 +78,8 @@ async function scrapeGrizzlyHackle() {
                 last_updated_text: dateMatch ? dateMatch[0] : new Date().toLocaleDateString(),
                 scraped_at: new Date(),
                 icon_url: ICON_URL,
-                water_clarity: waterClarity
+                water_clarity: waterClarity,
+                hatches: hatchData.hatches
             });
             
         } catch (error) {
