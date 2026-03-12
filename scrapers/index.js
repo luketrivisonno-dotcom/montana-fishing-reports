@@ -144,11 +144,9 @@ async function runAllScrapers() {
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
     { name: 'Orvis (Madison)', fn: madison.scrapeMadisonOrvis },
-    { name: 'River\'s Edge (Madison)', fn: madison.scrapeMadisonRiversEdge },
     { name: 'Bozeman Fly Supply (Madison)', fn: madison.scrapeMadisonBozemanFlySupply },
     { name: 'Yellow Dog (Madison)', fn: madison.scrapeMadisonYellowDog },
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
-    { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
     { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
 

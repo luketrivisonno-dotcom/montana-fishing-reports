@@ -36,25 +36,6 @@ async function scrapeMadisonOrvis() {
     ];
 }
 
-async function scrapeMadisonRiversEdge() {
-    return [
-        {
-            source: "The River's Edge",
-            river: 'Upper Madison River',
-            url: 'https://theriversedge.com/pages/upper-madison-river-fishing-report',
-            last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString()
-        },
-        {
-            source: "The River's Edge",
-            river: 'Lower Madison River',
-            url: 'https://theriversedge.com/pages/lower-madison-river-fishing-report',
-            last_updated: new Date().toLocaleDateString(),
-            scraped_at: new Date().toISOString()
-        }
-    ];
-}
-
 async function scrapeMadisonBozemanFlySupply() {
     return [
         {
@@ -96,7 +77,6 @@ async function scrapeMadisonYellowDog() {
 module.exports = {
     scrapeMadisonMontanaAngler,
     scrapeMadisonOrvis,
-    scrapeMadisonRiversEdge,
     scrapeMadisonBozemanFlySupply,
     scrapeMadisonYellowDog
 };
