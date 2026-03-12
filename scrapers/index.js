@@ -141,6 +141,7 @@ async function runAllScrapers() {
     { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
     { name: 'Parks Fly Shop', fn: scrapeParksFlyShop },
     { name: 'Boulder River', fn: scrapeBoulder },
+    { name: 'The Missoulian Angler', fn: missoulianangler.scrapeMissoulianAngler },
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
