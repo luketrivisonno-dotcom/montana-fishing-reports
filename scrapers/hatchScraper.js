@@ -126,8 +126,8 @@ async function scrapeMontanaAnglerHatches() {
       // Extract hatches from text
       const hatches = extractHatches(contentText);
       
-      // Extract water temp if available
-      const tempMatch = contentText.match(/(\d{2,3})\s*°?\s*[Ff]/);
+      // Extract water temp if available - must have degree symbol or F to avoid false matches
+      const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
       const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
       
       // Extract water conditions
@@ -191,8 +191,8 @@ async function scrapeBlueRibbonFliesHatches() {
     // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Extract water temp
-    const tempMatch = contentText.match(/(\d{2,3})\s*°?\s*[Ff]/);
+    // Extract water temp - must have degree symbol or F to avoid false matches
+    const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
     const waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
     
     // Blue Ribbon Flies focuses on West Yellowstone area rivers
