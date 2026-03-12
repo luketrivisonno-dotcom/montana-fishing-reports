@@ -5,14 +5,15 @@ import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-// RevenueCat API Keys - Replace with your actual keys from RevenueCat dashboard
+// RevenueCat API Keys
+// Get these from your RevenueCat Dashboard: https://app.revenuecat.com
 const REVENUECAT_API_KEYS = {
-  ios: 'appl_YOUR_IOS_API_KEY',     // Replace with your iOS API key
-  android: 'goog_YOUR_ANDROID_API_KEY', // Replace with your Android API key
+  ios: 'appl_walHurkTWBJnXkKnGsJUAsTilHm',     // Your iOS API key
+  android: 'goog_YOUR_ANDROID_API_KEY',        // Replace with Android key when ready
 };
 
 // Entitlement ID - Must match what you set up in RevenueCat dashboard
-const PREMIUM_ENTITLEMENT_ID = 'premium';
+const PREMIUM_ENTITLEMENT_ID = 'Montana Fishing Reports Pro';
 
 // Offering identifiers - Must match your RevenueCat products
 const OFFERING_IDENTIFIER = 'default';

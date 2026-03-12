@@ -41,7 +41,7 @@ import {
 } from './utils/notifications';
 import RiverMap from './components/RiverMap';
 import Paywall from './components/Paywall';
-import { initializeRevenueCat, checkPremiumStatus } from './services/revenuecat';
+import { initializePurchases } from './hooks/useRevenueCat';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -809,13 +809,11 @@ export default function App() {
   const [isPremium, setIsPremium] = useState(DEV_MODE);
   
   useEffect(() => {
-    // Initialize RevenueCat
-    initializeRevenueCat().then(() => {
-      // Check premium status
-      checkPremiumStatus().then(status => {
-        setIsPremium(status.isPremium || DEV_MODE);
-        globalIsPremium = status.isPremium || DEV_MODE;
-      });
+    // Initialize RevenueCat first
+    initializePurchases().then((success) => {
+      if (success) {
+        console.log('RevenueCat ready for purchases');
+      }
     });
     
     // Initialize Google Mobile Ads SDK if available
@@ -833,6 +831,10 @@ export default function App() {
     setIsPremium(true);
     globalIsPremium = true;
     setShowPaywall(false);
+  };
+  
+  const openPaywall = () => {
+    setShowPaywall(true);
   };
 
   return (

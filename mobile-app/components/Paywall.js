@@ -1,5 +1,7 @@
 // RevenueCat Paywall Component
-import React, { useState, useEffect } from 'react';
+// Modern implementation using useRevenueCat hook
+
+import React from 'react';
 import {
   View,
   Text,
@@ -11,12 +13,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import {
-  getOfferings,
-  purchasePackage,
-  restorePurchases,
-  checkPremiumStatus,
-} from '../services/revenuecat';
+import { useRevenueCat } from '../hooks/useRevenueCat';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -43,28 +40,43 @@ const FEATURES = [
 ];
 
 export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
-  const [offerings, setOfferings] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
-  const [restoring, setRestoring] = useState(false);
+  const {
+    isLoading,
+    isPurchasing,
+    isPremium,
+    monthlyPackage,
+    yearlyPackage,
+    purchasePackage,
+    restorePurchases,
+  } = useRevenueCat();
 
-  useEffect(() => {
-    if (visible) {
-      loadOfferings();
-    }
-  }, [visible]);
-
-  const loadOfferings = async () => {
-    setLoading(true);
-    const data = await getOfferings();
-    setOfferings(data);
-    setLoading(false);
-  };
+  // If already premium, show different UI
+  if (isPremium && visible) {
+    return (
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <View style={styles.overlay}>
+          <View style={styles.container}>
+            <View style={styles.premiumHeader}>
+              <MaterialIcons name="diamond" size={48} color={COLORS.premium} />
+              <Text style={styles.title}>You're Premium!</Text>
+              <Text style={styles.subtitle}>Thank you for supporting Montana Fishing Reports</Text>
+            </View>
+            <View style={styles.premiumContent}>
+              <Text style={styles.premiumText}>
+                You have access to all premium features including unlimited favorites, push notifications, hatch alerts, and more.
+              </Text>
+              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+                <Text style={styles.closeBtnText}>Continue</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   const handlePurchase = async (pkg) => {
-    setPurchasing(true);
     const result = await purchasePackage(pkg);
-    setPurchasing(false);
 
     if (result.success) {
       Alert.alert(
@@ -80,9 +92,7 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
   };
 
   const handleRestore = async () => {
-    setRestoring(true);
     const result = await restorePurchases();
-    setRestoring(false);
 
     if (result.success && result.isPremium) {
       Alert.alert(
@@ -97,15 +107,11 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
     }
   };
 
-  const formatPrice = (priceString) => {
-    return priceString;
-  };
-
   const getAnnualSavings = () => {
-    if (!offerings?.monthly || !offerings?.annual) return null;
+    if (!monthlyPackage || !yearlyPackage) return null;
     
-    const monthlyPrice = offerings.monthly.product.price;
-    const annualPrice = offerings.annual.product.price;
+    const monthlyPrice = monthlyPackage.product.price;
+    const annualPrice = yearlyPackage.product.price;
     const monthlyCost = monthlyPrice * 12;
     const savings = monthlyCost - annualPrice;
     const percentSaved = Math.round((savings / monthlyCost) * 100);
@@ -127,7 +133,7 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
             </TouchableOpacity>
           </View>
 
-          {loading ? (
+          {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.premium} />
               <Text style={styles.loadingText}>Loading subscription options...</Text>
@@ -148,17 +154,17 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
               {/* Pricing Options */}
               <View style={styles.pricingSection}>
                 {/* Annual Option (Best Value) */}
-                {offerings?.annual && (
+                {yearlyPackage && (
                   <TouchableOpacity
                     style={[styles.priceCard, styles.annualCard]}
-                    onPress={() => handlePurchase(offerings.annual)}
-                    disabled={purchasing}
+                    onPress={() => handlePurchase(yearlyPackage)}
+                    disabled={isPurchasing}
                   >
                     <View style={styles.bestValueBadge}>
                       <Text style={styles.bestValueText}>BEST VALUE</Text>
                     </View>
                     <Text style={styles.annualPrice}>
-                      {formatPrice(offerings.annual.product.priceString)}
+                      {yearlyPackage.product.priceString}
                     </Text>
                     <Text style={styles.annualPeriod}>per year</Text>
                     {getAnnualSavings() && (
@@ -166,29 +172,29 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                         Save {getAnnualSavings().percentSaved}%
                       </Text>
                     )}
-                    {purchasing && <ActivityIndicator color={COLORS.premium} style={styles.purchaseSpinner} />}
+                    {isPurchasing && <ActivityIndicator color={COLORS.premium} style={styles.purchaseSpinner} />}
                   </TouchableOpacity>
                 )}
 
                 {/* Monthly Option */}
-                {offerings?.monthly && (
+                {monthlyPackage && (
                   <TouchableOpacity
                     style={styles.priceCard}
-                    onPress={() => handlePurchase(offerings.monthly)}
-                    disabled={purchasing}
+                    onPress={() => handlePurchase(monthlyPackage)}
+                    disabled={isPurchasing}
                   >
                     <Text style={styles.monthlyPrice}>
-                      {formatPrice(offerings.monthly.product.priceString)}
+                      {monthlyPackage.product.priceString}
                     </Text>
                     <Text style={styles.monthlyPeriod}>per month</Text>
-                    {purchasing && <ActivityIndicator color={COLORS.premium} style={styles.purchaseSpinner} />}
+                    {isPurchasing && <ActivityIndicator color={COLORS.premium} style={styles.purchaseSpinner} />}
                   </TouchableOpacity>
                 )}
 
-                {!offerings && (
+                {!monthlyPackage && !yearlyPackage && (
                   <View style={styles.noOfferings}>
                     <Text style={styles.noOfferingsText}>
-                      Subscription options not available. Please try again later.
+                      Subscription options not available.{'\n'}Please try again later.
                     </Text>
                   </View>
                 )}
@@ -198,9 +204,9 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
               <TouchableOpacity
                 style={styles.restoreButton}
                 onPress={handleRestore}
-                disabled={restoring}
+                disabled={isPurchasing}
               >
-                {restoring ? (
+                {isPurchasing ? (
                   <ActivityIndicator size="small" color={COLORS.textSecondary} />
                 ) : (
                   <Text style={styles.restoreText}>Restore Purchases</Text>
@@ -209,7 +215,8 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
 
               {/* Terms */}
               <Text style={styles.termsText}>
-                Subscriptions auto-renew unless cancelled. Manage in App Store settings.
+                Subscriptions auto-renew unless cancelled.{'\n'}
+                Manage in App Store settings.
               </Text>
             </ScrollView>
           )}
@@ -376,5 +383,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 24,
+  },
+  // Premium User Styles
+  premiumHeader: {
+    backgroundColor: COLORS.success,
+    paddingVertical: 40,
+    alignItems: 'center',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  premiumContent: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  premiumText: {
+    fontSize: 15,
+    color: COLORS.text,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  closeBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 10,
+  },
+  closeBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
