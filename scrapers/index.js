@@ -177,13 +177,19 @@ async function runAllScrapers() {
             // 3. Same date but scraped more recently (content refresh)
             // 4. FORCE_UPDATE mode: always update (for fixing old bad data)
             // 5. Existing date is suspiciously recent (likely fake) - replace with real date
+            // 6. Source is River's Edge or Bozeman Fly Supply (known to have had bad data)
             const isExistingFake = existingDate && existingDate > new Date(Date.now() + 24 * 60 * 60 * 1000); // Future date = fake
             const isExistingVeryRecent = existingDate && 
               (new Date() - existingDate) < (7 * 24 * 60 * 60 * 1000) && // Within last 7 days
               (!newDate || newDate < existingDate); // But new date is older (suspicious)
             
+            const isProblemSource = item.source === "The River's Edge" || 
+                                    item.source === "River's Edge" ||
+                                    item.source === "Bozeman Fly Supply";
+            
             const shouldUpdate = 
               process.env.FORCE_UPDATE === 'true' ||  // Force update mode
+              (isProblemSource && newDate) ||  // Always update problem sources if we have a real date
               (newDate && !existingDate) ||  // New date found where none existed
               (newDate && existingDate && newDate > existingDate) ||  // Newer date
               (newDate && existingDate && newDate.getTime() === existingDate.getTime() && 
