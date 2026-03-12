@@ -1968,7 +1968,7 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log('\n========================================');
     console.log('Montana Fishing Reports API');
-    console.log('Version: 2.3.0');
+    console.log('Version: 2.3.2');
     console.log('Server running on port ' + PORT);
     console.log('Health: http://localhost:' + PORT + '/health');
     console.log('========================================\n');
