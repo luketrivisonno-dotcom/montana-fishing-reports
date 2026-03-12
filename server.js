@@ -502,6 +502,21 @@ app.get('/test', (req, res) => {
     res.json({ test: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint - check database contents
+app.get('/debug/reports', async (req, res) => {
+    try {
+        const result = await db.query(
+            "SELECT source, river, is_active, last_updated_text FROM reports WHERE source LIKE '%Edge%' ORDER BY source, river"
+        );
+        res.json({ 
+            count: result.rows.length,
+            reports: result.rows
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Clear reports endpoint
 app.get('/clear', async (req, res) => {
     try {
