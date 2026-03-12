@@ -1,13 +1,12 @@
-async function scrapeBighornTroutShop() {
-    return {
-        source: 'Trout Shop',
-        river: 'Bighorn River',
-        url: 'https://www.troutshop.com/fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
+// Bighorn River scrapers
+// Bighorn Angler is the main scraper (in bighornangler.js)
+// Trout Shop removed as requested
+
+async function scrapeBighornPlaceholder() {
+    // Placeholder - Bighorn Angler is the primary scraper
+    return null;
 }
 
 module.exports = {
-    scrapeBighornTroutShop
+    scrapeBighornPlaceholder
 };

@@ -8,17 +8,6 @@ async function scrapeClarkForkMissoulian() {
     };
 }
 
-async function scrapeClarkForkBigfork() {
-    return {
-        source: 'Bigfork Anglers',
-        river: 'Clark Fork River',
-        url: 'https://bigforkanglers.com/fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
-}
-
 module.exports = {
-    scrapeClarkForkMissoulian,
-    scrapeClarkForkBigfork
+    scrapeClarkForkMissoulian
 };

@@ -8,17 +8,6 @@ async function scrapeMissouriMontanaAngler() {
     };
 }
 
-async function scrapeMissouriTroutShop() {
-    return {
-        source: 'Trout Shop',
-        river: 'Missouri River',
-        url: 'https://www.troutshop.com/fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        scraped_at: new Date().toISOString()
-    };
-}
-
 module.exports = {
-    scrapeMissouriMontanaAngler,
-    scrapeMissouriTroutShop
+    scrapeMissouriMontanaAngler
 };

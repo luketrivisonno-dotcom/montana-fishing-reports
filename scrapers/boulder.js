@@ -17,6 +17,13 @@ async function scrapeBoulder() {
       url: 'https://sweetcastangler.com/fishingreport/',
       last_updated: new Date().toLocaleDateString(),
       scraped_at: new Date().toISOString()
+    },
+    {
+      source: 'Sweetwater Fly Shop',
+      river: 'Boulder River',
+      url: 'https://www.sweetwaterflyshop.com/fishing-reports/',
+      last_updated: new Date().toLocaleDateString(),
+      scraped_at: new Date().toISOString()
     }
   ];
 }

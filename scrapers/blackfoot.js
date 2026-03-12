@@ -11,19 +11,6 @@ async function scrapeBlackfootMissoulian() {
     };
 }
 
-async function scrapeBlackfootBigfork() {
-    return {
-        source: 'Bigfork Anglers',
-        river: 'Blackfoot River',
-        url: 'https://bigforkanglers.com/fishing-report',
-        last_updated: new Date().toLocaleDateString(),
-        last_updated_text: new Date().toLocaleDateString(),
-        scraped_at: new Date(),
-        icon_url: null,
-        water_clarity: null
-    };
-}
-
 async function scrapeBlackfootBRO() {
     const baseUrl = 'https://blackfootriver.com';
     return [
@@ -72,6 +59,5 @@ async function scrapeBlackfootBRO() {
 
 module.exports = {
     scrapeBlackfootMissoulian,
-    scrapeBlackfootBigfork,
     scrapeBlackfootBRO
 };

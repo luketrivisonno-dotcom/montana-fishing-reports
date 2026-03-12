@@ -62,6 +62,7 @@ const scrapeFinsFeathers = require('./finsfeathers');
 const scrapeStoneflyShop = require('./stoneflyshop');
 const scrapeYellowstoneAngler = require('./yellowstoneangler');
 const scrapeParksFlyShop = require('./parksflyshop');
+const scrapeBoulder = require('./boulder');
 
 // River-specific scrapers
 const madison = require('./madison');
@@ -141,6 +142,7 @@ async function runAllScrapers() {
     { name: 'Stonefly Shop', fn: scrapeStoneflyShop },
     { name: 'Yellowstone Angler', fn: scrapeYellowstoneAngler },
     { name: 'Parks Fly Shop', fn: scrapeParksFlyShop },
+    { name: 'Boulder River', fn: scrapeBoulder },
     
     // River-specific scrapers (with hardcoded URLs)
     { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
@@ -151,14 +153,11 @@ async function runAllScrapers() {
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
     { name: 'River\'s Edge (Yellowstone)', fn: yellowstone.scrapeYellowstoneRiversEdge },
     { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
-    { name: 'Sweetcast Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetcast },
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
 
     { name: 'Montana Angler (Gallatin)', fn: gallatin.scrapeMontanaAngler },
     { name: 'Missoulian Angler (Clark Fork)', fn: clarkfork.scrapeClarkForkMissoulian },
-
     { name: 'Missoulian Angler (Blackfoot)', fn: blackfoot.scrapeBlackfootMissoulian },
-
     { name: 'Blackfoot River Outfitters', fn: blackfoot.scrapeBlackfootBRO },
     { name: 'Missoulian Angler (Rock Creek)', fn: rockcreek.scrapeRockCreekMissoulian },
     { name: 'Orvis (Rock Creek)', fn: rockcreek.scrapeRockCreekOrvis },
