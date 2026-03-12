@@ -12,6 +12,13 @@ const RIVERS_EDGE_URLS = {
 // Icon disabled - using letter avatar
 const RIVERS_EDGE_ICON = null;
 
+function formatDate(dateStr) {
+  // Convert YYYY-MM-DD to "Month Day, YYYY" format
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
 async function scrapeRiversEdge() {
   let reports = [];
   
@@ -27,23 +34,27 @@ async function scrapeRiversEdge() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      // Look for date patterns in the content
-      // The River's Edge doesn't always have explicit report dates,
-      // so we look for various patterns
-      const datePatterns = [
-        /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
-        /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-        /Updated[\s:]+([A-Za-z]+)\s+(\d{1,2})/i,
-        /Report[\s:]+([A-Za-z]+)\s+(\d{1,2})/i,
-        /([A-Za-z]+)\s+(\d{1,2})\s*,?\s*(\d{4})/
-      ];
+      // Look for ISO date format YYYY-MM-DD (e.g., 2026-3-10)
+      // These are blog-style dates on the River's Edge pages
+      const isoDatePattern = /(\d{4})-(\d{1,2})-(\d{1,2})/;
+      const isoMatch = pageText.match(isoDatePattern);
       
       let lastUpdated = null;
-      for (const pattern of datePatterns) {
-        const match = pageText.match(pattern);
-        if (match) {
-          lastUpdated = match[0];
-          break;
+      if (isoMatch) {
+        lastUpdated = formatDate(isoMatch[0]);
+      } else {
+        // Fallback to other date patterns
+        const datePatterns = [
+          /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/,
+          /(\d{1,2})\/(\d{1,2})\/(\d{4})/
+        ];
+        
+        for (const pattern of datePatterns) {
+          const match = pageText.match(pattern);
+          if (match) {
+            lastUpdated = match[0];
+            break;
+          }
         }
       }
       
