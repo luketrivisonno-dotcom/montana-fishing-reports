@@ -428,7 +428,7 @@ app.get('/health', async (req, res) => {
         res.json({
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            version: '2.3.0',
+            version: '2.3.2',
             database: 'connected',
             activeReports: parseInt(reportsCount.rows[0].count),
             uptime: process.uptime()
