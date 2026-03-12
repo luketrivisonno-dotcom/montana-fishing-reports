@@ -327,7 +327,9 @@ async function runDatabaseCleanup() {
             'Fly Fishing Bozeman (Old)',
             'Madison River Outfitters',
             'River\'s Edge',  // Old riversedge.com domain
-            'George Anderson\'s Yellowstone Angler'  // Old URL
+            'George Anderson\'s Yellowstone Angler',  // Old URL
+            'Trout Shop',  // Removed per user request
+            'Bigfork Anglers'  // Removed per user request
         ];
         
         const defunctResult = await db.query(`
