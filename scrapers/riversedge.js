@@ -34,10 +34,11 @@ async function scrapeRiversEdge() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      // Look for ISO date format YYYY-MM-DD (e.g., 2026-3-10)
+      // Look for ISO date format YYYY-MM-DD (e.g., 2026-03-10)
       // These are blog-style dates on the River's Edge pages
       const isoDatePattern = /(\d{4})-(\d{1,2})-(\d{1,2})/;
       const isoMatch = pageText.match(isoDatePattern);
+      console.log('ISO date match:', isoMatch ? isoMatch[0] : 'none found');
       
       let lastUpdated = null;
       if (isoMatch) {
