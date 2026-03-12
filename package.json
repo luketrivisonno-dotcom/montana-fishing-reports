@@ -1,6 +1,6 @@
 {
   "name": "montana-fishing-reports",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "description": "Montana Fishing Reports API - Real-time fishing reports, river conditions, and weather",
   "main": "server.js",
   "scripts": {
