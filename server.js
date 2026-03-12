@@ -1854,6 +1854,41 @@ app.get('/api/hatches/:river',
     }
 );
 
+// Cleanup removed sources endpoint
+app.post('/api/admin/cleanup-removed-sources', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        // Deactivate Trout Shop reports
+        const troutShopResult = await db.query(
+            "UPDATE reports SET is_active = false WHERE source = 'Trout Shop' RETURNING id, river"
+        );
+        
+        // Deactivate Bigfork Anglers reports
+        const bigforkResult = await db.query(
+            "UPDATE reports SET is_active = false WHERE source = 'Bigfork Anglers' RETURNING id, river"
+        );
+        
+        res.json({
+            message: 'Cleanup completed',
+            troutShop: {
+                deactivated: troutShopResult.rowCount,
+                entries: troutShopResult.rows
+            },
+            bigforkAnglers: {
+                deactivated: bigforkResult.rowCount,
+                entries: bigforkResult.rows
+            }
+        });
+    } catch (error) {
+        console.error('Cleanup error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found', path: req.path });
