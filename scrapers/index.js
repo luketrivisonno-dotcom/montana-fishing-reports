@@ -63,7 +63,6 @@ const scrapeParksFlyShop = require('./parksflyshop');
 const scrapeBoulder = require('./boulder');
 
 // River-specific scrapers
-const madison = require('./madison');
 const yellowstone = require('./yellowstone');
 const missouri = require('./missouri');
 const clarkfork = require('./clarkfork');
@@ -142,9 +141,6 @@ async function runAllScrapers() {
     { name: 'The Missoulian Angler', fn: missoulianangler.scrapeMissoulianAngler },
     
     // River-specific scrapers (with hardcoded URLs)
-    { name: 'Montana Angler (Madison)', fn: madison.scrapeMadisonMontanaAngler },
-    { name: 'Orvis (Madison)', fn: madison.scrapeMadisonOrvis },
-    { name: 'Yellow Dog (Madison)', fn: madison.scrapeMadisonYellowDog },
     { name: 'Montana Angler (Yellowstone)', fn: yellowstone.scrapeYellowstoneMontanaAngler },
     { name: 'Sweetwater Fly Shop (Yellowstone)', fn: yellowstone.scrapeYellowstoneSweetwater },
     { name: 'Montana Angler (Missouri)', fn: missouri.scrapeMissouriMontanaAngler },
