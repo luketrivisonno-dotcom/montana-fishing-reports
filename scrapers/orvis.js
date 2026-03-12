@@ -38,6 +38,7 @@ async function scrapeOrvis() {
       
       let finalDate = lastUpdatedEl || null;
       
+      // If no element date, try to extract from page text
       if (!finalDate) {
         const dateMatch = 
           pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
@@ -47,17 +48,17 @@ async function scrapeOrvis() {
           pageText.match(/(\d{1,2}\/\d{1,2}\/\d{2})/);
         
         if (dateMatch) {
-          // Convert short year format (3/4/26) to full date
-          if (dateMatch[1].match(/^\d{1,2}\/\d{1,2}\/\d{2}$/)) {
-            const [m, d, y] = dateMatch[1].split('/');
-            const fullYear = parseInt(y) > 50 ? '19' + y : '20' + y;
-            finalDate = new Date(`${fullYear}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`).toLocaleDateString('en-US', {
-              month: 'long', day: 'numeric', year: 'numeric'
-            });
-          } else {
-            finalDate = dateMatch[1];
-          }
+          finalDate = dateMatch[1];
         }
+      }
+      
+      // Convert short year format (2/25/26) to full date
+      if (finalDate && finalDate.match(/^\d{1,2}\/\d{1,2}\/\d{2}$/)) {
+        const [m, d, y] = finalDate.split('/');
+        const fullYear = parseInt(y) > 50 ? '19' + y : '20' + y;
+        finalDate = new Date(`${fullYear}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`).toLocaleDateString('en-US', {
+          month: 'long', day: 'numeric', year: 'numeric'
+        });
       }
       
       // Extract water clarity
