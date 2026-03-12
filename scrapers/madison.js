@@ -41,14 +41,14 @@ async function scrapeMadisonBozemanFlySupply() {
         {
             source: 'Bozeman Fly Supply',
             river: 'Upper Madison River',
-            url: 'https://www.bozemanflysupply.com/fishing-reports/upper-madison',
+            url: 'https://www.bozemanflysupply.com/river-report/upper-madison',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         },
         {
             source: 'Bozeman Fly Supply',
             river: 'Lower Madison River',
-            url: 'https://www.bozemanflysupply.com/fishing-reports/lower-madison',
+            url: 'https://www.bozemanflysupply.com/river-report/lower-madison',
             last_updated: new Date().toLocaleDateString(),
             scraped_at: new Date().toISOString()
         }
