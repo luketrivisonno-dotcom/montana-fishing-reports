@@ -502,7 +502,7 @@ app.get('/', (req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Montana Fishing Reports API', 
-        version: '2.3.0', 
+        version: '2.3.2', 
         timestamp: new Date().toISOString(),
         endpoints: {
             rivers: '/api/rivers',
