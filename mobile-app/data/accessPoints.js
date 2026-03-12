@@ -336,6 +336,12 @@ export const ACCESS_POINTS = {
     { name: 'Glen Lake', lat: 48.87, lon: -114.94991, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754147' },
     { name: 'Skyles Lake', lat: 48.40453, lon: -114.40189, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754035' },
   ],
+  'Boulder River': [
+    { name: 'Boulder River Access', lat: 45.657690, lon: -110.108720, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false },
+  ],
+  'Stillwater River': [
+    { name: 'Stillwater River Access', lat: 45.643330, lon: -109.404440, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false },
+  ],
 };
 // Helper function to get all access points as a flat array
 export function getAllAccessPoints() {
