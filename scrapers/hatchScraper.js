@@ -5,7 +5,7 @@ const db = require('../db');
 // Fly shop URLs that include hatch info
 const HATCH_SOURCES = {
   'Montana Angler': {
-    'Madison River': 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
+    'Upper Madison River': 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
     'Yellowstone River': 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
     'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
     'Missouri River': 'https://www.montanaangler.com/montana-fishing-report/missouri-river-fishing-report',
@@ -16,7 +16,7 @@ const HATCH_SOURCES = {
     'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
   },
   'Blue Ribbon Flies': {
-    'Madison River': 'https://www.blueribbonflies.com/fishing-report/',
+    'Upper Madison River': 'https://www.blueribbonflies.com/fishing-report/',
     'Firehole River': 'https://www.blueribbonflies.com/fishing-report/',
     'Gibbon River': 'https://www.blueribbonflies.com/fishing-report/',
     'Slough Creek': 'https://www.blueribbonflies.com/fishing-report/',
@@ -198,7 +198,7 @@ async function scrapeBlueRibbonFliesHatches() {
     // Blue Ribbon Flies focuses on West Yellowstone area rivers
     // The report covers Madison, Firehole, Gibbon, and YNP rivers
     const rivers = [
-      { name: 'Madison River', keywords: ['madison', 'madison river'] },
+      { name: 'Upper Madison River', keywords: ['madison', 'madison river'] },
       { name: 'Firehole River', keywords: ['firehole', 'firehole river'] },
       { name: 'Gibbon River', keywords: ['gibbon', 'gibbon river'] },
       { name: 'Slough Creek', keywords: ['slough creek'] },

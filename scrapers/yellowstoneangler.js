@@ -7,7 +7,6 @@ const YELLOWSTONE_ANGLER_URLS = {
   'Lamar River': 'https://yellowstoneangler.com/fishing-report/lamar-river',
   'Gardner River': 'https://yellowstoneangler.com/fishing-report/gardner-river',
   'Firehole River': 'https://yellowstoneangler.com/fishing-report/firehole-river',
-  'Madison River': 'https://yellowstoneangler.com/fishing-report/madison-river',
   'Yellowstone River': 'https://yellowstoneangler.com/fishing-report/yellowstone-river'
 };
 

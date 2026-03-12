@@ -23,7 +23,8 @@ async function scrapeStoneflyShop() {
       'Beaverhead River',
       'Jefferson River',
       'Clark Fork River',
-      'Madison River',
+      'Upper Madison River',
+      'Lower Madison River',
       'Missouri River',
       'Rock Creek',
       'Ruby River'
