@@ -1,11 +1,19 @@
 const RIVER_INFO = {
-  'Madison River': {
+  'Upper Madison River': {
     difficulty: 'Intermediate',
     bestSeasons: ['May-June', 'September-October'],
     species: ['Rainbow Trout', 'Brown Trout', 'Whitefish'],
     regulations: 'Catch and release below Quake Lake. Check FWP for current regs.',
-    accessPoints: ['Three Dollar Bridge', 'Valley Garden', 'Palisades'],
-    description: 'World-renowned tailwater fishery with consistent flows and prolific hatches.'
+    accessPoints: ['Three Dollar Bridge', 'Valley Garden', 'Palisades', 'Quake Lake'],
+    description: 'World-renowned tailwater fishery above Ennis Lake. Best fishing from Quake Lake to Ennis.'
+  },
+  'Lower Madison River': {
+    difficulty: 'Intermediate',
+    bestSeasons: ['Year-round', 'Best in spring and fall'],
+    species: ['Rainbow Trout', 'Brown Trout', 'Whitefish'],
+    regulations: 'Standard Montana regulations. Catch and release sections near headwaters.',
+    accessPoints: ['Black’s Ford', 'Greycliff', 'Town Access'],
+    description: 'Warmer water fishery below Ennis Dam. Excellent spring and fall fishing, can be warm in summer.'
   },
   'Yellowstone River': {
     difficulty: 'Intermediate to Advanced',

@@ -1,18 +1,4 @@
 const HATCH_CHARTS = {
-  'Madison River': [
-    { month: 'Jan', hatches: ['Midges'] },
-    { month: 'Feb', hatches: ['Midges'] },
-    { month: 'Mar', hatches: ['Midges', 'Blue Winged Olives'] },
-    { month: 'Apr', hatches: ['Blue Winged Olives', 'March Browns'] },
-    { month: 'May', hatches: ['March Browns', 'Salmonflies', 'Golden Stones'] },
-    { month: 'Jun', hatches: ['Salmonflies', 'Golden Stones', 'PMDs', 'Yellow Sallies'] },
-    { month: 'Jul', hatches: ['PMDs', 'Yellow Sallies', 'Caddis', 'Hoppers'] },
-    { month: 'Aug', hatches: ['Hoppers', 'Tricos', 'Caddis'] },
-    { month: 'Sep', hatches: ['Tricos', 'Mahogany Duns', 'Baetis'] },
-    { month: 'Oct', hatches: ['Baetis', 'October Caddis'] },
-    { month: 'Nov', hatches: ['Baetis', 'Midges'] },
-    { month: 'Dec', hatches: ['Midges'] }
-  ],
   'Upper Madison River': [
     { month: 'Jan', hatches: ['Midges'] },
     { month: 'Feb', hatches: ['Midges'] },
