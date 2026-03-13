@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montana Fishing Reports - App Store Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            padding: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+        
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #000;
+            border-radius: 55px;
+            padding: 12px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f1e8;
+            border-radius: 43px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            height: 54px;
+            background: #2d4a3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 12px 25px 8px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        /* Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 84px;
+            background: #faf8f3;
+            border-top: 1px solid #d4cfc3;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+        }
+        
+        .tab-label {
+            font-size: 10px;
+            color: #2d4a3e;
+            font-weight: 500;
+        }
+        
+        .tab-label.active {
+            color: #c9a227;
+        }
+        
+        /* Screen 1: River List */
+        .river-list {
+            padding: 16px;
+            padding-bottom: 100px;
+            overflow-y: auto;
+            height: calc(100% - 138px);
+        }
+        
+        .header {
+            padding: 16px;
+            background: #2d4a3e;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .river-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(44, 36, 22, 0.08);
+        }
+        
+        .river-image {
+            height: 120px;
+            background: linear-gradient(135deg, #5a7d5a 0%, #2d4a3e 100%);
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 12px;
+        }
+        
+        .river-image.ypn {
+            background: linear-gradient(135deg, #8b6914 0%, #d4a574 50%, #5a7d5a 100%);
+        }
+        
+        .river-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .ynp-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            color: #c9a227;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .heart-btn {
+            position: absolute;
+            top: 12px;
+            right: 70px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .river-info {
+            padding: 12px 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .info-label {
+            color: #6b5d4d;
+        }
+        
+        .info-value {
+            color: #2c2416;
+            font-weight: 500;
+        }
+        
+        .flow-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .flow-good {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .reports-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            overflow-x: auto;
+        }
+        
+        .report-chip {
+            background: #f5f1e8;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #2c2416;
+            white-space: nowrap;
+        }
+        
+        /* Screen 2: River Details */
+        .detail-header {
+            height: 200px;
+            background: linear-gradient(135deg, #2d4a3e 0%, #1a2f27 100%);
+            position: relative;
+            padding: 60px 20px 20px;
+            color: white;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 50px;
+            left: 16px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .detail-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+        
+        .detail-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .detail-content {
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        
+        .weather-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(44, 36, 22, 0.08);
+        }
+        
+        .weather-title {
+            font-size: 14px;
+            color: #6b5d4d;
+            margin-bottom: 12px;
+        }
+        
+        .weather-row {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .weather-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .weather-temp {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c2416;
+        }
+        
+        .weather-label {
+            font-size: 12px;
+            color: #9a8b7a;
+        }
+        
+        /* Premium Card */
+        .premium-card {
+            background: linear-gradient(135deg, #b87333 0%, #8b5520 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            color: white;
+        }
+        
+        .premium-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .premium-features {
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .premium-btn {
+            background: white;
+            color: #8b5520;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 12px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        /* Hatch Chart */
+        .hatch-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(44, 36, 22, 0.08);
+        }
+        
+        .hatch-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c2416;
+            margin-bottom: 12px;
+        }
+        
+        .hatch-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0ede6;
+        }
+        
+        .hatch-icon {
+            width: 36px;
+            height: 36px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .hatch-name {
+            flex: 1;
+            font-size: 15px;
+            color: #2c2416;
+        }
+        
+        .hatch-status {
+            font-size: 12px;
+            color: #5a7d5a;
+            font-weight: 500;
+        }
+        
+        /* Locked Feature */
+        .locked-card {
+            background: linear-gradient(135deg, #f5f1e8 0%, #e8e4db 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+            border: 2px dashed #d4cfc3;
+        }
+        
+        .locked-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        
+        .locked-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c2416;
+            margin-bottom: 4px;
+        }
+        
+        .locked-subtitle {
+            font-size: 13px;
+            color: #9a8b7a;
+        }
+        
+        /* Map Screen */
+        .map-container {
+            height: calc(100% - 138px);
+            background: #d4e4d4;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #c8d6c8 0%, #b8c8b8 50%, #a8c0a8 100%);
+            position: relative;
+        }
+        
+        .map-river-line {
+            position: absolute;
+            height: 4px;
+            background: #4a7c59;
+            border-radius: 2px;
+        }
+        
+        .map-marker {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #2d4a3e;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .map-search {
+            position: absolute;
+            top: 70px;
+            left: 16px;
+            right: 16px;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .map-search input {
+            border: none;
+            outline: none;
+            font-size: 15px;
+            flex: 1;
+            background: transparent;
+        }
+        
+        /* Favorites Screen */
+        .favorites-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .favorites-empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .favorites-empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c2416;
+            margin-bottom: 8px;
+        }
+        
+        .favorites-empty-text {
+            font-size: 14px;
+            color: #9a8b7a;
+            line-height: 1.5;
+        }
+        
+        .premium-limit-banner {
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .premium-limit-icon {
+            font-size: 24px;
+        }
+        
+        .premium-limit-text {
+            flex: 1;
+            font-size: 13px;
+            color: #e65100;
+        }
+        
+        .premium-limit-btn {
+            background: #b87333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Paywall Screen */
+        .paywall-screen {
+            height: 100%;
+            background: linear-gradient(180deg, #1a2f27 0%, #2d4a3e 100%);
+            padding: 60px 24px 24px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .paywall-icon {
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .paywall-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .paywall-subtitle {
+            font-size: 16px;
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 32px;
+        }
+        
+        .paywall-features {
+            flex: 1;
+        }
+        
+        .paywall-feature {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .paywall-feature-icon {
+            font-size: 28px;
+        }
+        
+        .paywall-feature-text {
+            font-size: 16px;
+        }
+        
+        .paywall-price {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .price-amount {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .price-period {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        
+        .paywall-cta {
+            background: #c9a227;
+            color: #1a2f27;
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .paywall-terms {
+            text-align: center;
+            font-size: 11px;
+            opacity: 0.5;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Screen 1: River List -->
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 5G 🔋</span>
+            </div>
+            <div class="header">
+                <h1>🎣 Montana Rivers</h1>
+                <p>23 rivers with live fishing reports</p>
+            </div>
+            <div class="river-list">
+                <div class="river-card">
+                    <div class="river-image">
+                        <div class="heart-btn">♡</div>
+                        <span class="river-name">Gallatin River</span>
+                    </div>
+                    <div class="river-info">
+                        <div class="info-row">
+                            <span class="info-label">Flow</span>
+                            <span class="info-value">425 cfs</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Temp</span>
+                            <span class="info-value">42°F</span>
+                        </div>
+                        <span class="flow-badge flow-good">Good Flow</span>
+                        <div class="reports-row">
+                            <span class="report-chip">Montana Angler - 2 days ago</span>
+                            <span class="report-chip">Orvis</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="river-card">
+                    <div class="river-image ypn">
+                        <div class="heart-btn">♡</div>
+                        <span class="ynp-badge">🏔️ YNP</span>
+                        <span class="river-name">Firehole River</span>
+                    </div>
+                    <div class="river-info">
+                        <div class="info-row">
+                            <span class="info-label">Flow</span>
+                            <span class="info-value">180 cfs</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Temp</span>
+                            <span class="info-value">52°F (thermal)</span>
+                        </div>
+                        <span class="flow-badge flow-good">Excellent</span>
+                        <div class="reports-row">
+                            <span class="report-chip">Blue Ribbon Flies</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="river-card">
+                    <div class="river-image">
+                        <div class="heart-btn">♡</div>
+                        <span class="river-name">Madison River</span>
+                    </div>
+                    <div class="river-info">
+                        <div class="info-row">
+                            <span class="info-label">Flow</span>
+                            <span class="info-value">1,240 cfs</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Temp</span>
+                            <span class="info-value">45°F</span>
+                        </div>
+                        <span class="flow-badge flow-good">Prime</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">🌊</div>
+                    <div class="tab-label active">Rivers</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🗺️</div>
+                    <div class="tab-label">Map</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">♡</div>
+                    <div class="tab-label">Favorites</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">💎</div>
+                    <div class="tab-label">Premium</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 2: River Details -->
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 5G 🔋</span>
+            </div>
+            <div class="detail-header">
+                <div class="back-btn">‹</div>
+                <div class="detail-title">Gallatin River</div>
+                <div class="detail-subtitle">Bozeman, MT • Freestone</div>
+            </div>
+            <div class="detail-content">
+                <div class="weather-card">
+                    <div class="weather-title">Current Conditions</div>
+                    <div class="weather-row">
+                        <div class="weather-item">
+                            <div class="weather-temp">42°F</div>
+                            <div class="weather-label">Water</div>
+                        </div>
+                        <div class="weather-item">
+                            <div class="weather-temp">425</div>
+                            <div class="weather-label">CFS</div>
+                        </div>
+                        <div class="weather-item">
+                            <div class="weather-temp">58°F</div>
+                            <div class="weather-label">Air</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hatch-card">
+                    <div class="hatch-title">🦟 Current Hatches</div>
+                    <div class="hatch-item">
+                        <div class="hatch-icon">🪰</div>
+                        <div class="hatch-name">Blue Winged Olives</div>
+                        <div class="hatch-status">Active</div>
+                    </div>
+                    <div class="hatch-item">
+                        <div class="hatch-icon">🦗</div>
+                        <div class="hatch-name">Midges</div>
+                        <div class="hatch-status">Excellent</div>
+                    </div>
+                    <div class="hatch-item">
+                        <div class="hatch-icon">🪳</div>
+                        <div class="hatch-name">March Browns</div>
+                        <div class="hatch-status">Starting</div>
+                    </div>
+                </div>
+                
+                <div class="locked-card">
+                    <div class="locked-icon">🔒</div>
+                    <div class="locked-title">Fly Recommendations</div>
+                    <div class="locked-subtitle">Upgrade to Premium to see recommended flies</div>
+                </div>
+                
+                <div class="locked-card">
+                    <div class="locked-icon">📍</div>
+                    <div class="locked-title">River Mile Calculator</div>
+                    <div class="locked-subtitle">Premium feature for planning your trip</div>
+                </div>
+            </div>
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">🌊</div>
+                    <div class="tab-label">Rivers</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🗺️</div>
+                    <div class="tab-label">Map</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">♡</div>
+                    <div class="tab-label">Favorites</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">💎</div>
+                    <div class="tab-label">Premium</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 3: Map View -->
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 5G 🔋</span>
+            </div>
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <div class="map-search">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search rivers..." readonly>
+                    </div>
+                    <div class="map-marker" style="top: 30%; left: 25%;">G</div>
+                    <div class="map-marker" style="top: 45%; left: 60%;">M</div>
+                    <div class="map-marker" style="top: 60%; left: 40%;">Y</div>
+                    <div class="map-river-line" style="top: 35%; left: 20%; width: 120px; transform: rotate(15deg);"></div>
+                    <div class="map-river-line" style="top: 50%; left: 45%; width: 150px; transform: rotate(-10deg);"></div>
+                </div>
+            </div>
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">🌊</div>
+                    <div class="tab-label">Rivers</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🗺️</div>
+                    <div class="tab-label active">Map</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">♡</div>
+                    <div class="tab-label">Favorites</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">💎</div>
+                    <div class="tab-label">Premium</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 4: Favorites with Premium Limit -->
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 5G 🔋</span>
+            </div>
+            <div class="header">
+                <h1>♡ My Favorites</h1>
+                <p>Quick access to your rivers</p>
+            </div>
+            
+            <div class="premium-limit-banner">
+                <div class="premium-limit-icon">💎</div>
+                <div class="premium-limit-text">Free version: 2 favorites max. Upgrade for unlimited.</div>
+                <div class="premium-limit-btn">Upgrade</div>
+            </div>
+            
+            <div class="river-list">
+                <div class="river-card">
+                    <div class="river-image">
+                        <div class="heart-btn" style="background: #ff6b6b; color: white;">♥</div>
+                        <span class="river-name">Gallatin River</span>
+                    </div>
+                    <div class="river-info">
+                        <div class="info-row">
+                            <span class="info-label">Flow</span>
+                            <span class="info-value">425 cfs</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Last Updated</span>
+                            <span class="info-value">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="river-card">
+                    <div class="river-image" style="background: linear-gradient(135deg, #6b5d4d 0%, #8b7355 100%);">
+                        <div class="heart-btn" style="background: #ff6b6b; color: white;">♥</div>
+                        <span class="river-name">Madison River</span>
+                    </div>
+                    <div class="river-info">
+                        <div class="info-row">
+                            <span class="info-label">Flow</span>
+                            <span class="info-value">1,240 cfs</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Last Updated</span>
+                            <span class="info-value">Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">🌊</div>
+                    <div class="tab-label">Rivers</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🗺️</div>
+                    <div class="tab-label">Map</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">♥</div>
+                    <div class="tab-label active">Favorites</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">💎</div>
+                    <div class="tab-label">Premium</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 5: Paywall -->
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="paywall-screen">
+                <div class="paywall-icon">💎</div>
+                <div class="paywall-title">Go Premium</div>
+                <div class="paywall-subtitle">Unlock the full Montana fishing experience</div>
+                
+                <div class="paywall-features">
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">🦟</div>
+                        <div class="paywall-feature-text">Detailed hatch charts with fly recommendations</div>
+                    </div>
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">📍</div>
+                        <div class="paywall-feature-text">River mile calculator & access points</div>
+                    </div>
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">📊</div>
+                        <div class="paywall-feature-text">7-day flow history & trends</div>
+                    </div>
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">📝</div>
+                        <div class="paywall-feature-text">Personal fishing log with photos</div>
+                    </div>
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">♡</div>
+                        <div class="paywall-feature-text">Unlimited favorite rivers</div>
+                    </div>
+                    <div class="paywall-feature">
+                        <div class="paywall-feature-icon">🔔</div>
+                        <div class="paywall-feature-text">Hatch alerts & report notifications</div>
+                    </div>
+                </div>
+                
+                <div class="paywall-price">
+                    <div class="price-amount">$4.99<span style="font-size: 20px;">/month</span></div>
+                    <div class="price-period">or $39.99/year (save 33%)</div>
+                </div>
+                
+                <div class="paywall-cta">Start Free Trial</div>
+                <div class="paywall-terms">7-day free trial • Cancel anytime • Auto-renews</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
