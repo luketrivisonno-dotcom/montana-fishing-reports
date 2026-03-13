@@ -165,6 +165,24 @@ function DevModeBanner() {
   );
 }
 
+// Parse flow string like "301 CFS" to get numeric value
+const parseFlow = (flowString) => {
+  if (!flowString || flowString === 'N/A') return null;
+  const match = flowString.match(/(\d+)/);
+  return match ? parseInt(match[1]) : null;
+};
+
+// Get flow condition badge text and color
+const getFlowCondition = (flowString, riverName) => {
+  const cfs = parseFlow(flowString);
+  if (!cfs) return null;
+  
+  // Simple thresholds - could be refined per river
+  if (cfs < 200) return { text: 'Low Flow', color: '#e74c3c', bgColor: '#ffebee' };
+  if (cfs > 3000) return { text: 'High Flow', color: '#e67e22', bgColor: '#fff3e0' };
+  return { text: 'Good Flow', color: '#27ae60', bgColor: '#e8f5e9' };
+};
+
 // ============================================
 // RIVERS LIST SCREEN
 // ============================================
@@ -283,24 +301,6 @@ function RiversScreen({ navigation }) {
     setRefreshing(true);
     await fetchRivers();
     setRefreshing(false);
-  };
-
-  // Parse flow string like "301 CFS" to get numeric value
-  const parseFlow = (flowString) => {
-    if (!flowString || flowString === 'N/A') return null;
-    const match = flowString.match(/(\d+)/);
-    return match ? parseInt(match[1]) : null;
-  };
-
-  // Get flow condition badge text and color
-  const getFlowCondition = (flowString, riverName) => {
-    const cfs = parseFlow(flowString);
-    if (!cfs) return null;
-    
-    // Simple thresholds - could be refined per river
-    if (cfs < 200) return { text: 'Low Flow', color: '#e74c3c', bgColor: '#ffebee' };
-    if (cfs > 3000) return { text: 'High Flow', color: '#e67e22', bgColor: '#fff3e0' };
-    return { text: 'Good Flow', color: '#27ae60', bgColor: '#e8f5e9' };
   };
 
   // Format last updated date - just the date, no source name
