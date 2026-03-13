@@ -154,7 +154,15 @@ async function runAllScrapers() {
           if (existing.rows.length === 0) {
             await db.query(
               `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity) 
-               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8)`,
+               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8)
+               ON CONFLICT (source, river) DO UPDATE SET
+                 url = EXCLUDED.url,
+                 last_updated = EXCLUDED.last_updated,
+                 last_updated_text = EXCLUDED.last_updated_text,
+                 scraped_at = EXCLUDED.scraped_at,
+                 is_active = true,
+                 icon_url = EXCLUDED.icon_url,
+                 water_clarity = EXCLUDED.water_clarity`,
               [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null]
             );
             console.log(`✓ Inserted: ${item.source} (${item.river}) - ${displayDate}`);

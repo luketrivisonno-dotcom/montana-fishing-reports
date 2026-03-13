@@ -184,7 +184,8 @@ async function initDatabase() {
             last_updated_text VARCHAR(50),
             author VARCHAR(100),
             scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_active BOOLEAN DEFAULT true
+            is_active BOOLEAN DEFAULT true,
+            UNIQUE(source, river)
         )`);
         
         await db.query(`CREATE TABLE IF NOT EXISTS analytics (
