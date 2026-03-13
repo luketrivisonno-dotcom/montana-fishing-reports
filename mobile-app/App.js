@@ -297,7 +297,7 @@ function RiversScreen({ navigation }) {
     return { text: 'Good Flow', color: '#27ae60', bgColor: '#e8f5e9' };
   };
 
-  // Format last updated date
+  // Format last updated date - just the date, no source name
   const formatLastUpdated = (reports) => {
     if (!reports || reports.length === 0) return null;
     const mostRecent = reports.reduce((latest, report) => {
@@ -305,7 +305,7 @@ function RiversScreen({ navigation }) {
       if (!latest) return report;
       return new Date(report.last_updated) > new Date(latest.last_updated) ? report : latest;
     }, null);
-    return mostRecent ? { source: mostRecent.source, date: formatDate(mostRecent.last_updated) } : null;
+    return mostRecent ? formatDate(mostRecent.last_updated) : null;
   };
 
   const RiverListCard = ({ river }) => {
@@ -323,30 +323,36 @@ function RiversScreen({ navigation }) {
         onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river } })} 
         activeOpacity={0.9}
       >
-        {/* Card Header with Gradient */}
-        <View style={[styles.cardHeader, isYnp && styles.cardHeaderYnp]}>
-          <TouchableOpacity 
-            style={styles.heartButton}
-            onPress={(e) => {
-              e.stopPropagation();
-              // Toggle favorite logic here
-            }}
-          >
-            <Ionicons 
-              name={globalFavorites.includes(river) ? "heart" : "heart-outline"} 
-              size={20} 
-              color={globalFavorites.includes(river) ? COLORS.error : COLORS.text} 
-            />
-          </TouchableOpacity>
-          
-          {isYnp && (
-            <View style={styles.ynpBadgeNew}>
-              <Text style={styles.ynpBadgeTextNew}>🏔️ YNP</Text>
-            </View>
-          )}
-          
-          <Text style={styles.cardHeaderTitle}>{river}</Text>
-        </View>
+        {/* Card Header with River Image */}
+        <ImageBackground 
+          source={getRiverImage(river)} 
+          style={styles.cardHeaderImage}
+          imageStyle={styles.cardHeaderImageStyle}
+        >
+          <View style={styles.cardHeaderOverlay}>
+            <TouchableOpacity 
+              style={styles.heartButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                // Toggle favorite logic here
+              }}
+            >
+              <Ionicons 
+                name={globalFavorites.includes(river) ? "heart" : "heart-outline"} 
+                size={20} 
+                color={globalFavorites.includes(river) ? COLORS.error : 'white'} 
+              />
+            </TouchableOpacity>
+            
+            {isYnp && (
+              <View style={styles.ynpBadgeNew}>
+                <Text style={styles.ynpBadgeTextNew}>🏔️ YNP</Text>
+              </View>
+            )}
+            
+            <Text style={styles.cardHeaderTitle}>{river}</Text>
+          </View>
+        </ImageBackground>
         
         {/* Card Body with Flow/Temp */}
         <View style={styles.cardBody}>
@@ -376,7 +382,7 @@ function RiversScreen({ navigation }) {
             <View style={styles.reportChips}>
               <View style={styles.reportChip}>
                 <Text style={styles.reportChipText} numberOfLines={1}>
-                  {lastUpdated.source} • {lastUpdated.date}
+                  Updated {lastUpdated}
                 </Text>
               </View>
             </View>
@@ -1575,23 +1581,29 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },
-  cardHeader: {
+  cardHeaderImage: {
     height: 120,
-    backgroundColor: COLORS.primary,
     position: 'relative',
+  },
+  cardHeaderImageStyle: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  cardHeaderOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(26, 47, 39, 0.4)',
     justifyContent: 'flex-end',
     padding: 12,
-  },
-  cardHeaderYnp: {
-    backgroundColor: '#8b6914',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   cardHeaderTitle: {
     color: 'white',
     fontSize: 20,
     fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   heartButton: {
     position: 'absolute',
@@ -1603,6 +1615,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10,
   },
   ynpBadgeNew: {
     position: 'absolute',
@@ -1612,6 +1625,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
+    zIndex: 10,
   },
   ynpBadgeTextNew: {
     color: '#c9a227',
