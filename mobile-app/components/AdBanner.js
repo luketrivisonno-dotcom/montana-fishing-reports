@@ -1,41 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Check if we're in Expo Go (development without native modules)
-const isExpoGo = !Platform.select({
-  ios: () => {
-    try {
-      const NativeModules = require('react-native').NativeModules;
-      return !!NativeModules.RNGoogleMobileAdsModule;
-    } catch (e) {
-      return false;
-    }
-  },
-  android: () => {
-    try {
-      const NativeModules = require('react-native').NativeModules;
-      return !!NativeModules.RNGoogleMobileAdsModule;
-    } catch (e) {
-      return false;
-    }
-  },
-})?.();
-
-// Lazy load the ads module only when needed
+// Safely check if Google Mobile Ads native module exists
+let isExpoGo = true;
 let BannerAd = null;
 let BannerAdSize = null;
 let TestIds = null;
 
-if (!isExpoGo) {
-  try {
+try {
+  // Check if the native module exists
+  const hasAdsModule = NativeModules.RNGoogleMobileAdsModule !== undefined;
+  isExpoGo = !hasAdsModule;
+  
+  if (hasAdsModule) {
     const ads = require('react-native-google-mobile-ads');
     BannerAd = ads.BannerAd;
     BannerAdSize = ads.BannerAdSize;
     TestIds = ads.TestIds;
-  } catch (e) {
-    console.log('Google Mobile Ads not available');
   }
+} catch (e) {
+  console.log('Google Mobile Ads not available:', e.message);
+  isExpoGo = true;
 }
 
 // Production Ad Unit ID

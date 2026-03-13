@@ -23,8 +23,23 @@ let isExpoGo = false;  // True if running in Expo Go (no native purchases)
  * RevenueCat native modules don't work in Expo Go
  */
 const checkIsExpoGo = () => {
-  // @ts-ignore
-  return !!global.Expo || !!global.__expo;
+  try {
+    // Check if the native module exists - if it does, we're in a native build
+    const NativeModules = require('react-native').NativeModules;
+    const hasRevenueCat = !!NativeModules.RNPurchases;
+    
+    // If we have the native module, we're NOT in Expo Go
+    if (hasRevenueCat) {
+      return false;
+    }
+    
+    // Check for Expo Go specific globals as fallback
+    // @ts-ignore
+    return !!global.Expo || !!global.__expo;
+  } catch (e) {
+    // If we can't check, assume Expo Go to be safe
+    return true;
+  }
 };
 
 /**

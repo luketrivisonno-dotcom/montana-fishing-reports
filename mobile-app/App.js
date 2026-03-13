@@ -25,12 +25,13 @@ import RiverMileCalculator from './components/RiverMileCalculator';
 import AdBanner from './components/AdBanner';
 import AdManager from './components/AdManager';
 
-// Try to import mobile ads SDK - will be null in Expo Go
+// Try to import mobile ads SDK - will be null in Expo Go or if module not available
 let mobileAds = null;
 try {
-  mobileAds = require('react-native-google-mobile-ads').default;
+  const adsModule = require('react-native-google-mobile-ads');
+  mobileAds = adsModule.default || adsModule;
 } catch (e) {
-  console.log('Google Mobile Ads SDK not available (Expo Go)');
+  console.log('Google Mobile Ads SDK not available:', e.message);
 }
 import { 
   registerForPushNotificationsAsync, 
