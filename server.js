@@ -2021,3 +2021,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = { normalizeSource, formatDateForDisplay };
+// Deploy timestamp: Fri Mar 13 17:44:31 MDT 2026
