@@ -834,7 +834,8 @@ app.get('/api/reports/:river',
             const { river } = req.params;
             const result = await db.query(
                 `SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
-                 FROM reports WHERE river = $1 AND is_active = true ORDER BY last_updated DESC, scraped_at DESC`, 
+                 FROM reports WHERE river = $1 AND is_active = true 
+                 ORDER BY CASE WHEN last_updated IS NULL THEN 1 ELSE 0 END, last_updated DESC, scraped_at DESC`, 
                 [river]
             );
             const reports = result.rows.map(report => ({ 
@@ -1221,7 +1222,8 @@ app.get('/api/river-details/:river',
                 db.query(`SELECT id, source, river, url, last_updated, last_updated_text, scraped_at, icon_url, water_clarity 
                           FROM reports WHERE river = $1 AND is_active = true 
                           AND source NOT LIKE '%USGS%' AND url IS NOT NULL 
-                          AND url != '' AND url LIKE 'http%' ORDER BY last_updated DESC, scraped_at DESC`, 
+                          AND url != '' AND url LIKE 'http%' 
+                          ORDER BY CASE WHEN last_updated IS NULL THEN 1 ELSE 0 END, last_updated DESC, scraped_at DESC`, 
                          [river]),
                 getDynamicHatchData(river)
             ]);
