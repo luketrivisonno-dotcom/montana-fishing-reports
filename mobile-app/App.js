@@ -812,6 +812,16 @@ function RiverDetailsScreen({ route, navigation }) {
                     <Text style={{ fontSize: 10, color: COLORS.textLight }}> ({data.usgs.tempSource})</Text>
                   )}
                 </Text>
+                {(() => {
+                  const flowCondition = getFlowCondition(data.usgs.flow, river);
+                  return flowCondition ? (
+                    <View style={[styles.flowBadge, { backgroundColor: flowCondition.bgColor, marginTop: 6 }]}>
+                      <Text style={[styles.flowBadgeText, { color: flowCondition.color }]}>
+                        {flowCondition.text}
+                      </Text>
+                    </View>
+                  ) : null;
+                })()}
               </View>
               {data.usgs.url && (
                 <Ionicons name="open-outline" size={16} color={COLORS.textLight} style={styles.openIcon} />

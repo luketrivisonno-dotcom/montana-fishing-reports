@@ -569,6 +569,40 @@ const USGS_STATIONS = [
     lat: 48.02423056,
     lon: -113.9788194,
     type: 'usgs'
+  },
+
+  // YNP RIVERS
+  {
+    river: 'Firehole River',
+    siteId: '06036900',
+    location: 'Near West Yellowstone, YNP',
+    lat: 44.635,
+    lon: -110.867,
+    type: 'usgs'
+  },
+  {
+    river: 'Soda Butte Creek',
+    siteId: '06187500',
+    location: 'Near Lamar Ranger Station, YNP',
+    lat: 44.95,
+    lon: -110.4,
+    type: 'usgs'
+  },
+  {
+    river: 'Lamar River',
+    siteId: '06188000',
+    location: 'Near Tower Falls Ranger Station, YNP',
+    lat: 44.933,
+    lon: -110.4,
+    type: 'usgs'
+  },
+  {
+    river: 'Gardner River',
+    siteId: '06186200',
+    location: 'Near Mammoth, YNP',
+    lat: 44.967,
+    lon: -110.7,
+    type: 'usgs'
   }
 ];
 
