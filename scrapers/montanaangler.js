@@ -45,6 +45,28 @@ async function scrapeMontanaAngler() {
         dateMatch = pageText.match(/[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
       }
       
+      // Also try pattern without space after comma (e.g., "March 12,2026")
+      if (!dateMatch) {
+        dateMatch = pageText.match(/[A-Za-z]+\s+\d{1,2},\s*\d{4}/);
+      }
+      
+      let lastUpdated = null;
+      let lastUpdatedText = null;
+      
+      if (dateMatch) {
+        lastUpdatedText = dateMatch[0];
+        // Normalize the date string (ensure space after comma)
+        const normalizedDate = dateMatch[0].replace(/,\s*(\d{4})/, ', $1');
+        try {
+          const parsedDate = new Date(normalizedDate);
+          if (!isNaN(parsedDate.getTime())) {
+            lastUpdated = parsedDate.toISOString();
+          }
+        } catch (e) {
+          console.log(`  → Error parsing date for ${river}: ${dateMatch[0]}`);
+        }
+      }
+      
       // Extract water clarity
       let waterClarity = null;
       const clarityPatterns = [
@@ -65,8 +87,8 @@ async function scrapeMontanaAngler() {
       // Extract hatch data from the page content
       const hatchData = extractHatchData(pageText);
       
-      // Save hatch data if we found any
-      if (hatchData.hatches.length > 0) {
+      // Save hatch data if we found any (only if db is available)
+      if (hatchData.hatches.length > 0 && db) {
         try {
           // Mark previous reports for this river as not current
           await db.query(
@@ -87,7 +109,7 @@ async function scrapeMontanaAngler() {
               JSON.stringify({ extracted_from: 'Montana Angler fishing report', url }),
               hatchData.water_temp,
               hatchData.water_conditions,
-              dateMatch ? new Date(dateMatch[0]) : null
+              lastUpdated ? new Date(lastUpdated) : null
             ]
           );
           console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
@@ -100,13 +122,15 @@ async function scrapeMontanaAngler() {
         source: 'Montana Angler',
         river: river,
         url: url,
-        last_updated: dateMatch ? dateMatch[0] : null,
-        last_updated_text: dateMatch ? dateMatch[0] : null,
+        last_updated: lastUpdated,
+        last_updated_text: lastUpdatedText,
         scraped_at: new Date(),
         icon_url: ICON_URL,
         water_clarity: waterClarity,
-        hatches: hatchData.hatches // Include in report for potential notifications
+        hatches: hatchData.hatches
       });
+      
+      console.log(`  → Montana Angler - ${river}: ${lastUpdatedText || 'No date'}`);
       
     } catch (error) {
       console.error(`Montana Angler error for ${river}:`, error.message);
