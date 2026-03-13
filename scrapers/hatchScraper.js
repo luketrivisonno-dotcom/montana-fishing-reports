@@ -2,6 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('../db');
 const { getUSGSData } = require('../utils/usgs');
+const { extractHatches, getFlyRecommendations } = require('../utils/hatchExtractor');
 
 // Fly shop URLs that include hatch info
 const HATCH_SOURCES = {
@@ -33,80 +34,6 @@ const HATCH_SOURCES = {
   }
 };
 
-// Common hatch patterns to extract from text
-const HATCH_PATTERNS = [
-  { name: 'Midges', patterns: [/\bmidge/i, /\bmidges/i] },
-  { name: 'Blue Winged Olives', patterns: [/\bbwo\b/i, /\bblue.?winged/i, /\bbaetis/i] },
-  { name: 'March Browns', patterns: [/\bmarch brown/i] },
-  { name: 'Salmonflies', patterns: [/\bsalmonfly/i, /\bsalmon fly/i] },
-  { name: 'Golden Stones', patterns: [/\bgolden stone/i] },
-  { name: 'PMDs', patterns: [/\bpmd\b/i, /\bpale morning dun/i] },
-  { name: 'Yellow Sallies', patterns: [/\byellow sall/i, /\bisoperla/i] },
-  { name: 'Caddis', patterns: [/\bcaddis/i] },
-  { name: 'Hoppers', patterns: [/\bhopper/i] },
-  { name: 'Tricos', patterns: [/\btrico/i] },
-  { name: 'Mahogany Duns', patterns: [/\bmahogany/i] },
-  { name: 'October Caddis', patterns: [/\boctober caddis/i] },
-  { name: 'Skwalas', patterns: [/\bskwala/i] },
-  { name: 'Green Drakes', patterns: [/\bgreen drake/i] },
-  { name: 'Gray Drakes', patterns: [/\bgray drake/i] },
-  { name: 'Callibaetis', patterns: [/\bcallibaetis/i] },
-  { name: 'Pseudos', patterns: [/\bpseudo/i] },
-  { name: 'Ants', patterns: [/\bants?\b/i] },
-  { name: 'Beetles', patterns: [/\bbeetles?\b/i] },
-];
-
-// Fly recommendations based on hatch
-const FLY_RECOMMENDATIONS = {
-  'Midges': ['Zebra Midge #18-22', 'Top Secret Midge #20-22', 'Griffiths Gnat #18-20', 'Miracle Midge #20-22'],
-  'Blue Winged Olives': ['Parachute BWO #18-20', 'RS2 #20-22', 'Pheasant Tail #16-18', 'Barr Emerger #18-20'],
-  'Baetis': ['BWO Comparadun #20-22', 'Barr Emerger #20-22', 'Sparkle Dun #18-20'],
-  'March Browns': ['March Brown Dry #12-14', 'Hare\'s Ear #12-14', 'Parachute Adams #12-14'],
-  'Salmonflies': ['Salmonfly Dry #4-6', 'Chubby Chernobyl #6-8', 'Pats Rubber Legs #6-8', 'Kaufmann Stone #6-8'],
-  'Golden Stones': ['Golden Stone Dry #8-10', 'Kaufmann Stone #8-10', 'Chubby Chernobyl Tan #8-10'],
-  'PMDs': ['Parachute PMD #16-18', 'Sparkle Dun #16-18', 'Pheasant Tail #16', 'Split Case PMD #16-18'],
-  'Yellow Sallies': ['Yellow Sally Dry #14-16', 'Stimulator Yellow #14-16', 'Neversink Caddis #14-16'],
-  'Caddis': ['Elk Hair Caddis #14-16', 'X-Caddis #16-18', 'Pupa patterns #14-16', 'CDC Caddis #14-16'],
-  'Hoppers': ['Chubby Chernobyl #8-10', 'Morrish Hopper #10-12', 'Dave\'s Hopper #10-12', 'Parachute Hopper #10-12'],
-  'Tricos': ['Trico Spinner #20-22', 'Trico Dun #20-22', 'Trico Comparadun #20-22'],
-  'Mahogany Duns': ['Parachute Adams #14-16', 'Sparkle Dun #14-16', 'Pheasant Tail #14-16'],
-  'October Caddis': ['Orange Stimulator #10-12', 'Elk Hair Caddis Orange #12-14', 'Pupa patterns #12-14'],
-  'Skwalas': ['Skwala Dry #10-12', 'Pat\'s Rubber Legs Olive #8-10', 'Chubby Chernobyl Olive #10-12'],
-  'Green Drakes': ['Green Drake Dry #10-12', 'Parachute Green Drake #10-12'],
-  'Gray Drakes': ['Gray Drake Dry #10-12', 'Soda Fountain Parachute #10-12'],
-  'Callibaetis': ['Callibaetis Cripple #14', 'Parachute Adams #14', 'Callibaetis Spinner #14'],
-  'Pseudos': ['Pseudo Spinner #16-18', 'Sparkle Dun #16-18'],
-  'Ants': ['Flying Ant #16-18', 'Foam Ant #14-16'],
-  'Beetles': ['Foam Beetle #14-16', 'Crunchy Beetle #14-16'],
-};
-
-function extractHatches(text) {
-  const foundHatches = [];
-  const lowerText = text.toLowerCase();
-  
-  for (const hatch of HATCH_PATTERNS) {
-    for (const pattern of hatch.patterns) {
-      if (pattern.test(lowerText)) {
-        foundHatches.push(hatch.name);
-        break;
-      }
-    }
-  }
-  
-  return [...new Set(foundHatches)]; // Remove duplicates
-}
-
-function getFlyRecommendations(hatches) {
-  const recommendations = [];
-  for (const hatch of hatches) {
-    if (FLY_RECOMMENDATIONS[hatch]) {
-      recommendations.push(...FLY_RECOMMENDATIONS[hatch]);
-    }
-  }
-  // Return unique flies, limited to 6
-  return [...new Set(recommendations)].slice(0, 6);
-}
-
 async function scrapeMontanaAnglerHatches() {
   const results = [];
   
@@ -122,8 +49,6 @@ async function scrapeMontanaAnglerHatches() {
       });
       
       const $ = cheerio.load(data);
-      
-      // Try to find the main content area
       const contentText = $('body').text();
       
       // Extract date
@@ -204,68 +129,38 @@ async function scrapeBlueRibbonFliesHatches() {
     const $ = cheerio.load(data);
     const contentText = $('body').text();
     
-    // Extract date - Blue Ribbon Flies usually has date in header
+    // Extract date
     const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
     const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
     
     // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Get water temp from USGS first (most accurate), then fall back to scraped text
-    let waterTemp = null;
-    const riverName = 'Upper Madison River'; // Blue Ribbon is near West Yellowstone
-    try {
-      const usgsData = await getUSGSData(riverName);
-      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
-        waterTemp = usgsData.temp;
-      }
-    } catch (e) {
-      // USGS failed, will try scraping
-    }
+    // Get fly recommendations
+    const flyRecommendations = getFlyRecommendations(hatches);
     
-    // If no USGS temp, try to extract from page text
-    if (!waterTemp) {
-      const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
-      waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
-    }
-    
-    // Blue Ribbon Flies focuses on West Yellowstone area rivers
-    // The report covers Madison, Firehole, Gibbon, and YNP rivers
-    const rivers = [
-      { name: 'Upper Madison River', keywords: ['madison', 'madison river'] },
-      { name: 'Firehole River', keywords: ['firehole', 'firehole river'] },
-      { name: 'Gibbon River', keywords: ['gibbon', 'gibbon river'] },
-      { name: 'Slough Creek', keywords: ['slough creek'] },
-      { name: 'Soda Butte Creek', keywords: ['soda butte'] },
-      { name: 'Lamar River', keywords: ['lamar river'] },
-      { name: 'Gardner River', keywords: ['gardner river'] }
-    ];
-    
-    // Try to assign hatches to specific rivers based on text context
-    for (const river of rivers) {
-      // Look for river-specific sections
-      const riverPattern = new RegExp(`(${river.keywords.join('|')})[^.]*([^.]*hatch[^.]*|[^.]*fly[^.]*|[^.]*pattern[^.]*)`, 'gi');
-      const matches = contentText.match(riverPattern);
+    if (hatches.length > 0) {
+      // Blue Ribbon Flies covers YNP rivers
+      const ynppRivers = ['Firehole River', 'Gibbon River', 'Madison River', 'Yellowstone River'];
       
-      if (matches || hatches.length > 0) {
+      for (const river of ynppRivers) {
         results.push({
-          river: river.name,
+          river,
           source: 'Blue Ribbon Flies',
-          hatches: hatches,
-          fly_recommendations: getFlyRecommendations(hatches),
+          hatches,
+          fly_recommendations: flyRecommendations,
           hatch_details: {
-            extracted_from: 'Blue Ribbon Flies fishing report',
-            confidence: 'medium',
-            note: 'West Yellowstone area report'
+            extracted_from: 'fishing report text',
+            confidence: 'medium'
           },
-          water_temp: waterTemp,
+          water_temp: null,
           water_conditions: null,
           report_date: reportDate,
           url
         });
-        
-        console.log(`  Found data for ${river.name}: ${hatches.length} hatches`);
       }
+      
+      console.log(`  Found ${hatches.length} hatches for YNP rivers`);
     }
     
   } catch (error) {
@@ -277,10 +172,10 @@ async function scrapeBlueRibbonFliesHatches() {
 
 async function scrapeStoneflyShopHatches() {
   const results = [];
-  const url = HATCH_SOURCES['Stonefly Shop']['Beaverhead River'];
+  const url = 'https://www.thestonefly.com/pages/fishing-reports';
   
   try {
-    console.log(`Scraping Stonefly Shop hatch data for Beaverhead River...`);
+    console.log(`Scraping Stonefly Shop hatch data for Beaverhead...`);
     
     const { data } = await axios.get(url, {
       headers: {
@@ -299,36 +194,26 @@ async function scrapeStoneflyShopHatches() {
     // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Get water temp from USGS
-    let waterTemp = null;
-    try {
-      const usgsData = await getUSGSData('Beaverhead River');
-      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
-        waterTemp = usgsData.temp;
-      }
-    } catch (e) {
-      // USGS failed
-    }
+    // Get fly recommendations
+    const flyRecommendations = getFlyRecommendations(hatches);
     
-    // Stonefly Shop covers multiple rivers but we want Beaverhead specifically
     if (hatches.length > 0) {
       results.push({
         river: 'Beaverhead River',
         source: 'Stonefly Shop',
         hatches,
-        fly_recommendations: getFlyRecommendations(hatches),
+        fly_recommendations: flyRecommendations,
         hatch_details: {
-          extracted_from: 'Stonefly Shop fishing report',
-          confidence: 'medium',
-          note: 'Dillon area report'
+          extracted_from: 'fishing report text',
+          confidence: 'medium'
         },
-        water_temp: waterTemp,
+        water_temp: null,
         water_conditions: null,
         report_date: reportDate,
         url
       });
       
-      console.log(`  Found ${hatches.length} hatches for Beaverhead River`);
+      console.log(`  Found ${hatches.length} hatches: ${hatches.join(', ')}`);
     }
     
   } catch (error) {
@@ -340,10 +225,10 @@ async function scrapeStoneflyShopHatches() {
 
 async function scrapeTroutfittersHatches() {
   const results = [];
-  const url = HATCH_SOURCES['Troutfitters']['Big Hole River'];
+  const url = 'https://troutfitters.com/reports/big-hole-river';
   
   try {
-    console.log(`Scraping Troutfitters hatch data for Big Hole River...`);
+    console.log(`Scraping Troutfitters hatch data for Big Hole...`);
     
     const { data } = await axios.get(url, {
       headers: {
@@ -362,35 +247,26 @@ async function scrapeTroutfittersHatches() {
     // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Get water temp from USGS
-    let waterTemp = null;
-    try {
-      const usgsData = await getUSGSData('Big Hole River');
-      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
-        waterTemp = usgsData.temp;
-      }
-    } catch (e) {
-      // USGS failed
-    }
+    // Get fly recommendations
+    const flyRecommendations = getFlyRecommendations(hatches);
     
     if (hatches.length > 0) {
       results.push({
         river: 'Big Hole River',
         source: 'Troutfitters',
         hatches,
-        fly_recommendations: getFlyRecommendations(hatches),
+        fly_recommendations: flyRecommendations,
         hatch_details: {
-          extracted_from: 'Troutfitters fishing report',
-          confidence: 'medium',
-          note: 'Twin Bridges area report'
+          extracted_from: 'fishing report text',
+          confidence: 'medium'
         },
-        water_temp: waterTemp,
+        water_temp: null,
         water_conditions: null,
         report_date: reportDate,
         url
       });
       
-      console.log(`  Found ${hatches.length} hatches for Big Hole River`);
+      console.log(`  Found ${hatches.length} hatches: ${hatches.join(', ')}`);
     }
     
   } catch (error) {
@@ -473,7 +349,7 @@ async function runHatchScraper() {
     
     if (stoneflyHatches.length > 0) {
       const saved = await saveHatchReports(stoneflyHatches);
-      console.log(`✓ Saved ${saved.length} Stonefly Shop reports`);
+      console.log(`✓ Saved ${stoneflyHatches.length} Stonefly Shop reports`);
       totalSaved += saved.length;
       allReports.push(...stoneflyHatches);
     }
@@ -484,7 +360,7 @@ async function runHatchScraper() {
     
     if (troutfittersHatches.length > 0) {
       const saved = await saveHatchReports(troutfittersHatches);
-      console.log(`✓ Saved ${saved.length} Troutfitters reports`);
+      console.log(`✓ Saved ${troutfittersHatches.length} Troutfitters reports`);
       totalSaved += saved.length;
       allReports.push(...troutfittersHatches);
     }
@@ -498,7 +374,6 @@ async function runHatchScraper() {
         await processHatchAlerts(allReports);
       } catch (alertError) {
         console.error('Hatch alert processing error:', alertError.message);
-        // Don't fail the whole scraper if alerts fail
       }
     }
     
@@ -536,5 +411,8 @@ module.exports = {
   runHatchScraper,
   getCurrentHatches,
   getStaticHatches,
-  scrapeMontanaAnglerHatches
+  scrapeMontanaAnglerHatches,
+  // Re-export for backward compatibility
+  extractHatches,
+  getFlyRecommendations
 };
