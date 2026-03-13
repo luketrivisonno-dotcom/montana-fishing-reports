@@ -19,7 +19,12 @@ const USGS_SITES = {
   'Ruby River': { id: '06019500', location: 'Alder, MT' },
   'Stillwater River': { id: '06205000', location: 'Absarokee, MT' },
   'Boulder River': { id: '06207500', location: 'Big Timber, MT' },
-  'Swan River': { id: '12370000', location: 'Big Fork, MT' }
+  'Swan River': { id: '12370000', location: 'Big Fork, MT' },
+  // YNP Rivers
+  'Firehole River': { id: '06036900', location: 'Near West Yellowstone, YNP' },
+  'Soda Butte Creek': { id: '06187500', location: 'Near Lamar Ranger Station, YNP' },
+  'Lamar River': { id: '06188000', location: 'Near Tower Falls Ranger Station, YNP' },
+  'Gardner River': { id: '06186200', location: 'Near Mammoth, YNP' }
 };
 
 // Seasonal gauges - USGS stations that only run part of the year
@@ -92,7 +97,13 @@ const RIVER_TYPES = {
   'Stillwater River': 'freestone',
   'Boulder River': 'freestone',
   'Swan River': 'freestone',
-
+  // YNP Rivers
+  'Firehole River': 'freestone',
+  'Soda Butte Creek': 'mountain',
+  'Lamar River': 'freestone',
+  'Gardner River': 'freestone',
+  'Slough Creek': 'freestone',
+  'Gibbon River': 'freestone'
 };
 
 function getSeasonalTemp(riverName) {
