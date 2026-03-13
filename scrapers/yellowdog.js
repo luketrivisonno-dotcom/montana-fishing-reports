@@ -31,18 +31,24 @@ async function scrapeYellowDog() {
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
-      // Yellow Dog pages have fake dates like "January 1, 1988" - need to validate
+      // Yellow Dog pages show dates like "Mar 12, 26" (2-digit year) or "January 1, 1988" (fake)
       let dateMatch = 
-        pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/) ||
-        pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+        pageText.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{2,4})/i) ||
+        pageText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{2,4})/) ||
+        pageText.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
       
-      // Validate date is recent (not fake old dates like 1988)
+      // Validate date - reject old fake dates (1980s-1990s), accept 2020s
       if (dateMatch) {
         const dateStr = dateMatch[1] || dateMatch[0];
-        const year = parseInt(dateStr.match(/\d{4}/)?.[0]);
-        if (year && year < 2020) {
-          dateMatch = null; // Reject old fake dates
+        let year = parseInt(dateStr.match(/\d{4}/)?.[0]);
+        // Handle 2-digit years (26 = 2026)
+        if (!year) {
+          const year2digit = parseInt(dateStr.match(/\d{2}/)?.[0]);
+          if (year2digit >= 20 && year2digit <= 99) year = 2000 + year2digit;
+          else if (year2digit >= 0 && year2digit < 20) year = 2000 + year2digit; // 00-19 = 2000-2019
+        }
+        if (year && (year < 2020 || year > 2030)) {
+          dateMatch = null; // Reject old fake dates or far future dates
         }
       }
       
