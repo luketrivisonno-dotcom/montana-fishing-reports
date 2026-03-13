@@ -41,7 +41,7 @@ import {
 } from './utils/notifications';
 import RiverMap from './components/RiverMap';
 import Paywall from './components/Paywall';
-import { initializePurchases } from './hooks/useRevenueCat';
+import { initializePurchases, useRevenueCat, checkCachedPremiumStatus } from './hooks/useRevenueCat';
 import { getRiverImage, DEFAULT_RIVER_IMAGE } from './assets/river-images/riverImages';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -53,6 +53,9 @@ const YNP_RIVERS = ['Slough Creek', 'Soda Butte Creek', 'Lamar River', 'Gardner 
 // DEVELOPMENT MODE
 // ============================================
 const DEV_MODE = false;
+
+// Force free mode for testing (set to true to simulate free user)
+const FORCE_FREE_MODE = false;
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
@@ -90,6 +93,10 @@ const COLORS = {
 // ============================================
 let globalIsPremium = DEV_MODE;
 let globalFavorites = [];
+let globalShowPaywall = null; // Function to show paywall, set by App component
+
+// Free vs Premium limits
+const FREE_FAVORITES_LIMIT = 2;
 
 const formatDate = (dateString) => {
   if (!dateString || dateString === 'null' || dateString === 'Date unknown') return '';
@@ -357,14 +364,34 @@ function RiverDetailsScreen({ route, navigation }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
   const [logRefreshKey, setLogRefreshKey] = useState(0);
+  const [isPremium, setIsPremium] = useState(FORCE_FREE_MODE ? false : globalIsPremium);
 
   useEffect(() => { 
+    loadFavorites();
     fetchRiverData();
     checkSubscription();
     setupNotifications();
     // Show interstitial ad every 3rd river view
     AdManager.showInterstitialWithFrequency('river_details', 3);
+    
+    // Sync premium status periodically
+    const interval = setInterval(() => {
+      setIsPremium(globalIsPremium);
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
+  
+  const loadFavorites = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('favorites');
+      if (saved) {
+        globalFavorites = JSON.parse(saved);
+        setIsFavorite(globalFavorites.includes(river));
+      }
+    } catch (e) {
+      console.error('Error loading favorites:', e);
+    }
+  };
 
   const checkSubscription = async () => {
     const subscribed = await isSubscribedToRiver(river);
@@ -450,11 +477,39 @@ function RiverDetailsScreen({ route, navigation }) {
   };
 
   const toggleFavorite = async () => {
-    // Premium check disabled for free version
-    // if (!globalIsPremium) { setShowPremiumModal(true); return; }
-    if (isFavorite) { globalFavorites = globalFavorites.filter(r => r !== river); }
-    else { globalFavorites.push(river); }
-    setIsFavorite(!isFavorite);
+    let newFavorites;
+    
+    // If removing favorite, always allow
+    if (isFavorite) {
+      newFavorites = globalFavorites.filter(r => r !== river);
+      globalFavorites = newFavorites;
+      setIsFavorite(false);
+      AsyncStorage.setItem('favorites', JSON.stringify(newFavorites)).catch(console.error);
+      return;
+    }
+    
+    // Check if free user has hit the limit (2 favorites)
+    if (!globalIsPremium && globalFavorites.length >= FREE_FAVORITES_LIMIT) {
+      Alert.alert(
+        'Free Plan Limit Reached',
+        `Free users can save ${FREE_FAVORITES_LIMIT} favorite rivers. Upgrade for unlimited.`,
+        [
+          { text: 'Not Now', style: 'cancel' },
+          { 
+            text: 'Upgrade', 
+            style: 'default',
+            onPress: () => globalShowPaywall && globalShowPaywall()
+          }
+        ]
+      );
+      return;
+    }
+    
+    // Add to favorites
+    newFavorites = [...globalFavorites, river];
+    globalFavorites = newFavorites;
+    setIsFavorite(true);
+    AsyncStorage.setItem('favorites', JSON.stringify(newFavorites)).catch(console.error);
   };
 
   if (loading) {
@@ -596,22 +651,38 @@ function RiverDetailsScreen({ route, navigation }) {
           ) : null}
         </View>
 
-        {/* HATCH CHART */}
-        <HatchChart riverName={river} isPremium={true} hatchData={data?.hatchData} />
+        {/* HATCH CHART - Premium for full details, free gets teaser */}
+        <HatchChart 
+          riverName={river} 
+          isPremium={isPremium} 
+          hatchData={data?.hatchData}
+          onUpgrade={() => setShowPremiumModal(true)}
+        />
 
         {/* SOLUNAR FISHING TIMES */}
         <SolunarTimes riverName={river} />
 
-        {/* 7-DAY FLOW HISTORY */}
+        {/* 7-DAY FLOW HISTORY - PREMIUM ONLY */}
         {river !== 'Spring Creeks' && river !== 'Yellowstone National Park' && river !== 'Slough Creek' && river !== 'Soda Butte Creek' && river !== 'Lamar River' && river !== 'Gardner River' && river !== 'Firehole River' && (
-          <FlowChart riverName={river} />
+          isPremium ? (
+            <FlowChart riverName={river} />
+          ) : (
+            <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
+              <MaterialIcons name="show-chart" size={24} color={COLORS.premium} />
+              <View style={styles.premiumFeatureText}>
+                <Text style={styles.premiumFeatureTitle}>7-Day Flow History</Text>
+                <Text style={styles.premiumFeatureSubtitle}>Track water levels and trends over time</Text>
+              </View>
+              <MaterialIcons name="lock" size={20} color={COLORS.premium} />
+            </TouchableOpacity>
+          )
         )}
 
         {/* AD BANNER */}
         <AdBanner size="banner" />
 
         {/* RIVER MILE CALCULATOR - PREMIUM ONLY */}
-        {globalIsPremium ? (
+        {isPremium ? (
           <RiverMileCalculator riverName={river} />
         ) : (
           <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
@@ -624,22 +695,34 @@ function RiverDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         )}
 
-        {/* PERSONAL FISHING LOG */}
-        <FishingLogList 
-          riverName={river} 
-          onAddNew={() => setShowLogModal(true)}
-          refreshKey={logRefreshKey}
-        />
-
-        <FishingLogModal
-          visible={showLogModal}
-          onClose={() => setShowLogModal(false)}
-          riverName={river}
-          onSave={saveCatch}
-        />
+        {/* PERSONAL FISHING LOG - PREMIUM ONLY */}
+        {isPremium ? (
+          <>
+            <FishingLogList 
+              riverName={river} 
+              onAddNew={() => setShowLogModal(true)}
+              refreshKey={logRefreshKey}
+            />
+            <FishingLogModal
+              visible={showLogModal}
+              onClose={() => setShowLogModal(false)}
+              riverName={river}
+              onSave={saveCatch}
+            />
+          </>
+        ) : (
+          <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
+            <MaterialIcons name="format-list-bulleted" size={24} color={COLORS.premium} />
+            <View style={styles.premiumFeatureText}>
+              <Text style={styles.premiumFeatureTitle}>Personal Fishing Log</Text>
+              <Text style={styles.premiumFeatureSubtitle}>Track your catches, flies used, and conditions</Text>
+            </View>
+            <MaterialIcons name="lock" size={20} color={COLORS.premium} />
+          </TouchableOpacity>
+        )}
 
         {/* REGULATIONS & SEASONS - PREMIUM ONLY */}
-        {globalIsPremium ? (
+        {isPremium ? (
           <RegulationsInfo riverName={river} />
         ) : (
           <TouchableOpacity style={styles.premiumFeatureCard} onPress={() => setShowPremiumModal(true)}>
@@ -662,14 +745,42 @@ function RiverDetailsScreen({ route, navigation }) {
               <Text style={styles.modalSubtitle}>Unlock everything</Text>
             </View>
             <View style={styles.featuresList}>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>✨ Ad-free experience</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>🔔 Push notifications for new reports</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>🦋 Hatch alerts (Salmonflies, PMDs, etc.)</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📊 Detailed hatch charts & flies</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>⭐ Unlimited favorite rivers</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📏 River mile calculator</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📜 Detailed regulations & seasons</Text></View>
-              <View style={styles.featureItem}><Ionicons name="checkmark-circle" size={20} color={COLORS.success} /><Text style={styles.featureText}>📶 Offline mode</Text></View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialCommunityIcons name="bug-outline" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Detailed hatch charts & timing</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialCommunityIcons name="hook" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Exact fly recommendations & sizes</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="show-chart" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>7-Day flow history & trends</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="straighten" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>River mile calculator</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="format-list-bulleted" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Personal fishing log</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="gavel" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Detailed regulations & seasons</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="favorite" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Unlimited favorites (free: 2)</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><Ionicons name="notifications" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Push notifications</Text>
+              </View>
+              <View style={styles.modalFeatureItem}>
+                <View style={styles.modalFeatureIcon}><MaterialIcons name="block" size={18} color={COLORS.primary} /></View>
+                <Text style={styles.modalFeatureText}>Ad-free experience</Text>
+              </View>
             </View>
             <TouchableOpacity style={styles.subscribeButton}><Text style={styles.subscribeButtonText}>Subscribe $4.99/mo</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => setShowPremiumModal(false)}><Text style={styles.modalClose}>Maybe Later</Text></TouchableOpacity>
@@ -701,22 +812,17 @@ function MapScreen({ navigation }) {
 // ============================================
 function FavoritesScreen({ navigation }) {
   const [favorites, setFavorites] = useState([]);
-  useEffect(() => { setFavorites(globalFavorites); }, []);
-
-  // Premium check disabled for free version
-  // if (!globalIsPremium) {
-  //   return (
-  //     <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
-  //       <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
-  //       <DevModeBanner />
-  //       <View style={styles.upsellContainer}>
-  //         <MaterialIcons name="diamond" size={64} color={COLORS.premium} />
-  //         <Text style={styles.upsellTitle}>Premium Feature</Text>
-  //         <TouchableOpacity style={styles.upsellButton}><Text style={styles.upsellButtonText}>Upgrade to Premium</Text></TouchableOpacity>
-  //       </View>
-  //     </SafeAreaView>
-  //   );
-  // }
+  const [isPremium, setIsPremium] = useState(globalIsPremium);
+  
+  useEffect(() => { 
+    setFavorites(globalFavorites);
+    // Refresh premium status periodically
+    const interval = setInterval(() => {
+      setIsPremium(globalIsPremium);
+      setFavorites([...globalFavorites]);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (favorites.length === 0) {
     return (
@@ -727,19 +833,50 @@ function FavoritesScreen({ navigation }) {
           <Ionicons name="heart-outline" size={64} color={COLORS.textLight} />
           <Text style={styles.emptyTitle}>No Favorites Yet</Text>
           <Text style={styles.emptyText}>Tap the heart on any river to save it here</Text>
+          {!isPremium && (
+            <TouchableOpacity 
+              style={styles.upgradeHintButton}
+              onPress={() => globalShowPaywall && globalShowPaywall()}
+            >
+              <MaterialIcons name="diamond" size={16} color={COLORS.premium} />
+              <Text style={styles.upgradeHintText}>Upgrade for unlimited favorites (free: 2)</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </SafeAreaView>
     );
   }
+
+  const atLimit = !isPremium && favorites.length >= FREE_FAVORITES_LIMIT;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
       <DevModeBanner />
       <View style={styles.favoritesHeader}>
-        <Text style={styles.favoritesHeaderTitle}>Your Favorites</Text>
+        <View>
+          <Text style={styles.favoritesHeaderTitle}>Your Favorites</Text>
+          {!isPremium && (
+            <Text style={styles.favoritesLimitText}>
+              {favorites.length}/{FREE_FAVORITES_LIMIT} free limit
+            </Text>
+          )}
+        </View>
         <Text style={styles.favoritesCount}>{favorites.length} rivers</Text>
       </View>
+      
+      {/* Upgrade banner for free users at limit */}
+      {atLimit && (
+        <TouchableOpacity 
+          style={styles.upgradeBanner}
+          onPress={() => globalShowPaywall && globalShowPaywall()}
+        >
+          <MaterialIcons name="diamond" size={20} color="#fff" />
+          <Text style={styles.upgradeBannerText}>
+            Free limit reached ({FREE_FAVORITES_LIMIT}). Tap to upgrade for unlimited.
+          </Text>
+        </TouchableOpacity>
+      )}
       <FlatList
         data={favorites}
         keyExtractor={(item) => item}
@@ -769,6 +906,75 @@ function FavoritesScreen({ navigation }) {
 // PREMIUM SCREEN
 // ============================================
 function PremiumScreen() {
+  const [isPremium, setIsPremium] = useState(globalIsPremium);
+  const [showPaywall, setShowPaywall] = useState(false);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsPremium(globalIsPremium);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const handlePurchaseSuccess = () => {
+    setIsPremium(true);
+    globalIsPremium = true;
+    setShowPaywall(false);
+  };
+  
+  // If already premium, show premium status screen
+  if (isPremium) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
+        <DevModeBanner />
+        <ScrollView contentContainerStyle={[styles.center, { padding: 32 }]}>
+          <MaterialIcons name="diamond" size={80} color={COLORS.premium} />
+          <Text style={[styles.premiumHeroTitle, { marginTop: 24, color: COLORS.text }]}>
+            You're Premium!
+          </Text>
+          <Text style={{ textAlign: 'center', color: COLORS.textSecondary, marginTop: 12, lineHeight: 20 }}>
+            You have access to all premium features including detailed hatch charts, fly recommendations, river mile calculator, and unlimited favorites.
+          </Text>
+          <View style={{ marginTop: 32, width: '100%', gap: 12 }}>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialCommunityIcons name="bug-outline" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Detailed hatch charts</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialCommunityIcons name="hook" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Exact fly recommendations</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialIcons name="show-chart" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>7-Day flow history</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialIcons name="straighten" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>River mile calculator</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialIcons name="format-list-bulleted" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Personal fishing log</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialIcons name="favorite" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Unlimited favorites</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><Ionicons name="notifications" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Push notifications</Text>
+            </View>
+            <View style={styles.premiumFeatureRow}>
+              <View style={styles.premiumFeatureIcon}><MaterialIcons name="block" size={20} color={COLORS.primary} /></View>
+              <Text style={styles.premiumFeatureText}>Ad-free experience</Text>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+  
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primaryDark} />
@@ -779,15 +985,57 @@ function PremiumScreen() {
           <Text style={styles.premiumHeroTitle}>Go Premium</Text>
           <Text style={styles.premiumHeroSubtitle}>Unlock the ultimate Montana fishing experience</Text>
         </View>
+        
         <View style={styles.pricingSection}>
-          <TouchableOpacity style={styles.monthlyButton}><Text style={styles.monthlyButtonText}>$4.99/month</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.yearlyCard}>
-            <View style={styles.yearlyBadge}><Text style={styles.yearlyBadgeText}>BEST VALUE</Text></View>
-            <Text style={styles.yearlyPrice}>$39.99/year</Text>
-            <Text style={styles.yearlySave}>Save 33%</Text>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: 16 }}>Premium Features</Text>
+          
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialCommunityIcons name="bug-outline" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Detailed hatch charts & timing</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialCommunityIcons name="hook" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Exact fly recommendations & sizes</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialIcons name="show-chart" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>7-Day flow history & trends</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialIcons name="straighten" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>River mile calculator</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialIcons name="format-list-bulleted" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Personal fishing log</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialIcons name="favorite" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Unlimited favorites</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><Ionicons name="notifications" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Push notifications</Text>
+          </View>
+          <View style={styles.premiumFeatureRow}>
+            <View style={styles.premiumFeatureIcon}><MaterialIcons name="block" size={20} color={COLORS.primary} /></View>
+            <Text style={styles.premiumFeatureText}>Ad-free experience</Text>
+          </View>
+          
+          <TouchableOpacity 
+            style={[styles.monthlyButton, { marginTop: 24 }]} 
+            onPress={() => setShowPaywall(true)}
+          >
+            <Text style={styles.monthlyButtonText}>View Pricing</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      
+      <Paywall 
+        visible={showPaywall} 
+        onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={handlePurchaseSuccess}
+      />
     </SafeAreaView>
   );
 }
@@ -807,12 +1055,63 @@ function RiversStack() {
 export default function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [isPremium, setIsPremium] = useState(DEV_MODE);
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  
+  // Use RevenueCat hook for real premium status
+  const { isPremium: revenueCatPremium, isLoading: rcLoading } = useRevenueCat();
+  
+  // Sync RevenueCat status with app state
+  useEffect(() => {
+    if (!DEV_MODE) {
+      const premiumStatus = FORCE_FREE_MODE ? false : revenueCatPremium;
+      setIsPremium(premiumStatus);
+      globalIsPremium = premiumStatus;
+    }
+  }, [revenueCatPremium]);
+  
+  // Set up global paywall function
+  useEffect(() => {
+    globalShowPaywall = () => setShowPaywall(true);
+    
+    // Load cached favorites count
+    const loadFavorites = async () => {
+      try {
+        const saved = await AsyncStorage.getItem('favorites');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          globalFavorites = parsed;
+          setFavoritesCount(parsed.length);
+        }
+      } catch (e) {
+        console.error('Error loading favorites:', e);
+      }
+    };
+    loadFavorites();
+    
+    // Set up interval to refresh favorites count
+    const interval = setInterval(() => {
+      setFavoritesCount(globalFavorites.length);
+    }, 1000);
+    
+    return () => {
+      globalShowPaywall = null;
+      clearInterval(interval);
+    };
+  }, []);
   
   useEffect(() => {
     // Initialize RevenueCat first
     initializePurchases().then((success) => {
       if (success) {
         console.log('RevenueCat ready for purchases');
+      }
+    });
+    
+    // Check cached premium status for faster UI
+    checkCachedPremiumStatus().then(({ isPremium: cached }) => {
+      if (!DEV_MODE && cached && !FORCE_FREE_MODE) {
+        setIsPremium(true);
+        globalIsPremium = true;
       }
     });
     
@@ -852,6 +1151,7 @@ export default function App() {
         <Tab.Screen name="Rivers" component={RiversStack} />
         <Tab.Screen name="Map" component={MapScreen} />
         <Tab.Screen name="Favorites" component={FavoritesScreen} />
+        <Tab.Screen name="Premium" component={PremiumScreen} />
       </Tab.Navigator>
       
       {/* RevenueCat Paywall */}
@@ -951,7 +1251,7 @@ const styles = StyleSheet.create({
   modalHeader: { alignItems: 'center', marginBottom: 24, gap: 8 },
   modalTitle: { fontSize: 22, fontWeight: '700', color: COLORS.text },
   modalSubtitle: { fontSize: 14, color: COLORS.textLight },
-  featuresList: { marginBottom: 24, gap: 12 },
+  featuresList: { marginBottom: 24, gap: 8 },
   featureItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   featureText: { fontSize: 15, color: COLORS.text },
   subscribeButton: { backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: 10, alignItems: 'center', marginBottom: 12 },
@@ -987,4 +1287,94 @@ const styles = StyleSheet.create({
   premiumFeatureText: { flex: 1 },
   premiumFeatureTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
   premiumFeatureSubtitle: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
+  // Upgrade banner and hints
+  upgradeBanner: { 
+    backgroundColor: COLORS.premium, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 16, 
+    paddingVertical: 12, 
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 10 
+  },
+  upgradeBannerText: { 
+    flex: 1, 
+    color: '#fff', 
+    fontSize: 13, 
+    fontWeight: '600' 
+  },
+  upgradeHintButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.premium + '15',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 6,
+    marginTop: 8
+  },
+  upgradeHintText: {
+    color: COLORS.premium,
+    fontSize: 13,
+    fontWeight: '600'
+  },
+  favoritesLimitText: {
+    fontSize: 11,
+    color: 'rgba(245, 241, 232, 0.7)',
+    marginTop: 2
+  },
+  // Premium page feature rows (professional style)
+  premiumFeatureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  premiumFeatureIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  premiumFeatureText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    flex: 1,
+  },
+  // Modal feature items (inline premium modal)
+  modalFeatureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f1e8',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  modalFeatureIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  modalFeatureText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.text,
+    flex: 1,
+  }
 });

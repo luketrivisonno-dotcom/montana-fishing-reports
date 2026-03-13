@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 
@@ -13,6 +13,7 @@ const COLORS = {
   textSecondary: '#6b5d4d',
   textLight: '#9a8b7a',
   wade: '#5a7d5a',
+  premium: '#b87333',
 };
 
 // Static hatch charts by river and month
@@ -158,7 +159,6 @@ const RIVER_GO_TO_FLIES = {
   'Stillwater River': ['Chubby Chernobyl #6-8', 'Pat\'s Rubber Legs #6-8', 'Prince Nymph #10-12', 'Copper John #14-16', 'Zebra Midge #18-20'],
   'Spring Creeks': ['Zebra Midge #20-22', 'RS2 #20-22', 'Pheasant Tail #18-20', 'Barr Emerger #18-20', 'Scuds #16-18'],
   'Boulder River': ['Chubby Chernobyl #8-10', 'Pat\'s Rubber Legs #8-10', 'Zebra Midge #18-20', 'Pheasant Tail #16-18', 'Prince Nymph #12-14'],
-  'Bighorn River': ['Zebra Midge #18-20', 'RS2 #18-20', 'Pheasant Tail #16-18', 'San Juan Worm #12-14', 'Rainbow Warrior #16-18'],
   'Slough Creek': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
   'Soda Butte Creek': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
   'Lamar River': ['Elk Hair Caddis #14-16', 'Pheasant Tail #16-18', 'Hare\'s Ear #14-16', 'Stimulator #10-12', 'Woolly Bugger #6-8'],
@@ -187,7 +187,7 @@ const FLY_RECOMMENDATIONS = {
   'Pseudos': ['Pseudo Spinner #16-18', 'Sparkle Dun #16-18'],
 };
 
-const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) => {
+const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData, onUpgrade }) => {
   const [hatchData, setHatchData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -208,19 +208,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       }
     }
     fetchHatchData();
-  }, [riverName, isPremium, propHatchData]);
-
-  // Always ensure we have fallback data
-  useEffect(() => {
-    if (!loading && (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0)) {
-      const staticHatches = getStaticHatches(riverName);
-      setHatchData({
-        hatches: staticHatches,
-        flies: getFlyRecommendations(staticHatches),
-        source: 'Seasonal forecast'
-      });
-    }
-  }, [loading, hatchData, riverName]);
+  }, [riverName, propHatchData]);
 
   const getStaticHatches = (river) => {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
@@ -246,28 +234,20 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
         recommendations.push(...FLY_RECOMMENDATIONS[hatch]);
       }
     }
-    return [...new Set(recommendations)].slice(0, isPremium ? 6 : 4);
+    return [...new Set(recommendations)];
   };
 
   const fetchHatchData = async () => {
     try {
       setLoading(true);
       
-      // Try API first
-      const endpoint = isPremium 
-        ? `${API_URL}/api/premium/hatch-charts/${encodeURIComponent(riverName)}`
-        : `${API_URL}/api/hatches/${encodeURIComponent(riverName)}`;
-      
-      const headers = { 'Content-Type': 'application/json' };
-      if (isPremium) {
-        headers['x-api-key'] = 'dev-mode';
-        headers['x-user-email'] = 'dev@example.com';
-      }
+      // Use public API for all users - premium gets more data from backend
+      const endpoint = `${API_URL}/api/hatches/${encodeURIComponent(riverName)}`;
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const response = await fetch(endpoint, { headers, signal: controller.signal });
+      const response = await fetch(endpoint, { signal: controller.signal });
       clearTimeout(timeoutId);
       
       if (response.ok) {
@@ -275,10 +255,8 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
         if (data.currentHatches && data.currentHatches.length > 0) {
           setHatchData({
             hatches: data.currentHatches,
-            flies: data.recommendedFlies || getFlyRecommendations(data.currentHatches),
-            source: data.source || 'report',
-            waterTemp: data.waterTemp,
-            waterConditions: data.waterConditions
+            flies: getFlyRecommendations(data.currentHatches),
+            source: data.source || 'report'
           });
           setLoading(false);
           return;
@@ -306,14 +284,44 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
     );
   }
 
-  if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
-    return null;
+  const displayHatches = hatchData?.hatches || [];
+
+  // FREE USER VIEW - Teaser only
+  if (!isPremium) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <MaterialCommunityIcons name="bug" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+          <Text style={styles.title}>Current Hatches</Text>
+        </View>
+        
+        {/* Show just the hatch names for free users */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
+          {displayHatches.slice(0, 3).map((hatch, index) => (
+            <View key={index} style={[styles.hatchBadge, styles.primaryHatch]}>
+              <Text style={styles.hatchText}>{hatch}</Text>
+            </View>
+          ))}
+        </ScrollView>
+        
+        {/* Locked premium content teaser */}
+        <TouchableOpacity style={styles.lockedCard} onPress={onUpgrade}>
+          <View style={styles.lockedIconContainer}>
+            <MaterialIcons name="lock" size={20} color={COLORS.premium} />
+          </View>
+          <View style={styles.lockedTextContainer}>
+            <Text style={styles.lockedTitle}>Detailed Hatch Charts & Fly Recommendations</Text>
+            <Text style={styles.lockedSubtitle}>
+              See exact fly patterns, sizes, and go-to flies for current conditions
+            </Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={20} color={COLORS.premium} />
+        </TouchableOpacity>
+      </View>
+    );
   }
 
-  // Combine dynamic hatches with seasonal forecast if different
-  const displayHatches = hatchData.hatches || [];
-  const seasonalHatches = hatchData.seasonalForecast || [];
-  
+  // PREMIUM USER VIEW - Full content
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -322,7 +330,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       </View>
       
       {/* Water temp - subtle inline display */}
-      {hatchData.waterTemp && (
+      {hatchData?.waterTemp && (
         <Text style={styles.waterTempSubtle}>
           Water: {hatchData.waterTemp}
           {hatchData.tempSource && hatchData.tempSource !== 'USGS Live' && (
@@ -332,7 +340,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
       )}
       
       {/* Water conditions - only if meaningful */}
-      {hatchData.waterConditions && (
+      {hatchData?.waterConditions && (
         <Text style={styles.conditionsSubtle}>{hatchData.waterConditions}</Text>
       )}
       
@@ -345,28 +353,8 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
         ))}
       </ScrollView>
       
-      {/* Show seasonal forecast if different from current */}
-      {seasonalHatches.length > 0 && 
-       JSON.stringify(seasonalHatches.sort()) !== JSON.stringify(displayHatches.sort()) && (
-        <>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, marginBottom: 8 }}>
-            <MaterialCommunityIcons name="calendar-month" size={14} color={COLORS.textLight} style={{ marginRight: 6 }} />
-            <Text style={styles.seasonalLabel}>Seasonal Hatches Also Expected:</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
-            {seasonalHatches
-              .filter(h => !displayHatches.includes(h))
-              .map((hatch, index) => (
-              <View key={index} style={[styles.hatchBadge, styles.seasonalHatch]}>
-                <Text style={styles.seasonalHatchText}>{hatch}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </>
-      )}
-      
       {/* Fly recommendations */}
-      {hatchData.flies && hatchData.flies.length > 0 && (
+      {hatchData?.flies && hatchData.flies.length > 0 && (
         <>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, marginBottom: 10 }}>
             <MaterialCommunityIcons name="hook" size={16} color={COLORS.primary} style={{ marginRight: 8 }} />
@@ -399,7 +387,7 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData }) 
         </>
       )}
       
-      <Text style={styles.sourceText}>{hatchData.source}</Text>
+      <Text style={styles.sourceText}>{hatchData?.source}</Text>
     </View>
   );
 };
@@ -430,11 +418,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 10,
   },
-  waterInfo: {
-    fontSize: 13,
-    color: COLORS.primary,
-    marginBottom: 4,
-  },
   waterTempSubtle: {
     fontSize: 12,
     fontWeight: '500',
@@ -452,25 +435,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginBottom: 10,
   },
-  seasonalLabel: {
-    fontSize: 12,
-    color: COLORS.textLight,
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  primaryHatch: {
-    backgroundColor: COLORS.wade + '25',
-    borderColor: COLORS.wade,
-  },
-  seasonalHatch: {
-    backgroundColor: COLORS.textLight + '15',
-    borderColor: COLORS.textLight + '40',
-  },
-  seasonalHatchText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.textSecondary,
-  },
   hatchScroll: {
     flexDirection: 'row',
   },
@@ -483,10 +447,48 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.wade,
   },
+  primaryHatch: {
+    backgroundColor: COLORS.wade + '25',
+    borderColor: COLORS.wade,
+  },
   hatchText: {
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.wade,
+  },
+  // Locked card styles
+  lockedCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.premium + '10',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: COLORS.premium + '30',
+    borderStyle: 'dashed',
+  },
+  lockedIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.premium + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  lockedTextContainer: {
+    flex: 1,
+  },
+  lockedTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  lockedSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
   flyContainer: {
     flexDirection: 'row',

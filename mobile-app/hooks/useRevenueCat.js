@@ -14,12 +14,39 @@ const API_KEYS = {
 
 const ENTITLEMENT_ID = 'Montana Fishing Reports Pro';
 
+// Track SDK state
+let isConfigured = false;
+let isExpoGo = false;  // True if running in Expo Go (no native purchases)
+
+/**
+ * Check if running in Expo Go
+ * RevenueCat native modules don't work in Expo Go
+ */
+const checkIsExpoGo = () => {
+  // @ts-ignore
+  return !!global.Expo || !!global.__expo;
+};
+
 /**
  * Initialize RevenueCat SDK
  * Call this once when your app starts
  */
 export const initializePurchases = async () => {
   try {
+    // Check if already configured
+    if (isConfigured) {
+      console.log('✅ RevenueCat already initialized');
+      return true;
+    }
+    
+    // Check if running in Expo Go
+    if (checkIsExpoGo()) {
+      console.log('📱 Running in Expo Go - RevenueCat native purchases not available');
+      isExpoGo = true;
+      isConfigured = true;  // Mark as "configured" to prevent further errors
+      return true;
+    }
+    
     // Enable debug logs in development
     if (__DEV__) {
       Purchases.setLogLevel(LOG_LEVEL.DEBUG);
@@ -32,13 +59,31 @@ export const initializePurchases = async () => {
     // Configure with anonymous user ID (RevenueCat generates one)
     Purchases.configure({ apiKey });
     
+    isConfigured = true;
     console.log('✅ RevenueCat initialized');
     return true;
   } catch (error) {
+    // Check if this is the Expo Go error
+    if (error.message && error.message.includes('Expo Go')) {
+      console.log('📱 Running in Expo Go - RevenueCat native purchases not available');
+      isExpoGo = true;
+      isConfigured = true;  // Mark as "configured" to prevent further errors
+      return true;
+    }
     console.error('❌ RevenueCat init error:', error);
     return false;
   }
 };
+
+/**
+ * Check if RevenueCat is configured
+ */
+export const isRevenueCatConfigured = () => isConfigured;
+
+/**
+ * Check if running in Expo Go (no native purchases)
+ */
+export const isRunningInExpoGo = () => isExpoGo;
 
 /**
  * Main hook for RevenueCat functionality
@@ -48,6 +93,7 @@ export function useRevenueCat() {
   const [offerings, setOfferings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   // Check if user has premium entitlement
   const isPremium = customerInfo?.entitlements?.active?.[ENTITLEMENT_ID] !== undefined;
@@ -55,18 +101,70 @@ export function useRevenueCat() {
   // Get expiration date if available
   const expirationDate = customerInfo?.entitlements?.active?.[ENTITLEMENT_ID]?.expirationDate;
 
-  // Load customer info and offerings on mount
+  // Wait for SDK to be configured, then load data
   useEffect(() => {
-    loadCustomerInfo();
-    loadOfferings();
-
-    // Set up listener for customer info updates
-    const unsubscribe = Purchases.addCustomerInfoUpdateListener((info) => {
-      setCustomerInfo(info);
-      // Cache premium status
-      const hasPremium = info.entitlements?.active?.[ENTITLEMENT_ID] !== undefined;
-      AsyncStorage.setItem('isPremium', hasPremium ? 'true' : 'false');
-    });
+    let unsubscribe;
+    
+    const init = async () => {
+      // Wait for SDK to be configured
+      let attempts = 0;
+      while (!isConfigured && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      if (!isConfigured) {
+        console.warn('RevenueCat not configured after 5 seconds');
+        setIsLoading(false);
+        return;
+      }
+      
+      setIsReady(true);
+      
+      // Skip if running in Expo Go (native modules not available)
+      if (isExpoGo) {
+        console.log('📱 Expo Go mode - skipping RevenueCat data loading');
+        // Load cached premium status from AsyncStorage if available
+        try {
+          const cached = await AsyncStorage.getItem('isPremium');
+          if (cached === 'true') {
+            // Mock customer info for development
+            setCustomerInfo({
+              entitlements: {
+                active: {
+                  [ENTITLEMENT_ID]: {
+                    identifier: ENTITLEMENT_ID,
+                    expirationDate: null,
+                  }
+                }
+              }
+            });
+          }
+        } catch (e) {
+          // Ignore cache errors
+        }
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        // Set up listener for customer info updates
+        unsubscribe = Purchases.addCustomerInfoUpdateListener((info) => {
+          setCustomerInfo(info);
+          // Cache premium status
+          const hasPremium = info.entitlements?.active?.[ENTITLEMENT_ID] !== undefined;
+          AsyncStorage.setItem('isPremium', hasPremium ? 'true' : 'false');
+        });
+        
+        // Load initial data
+        await loadCustomerInfo();
+        await loadOfferings();
+      } catch (error) {
+        console.error('Error initializing RevenueCat hook:', error);
+      }
+    };
+    
+    init();
 
     return () => {
       unsubscribe?.();
@@ -74,6 +172,8 @@ export function useRevenueCat() {
   }, []);
 
   const loadCustomerInfo = useCallback(async () => {
+    if (!isConfigured) return;
+    
     try {
       const info = await Purchases.getCustomerInfo();
       setCustomerInfo(info);
@@ -94,6 +194,8 @@ export function useRevenueCat() {
   }, []);
 
   const loadOfferings = useCallback(async () => {
+    if (!isConfigured) return;
+    
     try {
       const offerings = await Purchases.getOfferings();
       setOfferings(offerings);
@@ -103,6 +205,10 @@ export function useRevenueCat() {
   }, []);
 
   const purchasePackage = useCallback(async (pkg) => {
+    if (isExpoGo) {
+      return { success: false, error: 'Purchases not available in Expo Go. Please use a development build.' };
+    }
+    if (!isConfigured) return { success: false, error: 'Purchase system not ready' };
     if (!pkg) return { success: false, error: 'No package selected' };
     
     setIsPurchasing(true);
@@ -135,6 +241,11 @@ export function useRevenueCat() {
   }, []);
 
   const restorePurchases = useCallback(async () => {
+    if (isExpoGo) {
+      return { success: false, error: 'Purchases not available in Expo Go. Please use a development build.' };
+    }
+    if (!isConfigured) return { success: false, error: 'Purchase system not ready' };
+    
     setIsPurchasing(true);
     try {
       const { customerInfo: newInfo } = await Purchases.restorePurchases();
@@ -186,6 +297,8 @@ export function useRevenueCat() {
   };
 
   const logout = useCallback(async () => {
+    if (!isConfigured) return;
+    
     try {
       await Purchases.logOut();
       await AsyncStorage.removeItem('isPremium');
@@ -206,6 +319,7 @@ export function useRevenueCat() {
     // State
     isLoading,
     isPurchasing,
+    isReady,
     isPremium,
     expirationDate,
     customerInfo,

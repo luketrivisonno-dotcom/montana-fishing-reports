@@ -12,8 +12,8 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRevenueCat } from '../hooks/useRevenueCat';
+import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRevenueCat, isRunningInExpoGo } from '../hooks/useRevenueCat';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -29,14 +29,16 @@ const COLORS = {
 };
 
 const FEATURES = [
-  { icon: '✨', text: 'Ad-free experience' },
-  { icon: '🔔', text: 'Push notifications for new reports' },
-  { icon: '🦋', text: 'Hatch alerts (Salmonflies, PMDs, etc.)' },
-  { icon: '📊', text: 'Detailed hatch charts & flies' },
-  { icon: '⭐', text: 'Unlimited favorite rivers' },
-  { icon: '📏', text: 'River mile calculator' },
-  { icon: '📜', text: 'Detailed regulations & seasons' },
-  { icon: '📶', text: 'Offline mode' },
+  { icon: 'bug', iconType: 'material-community', text: 'Detailed hatch charts & timing' },
+  { icon: 'hook', iconType: 'material-community', text: 'Exact fly recommendations & sizes' },
+  { icon: 'show-chart', iconType: 'material', text: '7-Day flow history & trends' },
+  { icon: 'straighten', iconType: 'material', text: 'River mile calculator' },
+  { icon: 'format-list-bulleted', iconType: 'material', text: 'Personal fishing log' },
+  { icon: 'gavel', iconType: 'material', text: 'Detailed regulations & seasons' },
+  { icon: 'favorite', iconType: 'material', text: 'Unlimited favorite rivers (free: 2)' },
+  { icon: 'notifications', iconType: 'ionicons', text: 'Push notifications for new reports' },
+  { icon: 'block', iconType: 'material', text: 'Ad-free experience' },
+  { icon: 'cloud-offline', iconType: 'ionicons', text: 'Offline mode' },
 ];
 
 export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
@@ -49,6 +51,9 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
     purchasePackage,
     restorePurchases,
   } = useRevenueCat();
+  
+  // Check if running in Expo Go (purchases not available)
+  const inExpoGo = isRunningInExpoGo();
 
   // If already premium, show different UI
   if (isPremium && visible) {
@@ -133,7 +138,18 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
             </TouchableOpacity>
           </View>
 
-          {isLoading ? (
+          {inExpoGo ? (
+            <View style={styles.loadingContainer}>
+              <Ionicons name="phone-portrait-outline" size={48} color={COLORS.premium} />
+              <Text style={styles.loadingText}>Purchases not available in Expo Go</Text>
+              <Text style={[styles.loadingText, { fontSize: 12, marginTop: 8 }]}>
+                Please use a development build to test purchases
+              </Text>
+              <TouchableOpacity style={[styles.restoreButton, { marginTop: 16 }]} onPress={onClose}>
+                <Text style={styles.restoreText}>Got it</Text>
+              </TouchableOpacity>
+            </View>
+          ) : isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.premium} />
               <Text style={styles.loadingText}>Loading subscription options...</Text>
@@ -145,7 +161,17 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                 <Text style={styles.featuresTitle}>Premium Features</Text>
                 {FEATURES.map((feature, index) => (
                   <View key={index} style={styles.featureItem}>
-                    <Text style={styles.featureIcon}>{feature.icon}</Text>
+                    <View style={styles.featureIconBox}>
+                      {feature.iconType === 'material-community' && (
+                        <MaterialCommunityIcons name={feature.icon} size={18} color={COLORS.primary} />
+                      )}
+                      {feature.iconType === 'material' && (
+                        <MaterialIcons name={feature.icon} size={18} color={COLORS.primary} />
+                      )}
+                      {feature.iconType === 'ionicons' && (
+                        <Ionicons name={feature.icon} size={18} color={COLORS.primary} />
+                      )}
+                    </View>
                     <Text style={styles.featureText}>{feature.text}</Text>
                   </View>
                 ))}
@@ -289,15 +315,26 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: 8,
+    backgroundColor: COLORS.surface,
+    borderRadius: 10,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e8e4da',
   },
-  featureIcon: {
-    fontSize: 18,
-    marginRight: 10,
-    width: 24,
+  featureIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: COLORS.primary + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   featureText: {
     fontSize: 14,
+    fontWeight: '500',
     color: COLORS.text,
     flex: 1,
   },
