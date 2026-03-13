@@ -316,6 +316,33 @@ function RiversScreen({ navigation }) {
     const lastUpdated = formatLastUpdated(reports);
     const flowCondition = getFlowCondition(flow, river);
     const isYnp = YNP_RIVERS.includes(river);
+    const [isFav, setIsFav] = useState(globalFavorites.includes(river));
+    
+    const toggleFavorite = async (e) => {
+      e.stopPropagation();
+      
+      if (isFav) {
+        // Remove from favorites
+        const newFavorites = globalFavorites.filter(r => r !== river);
+        globalFavorites = newFavorites;
+        setIsFav(false);
+        await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+      } else {
+        // Check limit for free users
+        if (!globalIsPremium && globalFavorites.length >= FREE_FAVORITES_LIMIT) {
+          Alert.alert(
+            'Free Plan Limit Reached',
+            `Free users can save ${FREE_FAVORITES_LIMIT} favorite rivers.`,
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+        // Add to favorites
+        globalFavorites.push(river);
+        setIsFav(true);
+        await AsyncStorage.setItem('favorites', JSON.stringify(globalFavorites));
+      }
+    };
     
     return (
       <TouchableOpacity 
@@ -330,20 +357,19 @@ function RiversScreen({ navigation }) {
           imageStyle={styles.cardHeaderImageStyle}
         >
           <View style={styles.cardHeaderOverlay}>
+            {/* Heart button - top right, transparent */}
             <TouchableOpacity 
               style={styles.heartButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                // Toggle favorite logic here
-              }}
+              onPress={toggleFavorite}
             >
               <Ionicons 
-                name={globalFavorites.includes(river) ? "heart" : "heart-outline"} 
-                size={20} 
-                color={globalFavorites.includes(river) ? COLORS.error : 'white'} 
+                name={isFav ? "heart" : "heart-outline"} 
+                size={24} 
+                color={isFav ? '#e74c3c' : 'white'} 
               />
             </TouchableOpacity>
             
+            {/* YNP badge - bottom right */}
             {isYnp && (
               <View style={styles.ynpBadgeNew}>
                 <Text style={styles.ynpBadgeTextNew}>🏔️ YNP</Text>
@@ -356,19 +382,21 @@ function RiversScreen({ navigation }) {
         
         {/* Card Body with Flow/Temp */}
         <View style={styles.cardBody}>
-          {flow && flow.cfs !== 'N/A' && (
-            <View style={styles.infoRowNew}>
-              <Text style={styles.infoLabelNew}>Flow</Text>
-              <Text style={styles.infoValueNew}>{flow.cfs} cfs</Text>
-            </View>
-          )}
+          {/* Always show flow row, even if loading */}
+          <View style={styles.infoRowNew}>
+            <Text style={styles.infoLabelNew}>Flow</Text>
+            <Text style={styles.infoValueNew}>
+              {flow && flow.cfs !== 'N/A' ? `${flow.cfs} cfs` : 'Loading...'}
+            </Text>
+          </View>
           
-          {temp && temp !== 'N/A' && (
-            <View style={styles.infoRowNew}>
-              <Text style={styles.infoLabelNew}>Temp</Text>
-              <Text style={styles.infoValueNew}>{temp}</Text>
-            </View>
-          )}
+          {/* Always show temp row */}
+          <View style={styles.infoRowNew}>
+            <Text style={styles.infoLabelNew}>Temp</Text>
+            <Text style={styles.infoValueNew}>
+              {temp && temp !== 'N/A' ? temp : 'Loading...'}
+            </Text>
+          </View>
           
           {flowCondition && (
             <View style={[styles.flowBadge, { backgroundColor: flowCondition.bgColor }]}>
@@ -382,7 +410,7 @@ function RiversScreen({ navigation }) {
             <View style={styles.reportChips}>
               <View style={styles.reportChip}>
                 <Text style={styles.reportChipText} numberOfLines={1}>
-                  Updated {lastUpdated}
+                  Updated report {lastUpdated}
                 </Text>
               </View>
             </View>
@@ -1607,19 +1635,18 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     position: 'absolute',
-    top: 12,
-    right: 70,
-    width: 32,
-    height: 32,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 16,
+    top: 8,
+    right: 8,
+    width: 36,
+    height: 36,
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
   },
   ynpBadgeNew: {
     position: 'absolute',
-    top: 12,
+    bottom: 12,
     right: 12,
     backgroundColor: 'rgba(0,0,0,0.6)',
     paddingHorizontal: 10,
