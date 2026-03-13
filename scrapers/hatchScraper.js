@@ -24,6 +24,12 @@ const HATCH_SOURCES = {
     'Soda Butte Creek': 'https://www.blueribbonflies.com/fishing-report/',
     'Lamar River': 'https://www.blueribbonflies.com/fishing-report/',
     'Gardner River': 'https://www.blueribbonflies.com/fishing-report/',
+  },
+  'Stonefly Shop': {
+    'Beaverhead River': 'https://www.thestonefly.com/pages/fishing-reports',
+  },
+  'Troutfitters': {
+    'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
   }
 };
 
@@ -269,6 +275,131 @@ async function scrapeBlueRibbonFliesHatches() {
   return results;
 }
 
+async function scrapeStoneflyShopHatches() {
+  const results = [];
+  const url = HATCH_SOURCES['Stonefly Shop']['Beaverhead River'];
+  
+  try {
+    console.log(`Scraping Stonefly Shop hatch data for Beaverhead River...`);
+    
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 15000
+    });
+    
+    const $ = cheerio.load(data);
+    const contentText = $('body').text();
+    
+    // Extract date
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
+    
+    // Extract hatches from text
+    const hatches = extractHatches(contentText);
+    
+    // Get water temp from USGS
+    let waterTemp = null;
+    try {
+      const usgsData = await getUSGSData('Beaverhead River');
+      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
+        waterTemp = usgsData.temp;
+      }
+    } catch (e) {
+      // USGS failed
+    }
+    
+    // Stonefly Shop covers multiple rivers but we want Beaverhead specifically
+    if (hatches.length > 0) {
+      results.push({
+        river: 'Beaverhead River',
+        source: 'Stonefly Shop',
+        hatches,
+        fly_recommendations: getFlyRecommendations(hatches),
+        hatch_details: {
+          extracted_from: 'Stonefly Shop fishing report',
+          confidence: 'medium',
+          note: 'Dillon area report'
+        },
+        water_temp: waterTemp,
+        water_conditions: null,
+        report_date: reportDate,
+        url
+      });
+      
+      console.log(`  Found ${hatches.length} hatches for Beaverhead River`);
+    }
+    
+  } catch (error) {
+    console.error(`  Error scraping Stonefly Shop:`, error.message);
+  }
+  
+  return results;
+}
+
+async function scrapeTroutfittersHatches() {
+  const results = [];
+  const url = HATCH_SOURCES['Troutfitters']['Big Hole River'];
+  
+  try {
+    console.log(`Scraping Troutfitters hatch data for Big Hole River...`);
+    
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 15000
+    });
+    
+    const $ = cheerio.load(data);
+    const contentText = $('body').text();
+    
+    // Extract date
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
+    
+    // Extract hatches from text
+    const hatches = extractHatches(contentText);
+    
+    // Get water temp from USGS
+    let waterTemp = null;
+    try {
+      const usgsData = await getUSGSData('Big Hole River');
+      if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
+        waterTemp = usgsData.temp;
+      }
+    } catch (e) {
+      // USGS failed
+    }
+    
+    if (hatches.length > 0) {
+      results.push({
+        river: 'Big Hole River',
+        source: 'Troutfitters',
+        hatches,
+        fly_recommendations: getFlyRecommendations(hatches),
+        hatch_details: {
+          extracted_from: 'Troutfitters fishing report',
+          confidence: 'medium',
+          note: 'Twin Bridges area report'
+        },
+        water_temp: waterTemp,
+        water_conditions: null,
+        report_date: reportDate,
+        url
+      });
+      
+      console.log(`  Found ${hatches.length} hatches for Big Hole River`);
+    }
+    
+  } catch (error) {
+    console.error(`  Error scraping Troutfitters:`, error.message);
+  }
+  
+  return results;
+}
+
 async function saveHatchReports(reports) {
   const saved = [];
   
@@ -334,6 +465,28 @@ async function runHatchScraper() {
       console.log(`✓ Saved ${saved.length} Blue Ribbon Flies reports`);
       totalSaved += saved.length;
       allReports.push(...blueRibbonHatches);
+    }
+    
+    // Scrape from Stonefly Shop
+    console.log('\n--- Stonefly Shop ---');
+    const stoneflyHatches = await scrapeStoneflyShopHatches();
+    
+    if (stoneflyHatches.length > 0) {
+      const saved = await saveHatchReports(stoneflyHatches);
+      console.log(`✓ Saved ${saved.length} Stonefly Shop reports`);
+      totalSaved += saved.length;
+      allReports.push(...stoneflyHatches);
+    }
+    
+    // Scrape from Troutfitters
+    console.log('\n--- Troutfitters ---');
+    const troutfittersHatches = await scrapeTroutfittersHatches();
+    
+    if (troutfittersHatches.length > 0) {
+      const saved = await saveHatchReports(troutfittersHatches);
+      console.log(`✓ Saved ${saved.length} Troutfitters reports`);
+      totalSaved += saved.length;
+      allReports.push(...troutfittersHatches);
     }
     
     console.log(`\n✓ Total: ${totalSaved} hatch reports saved`);
