@@ -74,16 +74,61 @@ async function scrapeBlackfootBRO() {
 }
 
 async function scrapeBlackfootMissoulian() {
-    return {
-        source: 'The Missoulian Angler',
-        river: 'Blackfoot River',
-        url: 'https://www.missoulianangler.com/fishing-reports',
-        last_updated: null,
-        last_updated_text: null,
-        scraped_at: new Date(),
-        icon_url: null,
-        water_clarity: null
-    };
+    const url = 'https://www.missoulianangler.com/pages/blackfoot-river-fishing-report';
+    
+    try {
+        const { data } = await axios.get(url, {
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' 
+            },
+            timeout: 10000
+        });
+        
+        const $ = cheerio.load(data);
+        const pageText = $('body').text();
+        
+        // Extract date - look for "Month DD, YYYY" pattern
+        const dateMatch = pageText.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i);
+        
+        let lastUpdated = null;
+        let lastUpdatedText = null;
+        
+        if (dateMatch) {
+            lastUpdatedText = dateMatch[0];
+            try {
+                lastUpdated = new Date(dateMatch[0]).toISOString();
+            } catch (e) {
+                console.log(`  → Error parsing date for Missoulian Angler: ${dateMatch[0]}`);
+            }
+        }
+        
+        console.log(`  → Missoulian Angler - Blackfoot River: ${lastUpdatedText || 'No date found'}`);
+        
+        return {
+            source: 'The Missoulian Angler',
+            river: 'Blackfoot River',
+            url: url,
+            last_updated: lastUpdated,
+            last_updated_text: lastUpdatedText,
+            scraped_at: new Date(),
+            icon_url: null,
+            water_clarity: null
+        };
+        
+    } catch (error) {
+        console.error('Missoulian Angler error:', error.message);
+        // Return fallback with correct URL
+        return {
+            source: 'The Missoulian Angler',
+            river: 'Blackfoot River',
+            url: url,
+            last_updated: null,
+            last_updated_text: null,
+            scraped_at: new Date(),
+            icon_url: null,
+            water_clarity: null
+        };
+    }
 }
 
 module.exports = {
