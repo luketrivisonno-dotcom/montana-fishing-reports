@@ -1,7 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { extractHatchData } = require('../utils/hatchExtractor');
-const db = require('../db');
 
 const MONTANA_ANGLER_URLS = {
   'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
@@ -21,8 +19,6 @@ const MONTANA_ANGLER_URLS = {
   'Firehole River': 'https://www.montanaangler.com/fly-fishing-yellowstone-park'
 };
 
-const ICON_URL = null;
-
 async function scrapeMontanaAngler() {
   let reports = [];
   
@@ -39,15 +35,9 @@ async function scrapeMontanaAngler() {
       const pageText = $('body').text();
       
       // Look for date patterns like "Thursday, March 13, 2026" or "March 13, 2026"
-      // Try the full pattern first, then fallback to simpler pattern
       let dateMatch = pageText.match(/[A-Za-z]+,\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
       if (!dateMatch) {
         dateMatch = pageText.match(/[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
-      }
-      
-      // Also try pattern without space after comma (e.g., "March 12,2026")
-      if (!dateMatch) {
-        dateMatch = pageText.match(/[A-Za-z]+\s+\d{1,2},\s*\d{4}/);
       }
       
       let lastUpdated = null;
@@ -55,13 +45,8 @@ async function scrapeMontanaAngler() {
       
       if (dateMatch) {
         lastUpdatedText = dateMatch[0];
-        // Normalize the date string (ensure space after comma)
-        const normalizedDate = dateMatch[0].replace(/,\s*(\d{4})/, ', $1');
         try {
-          const parsedDate = new Date(normalizedDate);
-          if (!isNaN(parsedDate.getTime())) {
-            lastUpdated = parsedDate.toISOString();
-          }
+          lastUpdated = new Date(dateMatch[0]).toISOString();
         } catch (e) {
           console.log(`  → Error parsing date for ${river}: ${dateMatch[0]}`);
         }
@@ -69,53 +54,9 @@ async function scrapeMontanaAngler() {
       
       // Extract water clarity
       let waterClarity = null;
-      const clarityPatterns = [
-        /clarity[:\s]+([^.]+)/i,
-        /visibility[:\s]+([^.]+)/i,
-        /water\s+is\s+([^.]*(?:clear|off|muddy|stained|gin|excellent|good)[^.]*)/i,
-        /(?:clear|off\s*color|muddy|stained|gin\s*clear)\s+water/i
-      ];
-      
-      for (const pattern of clarityPatterns) {
-        const match = pageText.match(pattern);
-        if (match) {
-          waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
-          break;
-        }
-      }
-      
-      // Extract hatch data from the page content
-      const hatchData = extractHatchData(pageText);
-      
-      // Save hatch data if we found any (only if db is available)
-      if (hatchData.hatches.length > 0 && db) {
-        try {
-          // Mark previous reports for this river as not current
-          await db.query(
-            `UPDATE hatch_reports SET is_current = false WHERE river = $1`,
-            [river]
-          );
-          
-          // Insert new hatch report
-          await db.query(
-            `INSERT INTO hatch_reports 
-             (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
-            [
-              river,
-              'Montana Angler',
-              hatchData.hatches,
-              hatchData.fly_recommendations,
-              JSON.stringify({ extracted_from: 'Montana Angler fishing report', url }),
-              hatchData.water_temp,
-              hatchData.water_conditions,
-              lastUpdated ? new Date(lastUpdated) : null
-            ]
-          );
-          console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
-        } catch (dbError) {
-          console.error(`  → Error saving hatch data:`, dbError.message);
-        }
+      const clarityMatch = pageText.match(/clarity[:\s]+([^.]+)/i);
+      if (clarityMatch) {
+        waterClarity = clarityMatch[1].trim().substring(0, 50);
       }
       
       reports.push({
@@ -125,19 +66,29 @@ async function scrapeMontanaAngler() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdatedText,
         scraped_at: new Date(),
-        icon_url: ICON_URL,
-        water_clarity: waterClarity,
-        hatches: hatchData.hatches
+        icon_url: null,
+        water_clarity: waterClarity
       });
       
       console.log(`  → Montana Angler - ${river}: ${lastUpdatedText || 'No date'}`);
       
     } catch (error) {
       console.error(`Montana Angler error for ${river}:`, error.message);
+      // Still add the report with null date
+      reports.push({
+        source: 'Montana Angler',
+        river: river,
+        url: url,
+        last_updated: null,
+        last_updated_text: null,
+        scraped_at: new Date(),
+        icon_url: null,
+        water_clarity: null
+      });
     }
   }
   
-  return reports.length > 0 ? reports : null;
+  return reports;
 }
 
 module.exports = scrapeMontanaAngler;
