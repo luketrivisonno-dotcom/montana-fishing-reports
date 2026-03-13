@@ -27,10 +27,26 @@ async function scrapeGrizzlyHackle() {
             });
             
             const $ = cheerio.load(data);
-            const pageText = $('body').text().toLowerCase();
+            const pageText = $('body').text();
             
-            // Extract date - use word boundary to avoid capturing text like "belowFebruary"
-            const dateMatch = $('body').text().match(/\b([A-Za-z]+\s+\d{1,2},?\s+\d{4})|\b(\d{1,2}\/\d{1,2}\/\d{4})/);
+            // Extract date - look for "Month DD, YYYY" pattern
+            // Grizzly Hackle uses format like "February 25, 2026"
+            const dateMatch = pageText.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i);
+            
+            let lastUpdated = null;
+            let lastUpdatedText = null;
+            
+            if (dateMatch) {
+                lastUpdatedText = dateMatch[0];
+                try {
+                    const parsedDate = new Date(dateMatch[0]);
+                    if (!isNaN(parsedDate.getTime())) {
+                        lastUpdated = parsedDate.toISOString();
+                    }
+                } catch (e) {
+                    console.log(`  → Error parsing Grizzly Hackle date for ${river.name}: ${dateMatch[0]}`);
+                }
+            }
             
             // Extract water clarity from various patterns
             let waterClarity = null;
@@ -42,7 +58,7 @@ async function scrapeGrizzlyHackle() {
             ];
             
             for (const pattern of clarityPatterns) {
-                const match = $('body').text().match(pattern);
+                const match = pageText.match(pattern);
                 if (match) {
                     waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
                     break;
@@ -50,7 +66,7 @@ async function scrapeGrizzlyHackle() {
             }
             
             // Extract hatch data for Primary hatch source
-            const hatchData = extractHatchData(pageText);
+            const hatchData = extractHatchData(pageText.toLowerCase());
             
             // Save hatch data if found (Primary)
             if (hatchData.hatches.length > 0) {
@@ -62,7 +78,7 @@ async function scrapeGrizzlyHackle() {
                         [river.name, 'Grizzly Hackle', hatchData.hatches, hatchData.fly_recommendations,
                          JSON.stringify({ extracted_from: 'Grizzly Hackle fishing report', url }),
                          hatchData.water_temp, hatchData.water_conditions,
-                         dateMatch ? new Date(dateMatch[0]) : new Date()]
+                         lastUpdated || new Date()]
                     );
                     console.log(`  → Grizzly Hackle hatches for ${river.name}: ${hatchData.hatches.join(', ')}`);
                 } catch (dbError) {
@@ -74,13 +90,15 @@ async function scrapeGrizzlyHackle() {
                 source: 'Grizzly Hackle',
                 river: river.name,
                 url: url,
-                last_updated: dateMatch ? dateMatch[0] : null,
-                last_updated_text: dateMatch ? dateMatch[0] : null,
+                last_updated: lastUpdated,
+                last_updated_text: lastUpdatedText,
                 scraped_at: new Date(),
                 icon_url: ICON_URL,
                 water_clarity: waterClarity,
                 hatches: hatchData.hatches
             });
+            
+            console.log(`  → Grizzly Hackle - ${river.name}: ${lastUpdatedText || 'No date found'}`);
             
         } catch (error) {
             console.error(`Grizzly Hackle error for ${river.name}:`, error.message);

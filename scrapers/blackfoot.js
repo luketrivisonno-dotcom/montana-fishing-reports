@@ -1,3 +1,78 @@
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+const RIVERS = [
+    { name: 'Blackfoot River', path: 'the-blackfoot-river-fishing-report' },
+    { name: 'Clark Fork River', path: 'clark-fork-river-fishing-report' },
+    { name: 'Bitterroot River', path: 'bitterroot-river-fishing-report' },
+    { name: 'Rock Creek', path: 'rock-creek-fishing-report' }
+];
+
+async function scrapeBlackfootBRO() {
+    const baseUrl = 'https://blackfootriver.com/blogs/fishing-reports';
+    let reports = [];
+    
+    for (const river of RIVERS) {
+        try {
+            const url = `${baseUrl}/${river.path}`;
+            const { data } = await axios.get(url, {
+                headers: { 
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' 
+                },
+                timeout: 10000
+            });
+            
+            const $ = cheerio.load(data);
+            const pageText = $('body').text();
+            
+            // Extract date - look for "Month DD, YYYY" pattern
+            // Shopify articles typically have date in format "February 25, 2026"
+            const dateMatch = pageText.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i);
+            
+            let lastUpdated = null;
+            let lastUpdatedText = null;
+            
+            if (dateMatch) {
+                lastUpdatedText = dateMatch[0];
+                try {
+                    lastUpdated = new Date(dateMatch[0]).toISOString();
+                } catch (e) {
+                    console.log(`  → Error parsing date for ${river.name}: ${dateMatch[0]}`);
+                }
+            }
+            
+            reports.push({
+                source: 'Blackfoot River Outfitters',
+                river: river.name,
+                url: url,
+                last_updated: lastUpdated,
+                last_updated_text: lastUpdatedText,
+                scraped_at: new Date(),
+                icon_url: null,
+                water_clarity: null
+            });
+            
+            console.log(`  → Blackfoot River Outfitters - ${river.name}: ${lastUpdatedText || 'No date found'}`);
+            
+        } catch (error) {
+            console.error(`Blackfoot River Outfitters error for ${river.name}:`, error.message);
+            // Return fallback with null date
+            reports.push({
+                source: 'Blackfoot River Outfitters',
+                river: river.name,
+                url: `https://blackfootriver.com/blogs/fishing-reports/${river.path}`,
+                last_updated: null,
+                last_updated_text: null,
+                scraped_at: new Date(),
+                icon_url: null,
+                water_clarity: null
+            });
+        }
+    }
+    
+    return reports;
+}
+
 async function scrapeBlackfootMissoulian() {
     return {
         source: 'The Missoulian Angler',
@@ -9,52 +84,6 @@ async function scrapeBlackfootMissoulian() {
         icon_url: null,
         water_clarity: null
     };
-}
-
-async function scrapeBlackfootBRO() {
-    const baseUrl = 'https://blackfootriver.com';
-    return [
-        {
-            source: 'Blackfoot River Outfitters',
-            river: 'Blackfoot River',
-            url: baseUrl + '/blogs/fishing-reports/the-blackfoot-river-fishing-report',
-            last_updated: null,
-            last_updated_text: null,
-            scraped_at: new Date(),
-            icon_url: null,
-            water_clarity: null
-        },
-        {
-            source: 'Blackfoot River Outfitters',
-            river: 'Clark Fork River',
-            url: baseUrl + '/blogs/fishing-reports/clark-fork-river-fishing-report',
-            last_updated: null,
-            last_updated_text: null,
-            scraped_at: new Date(),
-            icon_url: null,
-            water_clarity: null
-        },
-        {
-            source: 'Blackfoot River Outfitters',
-            river: 'Bitterroot River',
-            url: baseUrl + '/blogs/fishing-reports/bitterroot-river-fishing-report',
-            last_updated: null,
-            last_updated_text: null,
-            scraped_at: new Date(),
-            icon_url: null,
-            water_clarity: null
-        },
-        {
-            source: 'Blackfoot River Outfitters',
-            river: 'Rock Creek',
-            url: baseUrl + '/blogs/fishing-reports/rock-creek-fishing-report',
-            last_updated: null,
-            last_updated_text: null,
-            scraped_at: new Date(),
-            icon_url: null,
-            water_clarity: null
-        }
-    ];
 }
 
 module.exports = {
