@@ -170,6 +170,7 @@ function DevModeBanner() {
 // ============================================
 function RiversScreen({ navigation }) {
   const [rivers, setRivers] = useState([]);
+  const [riverData, setRiverData] = useState({}); // Store flow/temp data for each river
   const [filteredRivers, setFilteredRivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -209,11 +210,21 @@ function RiversScreen({ navigation }) {
       setFilteredRivers(sortedRivers);
       setIsOffline(false);
       await cacheRiverData('river_list', sortedRivers);
+      
+      // Fetch summary data for each river
+      fetchAllRiverData(sortedRivers);
     } catch (error) {
       setIsOffline(true);
       const cachedRivers = await getCachedRiverData('river_list');
       if (cachedRivers) {
         setRivers(cachedRivers);
+        // Try to load cached river data
+        const cachedData = {};
+        for (const river of cachedRivers) {
+          const riverCache = await getCachedRiverData(river);
+          if (riverCache) cachedData[river] = riverCache;
+        }
+        setRiverData(cachedData);
       } else {
         // Fallback to essential rivers if no cache
         setRivers(ESSENTIAL_RIVERS.sort());
@@ -224,10 +235,155 @@ function RiversScreen({ navigation }) {
     }
   };
 
+  // Fetch data for all rivers in parallel (with delay to not overwhelm API)
+  const fetchAllRiverData = async (riverList) => {
+    const data = {};
+    // Fetch first 10 rivers immediately, rest with delay
+    const priorityRivers = riverList.slice(0, 10);
+    const otherRivers = riverList.slice(10);
+    
+    // Fetch priority rivers
+    await Promise.all(priorityRivers.map(async (river) => {
+      try {
+        const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
+        if (response.ok) {
+          const result = await response.json();
+          data[river] = result;
+        }
+      } catch (e) {
+        // Ignore errors for individual rivers
+      }
+    }));
+    
+    setRiverData(prev => ({ ...prev, ...data }));
+    
+    // Fetch remaining rivers with delay
+    if (otherRivers.length > 0) {
+      setTimeout(async () => {
+        const remainingData = {};
+        for (const river of otherRivers) {
+          try {
+            const response = await fetch(`${API_URL}/api/river-details/${encodeURIComponent(river)}`);
+            if (response.ok) {
+              const result = await response.json();
+              remainingData[river] = result;
+            }
+            // Small delay between requests
+            await new Promise(r => setTimeout(r, 100));
+          } catch (e) {
+            // Ignore errors
+          }
+        }
+        setRiverData(prev => ({ ...prev, ...remainingData }));
+      }, 500);
+    }
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchRivers();
     setRefreshing(false);
+  };
+
+  // Get flow condition badge text and color
+  const getFlowCondition = (flow, riverName) => {
+    if (!flow || flow.cfs === 'N/A') return null;
+    const cfs = parseInt(flow.cfs);
+    if (isNaN(cfs)) return null;
+    
+    // Simple thresholds - could be refined per river
+    if (cfs < 200) return { text: 'Low Flow', color: '#e74c3c', bgColor: '#ffebee' };
+    if (cfs > 3000) return { text: 'High Flow', color: '#e67e22', bgColor: '#fff3e0' };
+    return { text: 'Good Flow', color: '#27ae60', bgColor: '#e8f5e9' };
+  };
+
+  // Format last updated date
+  const formatLastUpdated = (reports) => {
+    if (!reports || reports.length === 0) return null;
+    const mostRecent = reports.reduce((latest, report) => {
+      if (!report.last_updated) return latest;
+      if (!latest) return report;
+      return new Date(report.last_updated) > new Date(latest.last_updated) ? report : latest;
+    }, null);
+    return mostRecent ? { source: mostRecent.source, date: formatDate(mostRecent.last_updated) } : null;
+  };
+
+  const RiverListCard = ({ river }) => {
+    const data = riverData[river];
+    const flow = data?.usgs?.flow;
+    const temp = data?.usgs?.temp;
+    const reports = data?.reports;
+    const lastUpdated = formatLastUpdated(reports);
+    const flowCondition = getFlowCondition(flow, river);
+    const isYnp = YNP_RIVERS.includes(river);
+    
+    return (
+      <TouchableOpacity 
+        style={styles.newRiverCard} 
+        onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river } })} 
+        activeOpacity={0.9}
+      >
+        {/* Card Header with Gradient */}
+        <View style={[styles.cardHeader, isYnp && styles.cardHeaderYnp]}>
+          <TouchableOpacity 
+            style={styles.heartButton}
+            onPress={(e) => {
+              e.stopPropagation();
+              // Toggle favorite logic here
+            }}
+          >
+            <Ionicons 
+              name={globalFavorites.includes(river) ? "heart" : "heart-outline"} 
+              size={20} 
+              color={globalFavorites.includes(river) ? COLORS.error : COLORS.text} 
+            />
+          </TouchableOpacity>
+          
+          {isYnp && (
+            <View style={styles.ynpBadgeNew}>
+              <Text style={styles.ynpBadgeTextNew}>🏔️ YNP</Text>
+            </View>
+          )}
+          
+          <Text style={styles.cardHeaderTitle}>{river}</Text>
+        </View>
+        
+        {/* Card Body with Flow/Temp */}
+        <View style={styles.cardBody}>
+          {flow && flow.cfs !== 'N/A' && (
+            <View style={styles.infoRowNew}>
+              <Text style={styles.infoLabelNew}>Flow</Text>
+              <Text style={styles.infoValueNew}>{flow.cfs} cfs</Text>
+            </View>
+          )}
+          
+          {temp && temp !== 'N/A' && (
+            <View style={styles.infoRowNew}>
+              <Text style={styles.infoLabelNew}>Temp</Text>
+              <Text style={styles.infoValueNew}>{temp}</Text>
+            </View>
+          )}
+          
+          {flowCondition && (
+            <View style={[styles.flowBadge, { backgroundColor: flowCondition.bgColor }]}>
+              <Text style={[styles.flowBadgeText, { color: flowCondition.color }]}>
+                {flowCondition.text}
+              </Text>
+            </View>
+          )}
+          
+          {lastUpdated && (
+            <View style={styles.reportChips}>
+              <View style={styles.reportChip}>
+                <Text style={styles.reportChipText} numberOfLines={1}>
+                  {lastUpdated.source} • {lastUpdated.date}
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   if (loading) {
@@ -287,28 +443,7 @@ function RiversScreen({ navigation }) {
         keyExtractor={(item) => item}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />}
         contentContainerStyle={styles.listContainer}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.riverCard} onPress={() => navigation.navigate('Rivers', { screen: 'RiverDetails', params: { river: item } })} activeOpacity={0.9}>
-            <ImageBackground source={getRiverImage(item)} style={styles.riverCardBackground} imageStyle={styles.riverCardImage}>
-              <View style={styles.riverCardOverlay}>
-                <View style={styles.riverCardContent}>
-                  <View style={styles.riverInfo}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={styles.riverName}>{item}</Text>
-                      {YNP_RIVERS.includes(item) && (
-                        <View style={styles.ynpBadge}>
-                          <Text style={styles.ynpBadgeText}>YNP</Text>
-                        </View>
-                      )}
-                    </View>
-                    <Text style={styles.riverMeta}>Tap for conditions & reports</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={22} color="#c9a227" />
-                </View>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => <RiverListCard river={item} />}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="search-outline" size={48} color={COLORS.textLight} />
@@ -1421,5 +1556,103 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.text,
     flex: 1,
-  }
+  },
+  // New River Card Styles (Marketing Preview Design)
+  newRiverCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  cardHeader: {
+    height: 120,
+    backgroundColor: COLORS.primary,
+    position: 'relative',
+    justifyContent: 'flex-end',
+    padding: 12,
+  },
+  cardHeaderYnp: {
+    backgroundColor: '#8b6914',
+  },
+  cardHeaderTitle: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  heartButton: {
+    position: 'absolute',
+    top: 12,
+    right: 70,
+    width: 32,
+    height: 32,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ynpBadgeNew: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  ynpBadgeTextNew: {
+    color: '#c9a227',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  cardBody: {
+    padding: 16,
+  },
+  infoRowNew: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  infoLabelNew: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  infoValueNew: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  flowBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+  flowBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  reportChips: {
+    flexDirection: 'row',
+    marginTop: 12,
+  },
+  reportChip: {
+    backgroundColor: '#f5f1e8',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  reportChipText: {
+    fontSize: 12,
+    color: COLORS.text,
+  },
 });
