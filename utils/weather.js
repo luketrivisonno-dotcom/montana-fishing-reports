@@ -1,28 +1,31 @@
 const axios = require('axios');
 
-// River locations with weather station names
+// River locations with lat/lon for weather
 const RIVER_LOCATIONS = {
-  'Gallatin River': { lat: 45.5200, lon: -111.2000, station: 'Gallatin Gateway', noaaStation: 'KGTF' },
-  'Upper Madison River': { lat: 45.3491, lon: -111.7308, station: 'Ennis', noaaStation: 'KEKS' },
-  'Lower Madison River': { lat: 45.8923, lon: -111.5522, station: 'Three Forks', noaaStation: 'K3TR' },
-  'Yellowstone River': { lat: 45.6770, lon: -110.5631, station: 'Livingston', noaaStation: 'KLVM' },
-  'Missouri River': { lat: 47.0527, lon: -111.8316, station: 'Craig', noaaStation: 'KCTB' },
-  'Clark Fork River': { lat: 46.8721, lon: -113.9940, station: 'Missoula', noaaStation: 'KMSO' },
-  'Blackfoot River': { lat: 46.8770, lon: -113.8940, station: 'Bonner', noaaStation: 'KMSO' },
-  'Bitterroot River': { lat: 46.2468, lon: -114.1548, station: 'Hamilton', noaaStation: 'KMSO' },
-  'Rock Creek': { lat: 46.7694, lon: -113.7117, station: 'Clinton', noaaStation: 'KMSO' },
-  'Bighorn River': { lat: 45.7325, lon: -108.3501, station: 'Hardin', noaaStation: 'KHDN' },
-  'Beaverhead River': { lat: 45.2163, lon: -112.6381, station: 'Dillon', noaaStation: 'KDLN' },
-  'Big Hole River': { lat: 45.1847, lon: -113.4081, station: 'Divide', noaaStation: 'KBTM' },
-  'Flathead River': { lat: 48.3725, lon: -114.1818, station: 'Columbia Falls', noaaStation: 'KGPI' },
-  'Jefferson River': { lat: 45.4819, lon: -112.3320, station: 'Twin Bridges', noaaStation: 'K3TR' },
-  'Ruby River': { lat: 45.3295, lon: -112.1076, station: 'Alder', noaaStation: 'KRXE' },
-  'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee', noaaStation: 'KBYZ' },
-  'Boulder River': { lat: 45.5333, lon: -109.9167, station: 'Big Timber', noaaStation: 'K6S0' },
-  'Swan River': { lat: 48.0833, lon: -114.0665, station: 'Big Fork', noaaStation: 'KGPI' },
-  'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone', noaaStation: 'KWYS' },
-  'Spring Creeks': { lat: 45.6625, lon: -110.5610, station: 'Livingston', noaaStation: 'KLVM' }
+  'Gallatin River': { lat: 45.5200, lon: -111.2000, station: 'Gallatin Gateway' },
+  'Upper Madison River': { lat: 45.3491, lon: -111.7308, station: 'Ennis' },
+  'Lower Madison River': { lat: 45.8923, lon: -111.5522, station: 'Three Forks' },
+  'Yellowstone River': { lat: 45.6770, lon: -110.5631, station: 'Livingston' },
+  'Missouri River': { lat: 47.0527, lon: -111.8316, station: 'Craig' },
+  'Clark Fork River': { lat: 46.8721, lon: -113.9940, station: 'Missoula' },
+  'Blackfoot River': { lat: 46.8770, lon: -113.8940, station: 'Bonner' },
+  'Bitterroot River': { lat: 46.2468, lon: -114.1548, station: 'Hamilton' },
+  'Rock Creek': { lat: 46.7694, lon: -113.7117, station: 'Clinton' },
+  'Bighorn River': { lat: 45.7325, lon: -108.3501, station: 'Hardin' },
+  'Beaverhead River': { lat: 45.2163, lon: -112.6381, station: 'Dillon' },
+  'Big Hole River': { lat: 45.1847, lon: -113.4081, station: 'Divide' },
+  'Flathead River': { lat: 48.3725, lon: -114.1818, station: 'Columbia Falls' },
+  'Jefferson River': { lat: 45.4819, lon: -112.3320, station: 'Twin Bridges' },
+  'Ruby River': { lat: 45.3295, lon: -112.1076, station: 'Alder' },
+  'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee' },
+  'Boulder River': { lat: 45.5333, lon: -109.9167, station: 'Big Timber' },
+  'Swan River': { lat: 48.0833, lon: -114.0665, station: 'Big Fork' },
+  'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone' },
+  'Spring Creeks': { lat: 45.6625, lon: -110.5610, station: 'Livingston' }
 };
+
+// Cache for NOAA grid points (to avoid repeated API calls)
+let noaaGridCache = {};
 
 // WMO Weather codes to emoji icons
 const WEATHER_ICONS = {
@@ -92,9 +95,8 @@ async function getWeatherForRiver(riverName) {
       river: riverName,
       source: 'Open-Meteo',
       sourceUrl: 'https://open-meteo.com',
-      noaaStation: location.noaaStation,
       noaaUrl: noaaLink,
-      attribution: 'Weather data from Open-Meteo • NOAA station available'
+      attribution: 'Weather data from Open-Meteo • NOAA link available'
     };
   } catch (error) {
     console.error(`Weather fetch failed for ${riverName}:`, error.message);
@@ -102,15 +104,51 @@ async function getWeatherForRiver(riverName) {
   }
 }
 
+// Get NOAA grid point info for a location
+async function getNOAAGridPoint(lat, lon) {
+  const cacheKey = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+  
+  if (noaaGridCache[cacheKey]) {
+    return noaaGridCache[cacheKey];
+  }
+  
+  try {
+    const response = await axios.get(
+      `https://api.weather.gov/points/${lat},${lon}`,
+      { timeout: 5000, headers: { 'User-Agent': 'MontanaFishingReports/1.0' } }
+    );
+    
+    const props = response.data.properties;
+    const gridInfo = {
+      gridId: props.gridId,
+      gridX: props.gridX,
+      gridY: props.gridY,
+      forecastUrl: props.forecast,
+      forecastHourlyUrl: props.forecastHourly,
+      observationStations: props.observationStations
+    };
+    
+    noaaGridCache[cacheKey] = gridInfo;
+    return gridInfo;
+  } catch (error) {
+    console.error(`NOAA grid point fetch failed for ${lat},${lon}:`, error.message);
+    return null;
+  }
+}
+
 // Fetch detailed NOAA forecast if available
 async function getNOAAForecast(riverName) {
   const location = RIVER_LOCATIONS[riverName];
-  if (!location || !location.noaaStation) return null;
+  if (!location) return null;
 
   try {
-    // NOAA API endpoint for forecast
+    // First get the grid point info
+    const gridPoint = await getNOAAGridPoint(location.lat, location.lon);
+    if (!gridPoint) return null;
+    
+    // Then get the forecast using the correct grid URL
     const response = await axios.get(
-      `https://api.weather.gov/gridpoints/${location.noaaStation}/31,80/forecast`,
+      gridPoint.forecastUrl,
       { timeout: 5000, headers: { 'User-Agent': 'MontanaFishingReports/1.0' } }
     );
     
