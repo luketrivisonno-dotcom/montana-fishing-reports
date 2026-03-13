@@ -320,7 +320,6 @@ function RiversScreen({ navigation }) {
     const temp = data?.usgs?.temp;
     const reports = data?.reports;
     const lastUpdated = formatLastUpdated(reports);
-    const flowCondition = getFlowCondition(flow, river);
     const isYnp = YNP_RIVERS.includes(river);
     const [isFav, setIsFav] = useState(globalFavorites.includes(river));
     
@@ -403,14 +402,6 @@ function RiversScreen({ navigation }) {
               {temp && temp !== 'N/A' ? temp : data?.usgs ? 'N/A' : 'Loading...'}
             </Text>
           </View>
-          
-          {flowCondition && (
-            <View style={[styles.flowBadge, { backgroundColor: flowCondition.bgColor }]}>
-              <Text style={[styles.flowBadgeText, { color: flowCondition.color }]}>
-                {flowCondition.text}
-              </Text>
-            </View>
-          )}
           
           {lastUpdated && (
             <View style={styles.reportChips}>
