@@ -285,6 +285,14 @@ async function initDatabase() {
         
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS source_normalized VARCHAR(100)`);
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS last_updated_text VARCHAR(50)`);
+        
+        // Add UNIQUE constraint on (source, river) if it doesn't exist
+        try {
+            await db.query(`ALTER TABLE reports ADD CONSTRAINT reports_source_river_unique UNIQUE (source, river)`);
+            console.log('Added UNIQUE constraint on (source, river)');
+        } catch (e) {
+            // Constraint already exists - ignore
+        }
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS icon_url TEXT`);
         await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS water_clarity VARCHAR(50)`);
         
