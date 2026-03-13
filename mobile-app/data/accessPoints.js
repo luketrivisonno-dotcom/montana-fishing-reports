@@ -368,6 +368,9 @@ export const ACCESS_POINTS = {
     { name: 'Rosebud Isle', lat: 45.45074, lon: -109.50677, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753686' }
   ],
 };
+// Import BLM access points
+import BLM_ACCESS_POINTS from './blmAccessPoints.json';
+
 // Helper function to get all access points as a flat array
 export function getAllAccessPoints() {
   const allPoints = [];
@@ -376,7 +379,22 @@ export function getAllAccessPoints() {
       allPoints.push(point);
     });
   });
+  // Add BLM access points
+  BLM_ACCESS_POINTS.forEach(point => {
+    allPoints.push({
+      ...point,
+      parking: true,
+      restrooms: false,
+      camping: false,
+      fwpUrl: null
+    });
+  });
   return allPoints;
+}
+
+// Helper function to get BLM access points
+export function getBLMAccessPoints() {
+  return BLM_ACCESS_POINTS;
 }
 
 // Helper function to get access points for a specific river

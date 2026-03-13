@@ -190,9 +190,12 @@ export default function RiverMap({ isPremium }) {
             title={point.name}
             description={point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access'}
           >
-            <Callout onPress={() => openFWP(point.fwpUrl)}>
+            <Callout onPress={() => point.source === 'BLM' ? null : openFWP(point.fwpUrl)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{point.name}</Text>
+                {point.source === 'BLM' && (
+                  <Text style={styles.calloutSource}>BLM Access</Text>
+                )}
 
                 <View style={styles.calloutDetails}>
                   <View style={styles.calloutRow}>
@@ -202,7 +205,7 @@ export default function RiverMap({ isPremium }) {
                       color={COLORS.textSecondary} 
                     />
                     <Text style={styles.calloutText}>
-                      {point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access'}
+                      {point.subtype || (point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access')}
                     </Text>
                   </View>
                   {point.parking && (
@@ -224,10 +227,12 @@ export default function RiverMap({ isPremium }) {
                     </View>
                   )}
                 </View>
-                <View style={styles.calloutButton}>
-                  <Text style={styles.calloutButtonText}>View on FWP</Text>
-                  <Ionicons name="open-outline" size={14} color={COLORS.primary} />
-                </View>
+                {point.source !== 'BLM' && point.fwpUrl && (
+                  <View style={styles.calloutButton}>
+                    <Text style={styles.calloutButtonText}>View on FWP</Text>
+                    <Ionicons name="open-outline" size={14} color={COLORS.primary} />
+                  </View>
+                )}
               </View>
             </Callout>
           </Marker>
@@ -346,6 +351,12 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
     marginBottom: 6,
+  },
+  calloutSource: {
+    fontSize: 11,
+    color: COLORS.accent,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   calloutDetails: {
     gap: 3,
