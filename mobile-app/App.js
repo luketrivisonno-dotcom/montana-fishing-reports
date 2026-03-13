@@ -285,11 +285,17 @@ function RiversScreen({ navigation }) {
     setRefreshing(false);
   };
 
+  // Parse flow string like "301 CFS" to get numeric value
+  const parseFlow = (flowString) => {
+    if (!flowString || flowString === 'N/A') return null;
+    const match = flowString.match(/(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  };
+
   // Get flow condition badge text and color
-  const getFlowCondition = (flow, riverName) => {
-    if (!flow || flow.cfs === 'N/A') return null;
-    const cfs = parseInt(flow.cfs);
-    if (isNaN(cfs)) return null;
+  const getFlowCondition = (flowString, riverName) => {
+    const cfs = parseFlow(flowString);
+    if (!cfs) return null;
     
     // Simple thresholds - could be refined per river
     if (cfs < 200) return { text: 'Low Flow', color: '#e74c3c', bgColor: '#ffebee' };
@@ -382,19 +388,19 @@ function RiversScreen({ navigation }) {
         
         {/* Card Body with Flow/Temp */}
         <View style={styles.cardBody}>
-          {/* Always show flow row, even if loading */}
+          {/* Flow row */}
           <View style={styles.infoRowNew}>
             <Text style={styles.infoLabelNew}>Flow</Text>
             <Text style={styles.infoValueNew}>
-              {flow && flow.cfs !== 'N/A' ? `${flow.cfs} cfs` : 'Loading...'}
+              {flow && flow !== 'N/A' ? flow : data?.usgs ? 'N/A' : 'Loading...'}
             </Text>
           </View>
           
-          {/* Always show temp row */}
+          {/* Temp row */}
           <View style={styles.infoRowNew}>
             <Text style={styles.infoLabelNew}>Temp</Text>
             <Text style={styles.infoValueNew}>
-              {temp && temp !== 'N/A' ? temp : 'Loading...'}
+              {temp && temp !== 'N/A' ? temp : data?.usgs ? 'N/A' : 'Loading...'}
             </Text>
           </View>
           
