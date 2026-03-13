@@ -41,11 +41,14 @@ async function scrapeYellowDog() {
       if (dateMatch) {
         const dateStr = dateMatch[1] || dateMatch[0];
         let year = parseInt(dateStr.match(/\d{4}/)?.[0]);
-        // Handle 2-digit years (26 = 2026)
+        // Handle 2-digit years at end of string (e.g., "Mar 12, 26")
         if (!year) {
-          const year2digit = parseInt(dateStr.match(/\d{2}/)?.[0]);
-          if (year2digit >= 20 && year2digit <= 99) year = 2000 + year2digit;
-          else if (year2digit >= 0 && year2digit < 20) year = 2000 + year2digit; // 00-19 = 2000-2019
+          const yearMatch = dateStr.match(/(\d{2})$/); // Get last 2 digits at end
+          if (yearMatch) {
+            const year2digit = parseInt(yearMatch[1]);
+            if (year2digit >= 20 && year2digit <= 99) year = 2000 + year2digit;
+            else if (year2digit >= 0 && year2digit < 20) year = 2000 + year2digit;
+          }
         }
         if (year && (year < 2020 || year > 2030)) {
           dateMatch = null; // Reject old fake dates or far future dates
