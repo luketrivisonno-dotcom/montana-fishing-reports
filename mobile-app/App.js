@@ -1191,6 +1191,12 @@ function RiversStack() {
 }
 
 // Error Boundary Component to catch and display errors
+// Use hardcoded colors to avoid COLORS dependency issues
+const ERROR_BG = '#f5f1e8';
+const ERROR_TEXT = '#a65d57';
+const ERROR_DARK = '#2c2416';
+const ERROR_LIGHT = '#6b5d4d';
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -1209,14 +1215,14 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: COLORS.background }}>
-          <Text style={{ fontSize: 24, fontWeight: 'bold', color: COLORS.error, marginBottom: 10 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: ERROR_BG }}>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: ERROR_TEXT, marginBottom: 10 }}>
             Something went wrong
           </Text>
-          <Text style={{ fontSize: 14, color: COLORS.text, textAlign: 'center', marginBottom: 20 }}>
+          <Text style={{ fontSize: 14, color: ERROR_DARK, textAlign: 'center', marginBottom: 20 }}>
             {this.state.error?.toString()}
           </Text>
-          <Text style={{ fontSize: 12, color: COLORS.textLight, textAlign: 'center' }}>
+          <Text style={{ fontSize: 12, color: ERROR_LIGHT, textAlign: 'center' }}>
             Check the console for more details
           </Text>
         </View>

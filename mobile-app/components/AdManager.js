@@ -1,4 +1,4 @@
-import { Platform, NativeModules } from 'react-native';
+import { NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Safely check if Google Mobile Ads native module exists
@@ -23,18 +23,21 @@ try {
   isExpoGo = true;
 }
 
-// Production IDs
-const PRODUCTION_INTERSTITIAL_ID = Platform.select({
-  ios: 'ca-app-pub-9219871596282320/7938533170',
-  android: 'ca-app-pub-9219871596282320/7938533170',
-});
+// Production IDs - use lazy getter to avoid Platform issues at module load
+const getProductionId = () => {
+  const { Platform } = require('react-native');
+  return Platform.select({
+    ios: 'ca-app-pub-9219871596282320/7938533170',
+    android: 'ca-app-pub-9219871596282320/7938533170',
+  });
+};
 
 const USE_TEST_ADS = true;
 
 class AdManager {
   constructor() {
     if (!isExpoGo && TestIds) {
-      this.interstitialAdId = USE_TEST_ADS ? TestIds.INTERSTITIAL : PRODUCTION_INTERSTITIAL_ID;
+      this.interstitialAdId = USE_TEST_ADS ? TestIds.INTERSTITIAL : getProductionId();
     } else {
       this.interstitialAdId = null;
     }

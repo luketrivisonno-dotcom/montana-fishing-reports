@@ -24,11 +24,14 @@ try {
   isExpoGo = true;
 }
 
-// Production Ad Unit ID
-const PRODUCTION_BANNER_ID = Platform.select({
-  ios: 'ca-app-pub-9219871596282320/1069397131',
-  android: 'ca-app-pub-9219871596282320/1069397131',
-});
+// Production Ad Unit ID - lazy getter to avoid Platform issues
+const getProductionBannerId = () => {
+  const { Platform } = require('react-native');
+  return Platform.select({
+    ios: 'ca-app-pub-9219871596282320/1069397131',
+    android: 'ca-app-pub-9219871596282320/1069397131',
+  });
+};
 
 // Use test ID for development
 const USE_TEST_ADS = true;
@@ -76,7 +79,7 @@ const AdBanner = ({
     return null;
   }
 
-  const adUnitId = USE_TEST_ADS ? TestIds.BANNER : PRODUCTION_BANNER_ID;
+  const adUnitId = USE_TEST_ADS ? TestIds.BANNER : getProductionBannerId();
   const bannerSize = BannerAdSize[size] || BannerAdSize.BANNER;
 
   return (
