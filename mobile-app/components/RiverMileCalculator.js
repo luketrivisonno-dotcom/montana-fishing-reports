@@ -21,7 +21,24 @@ const RiverMileCalculator = ({ riverName }) => {
 
   const mileData = RIVER_MILES[riverName];
   
-  if (!mileData || mileData.length === 0) return null;
+  // Show "Coming Soon" for rivers without mile data
+  if (!mileData || mileData.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <MaterialCommunityIcons name="map-marker-distance" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+          <Text style={styles.title}>River Mile Calculator</Text>
+        </View>
+        <View style={styles.comingSoonBox}>
+          <MaterialCommunityIcons name="clock-outline" size={32} color={COLORS.textLight} />
+          <Text style={styles.comingSoonTitle}>Coming Soon</Text>
+          <Text style={styles.comingSoonText}>
+            River mile data for {riverName} is currently being mapped. Check back soon!
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   const calculateDistance = () => {
     if (!startPoint || !endPoint) return null;
@@ -253,6 +270,28 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+  },
+  comingSoonBox: {
+    backgroundColor: '#f5f1e8',
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e8e4da',
+    borderStyle: 'dashed',
+  },
+  comingSoonTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  comingSoonText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
   },
 });
 
