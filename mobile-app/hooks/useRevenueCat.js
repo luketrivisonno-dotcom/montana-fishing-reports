@@ -2,9 +2,21 @@
 // Provides easy access to purchases, customer info, and premium status
 
 import { useState, useEffect, useCallback } from 'react';
-import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
+
+// Try to import Purchases - it may not be available in development builds
+let Purchases = null;
+let LOG_LEVEL = null;
+
+try {
+  const rcModule = require('react-native-purchases');
+  Purchases = rcModule.default || rcModule;
+  LOG_LEVEL = rcModule.LOG_LEVEL;
+  console.log('✅ RevenueCat Purchases module loaded');
+} catch (e) {
+  console.log('⚠️ RevenueCat Purchases not available:', e.message);
+}
 
 // RevenueCat Configuration
 const API_KEYS = {
@@ -54,6 +66,14 @@ export const initializePurchases = async () => {
       return true;
     }
     
+    // Check if Purchases module is available
+    if (!Purchases) {
+      console.log('📱 RevenueCat module not available - purchases disabled');
+      isExpoGo = true;
+      isConfigured = true;  // Mark as "configured" to prevent further errors
+      return true;
+    }
+    
     // Check if running in Expo Go
     if (checkIsExpoGo()) {
       console.log('📱 Running in Expo Go - RevenueCat native purchases not available');
@@ -63,9 +83,9 @@ export const initializePurchases = async () => {
     }
     
     // Enable debug logs in development
-    if (__DEV__) {
+    if (__DEV__ && LOG_LEVEL) {
       Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-    } else {
+    } else if (LOG_LEVEL) {
       Purchases.setLogLevel(LOG_LEVEL.INFO);
     }
 
@@ -163,6 +183,12 @@ export function useRevenueCat() {
       }
       
       try {
+        if (!Purchases) {
+          console.log('Purchases module not available');
+          setIsLoading(false);
+          return;
+        }
+        
         // Set up listener for customer info updates
         unsubscribe = Purchases.addCustomerInfoUpdateListener((info) => {
           setCustomerInfo(info);
@@ -187,7 +213,7 @@ export function useRevenueCat() {
   }, []);
 
   const loadCustomerInfo = useCallback(async () => {
-    if (!isConfigured) return;
+    if (!isConfigured || !Purchases) return;
     
     try {
       const info = await Purchases.getCustomerInfo();
@@ -209,7 +235,7 @@ export function useRevenueCat() {
   }, []);
 
   const loadOfferings = useCallback(async () => {
-    if (!isConfigured) return;
+    if (!isConfigured || !Purchases) return;
     
     try {
       const offerings = await Purchases.getOfferings();
@@ -224,6 +250,7 @@ export function useRevenueCat() {
       return { success: false, error: 'Purchases not available in Expo Go. Please use a development build.' };
     }
     if (!isConfigured) return { success: false, error: 'Purchase system not ready' };
+    if (!Purchases) return { success: false, error: 'Purchase system not available' };
     if (!pkg) return { success: false, error: 'No package selected' };
     
     setIsPurchasing(true);
@@ -260,6 +287,7 @@ export function useRevenueCat() {
       return { success: false, error: 'Purchases not available in Expo Go. Please use a development build.' };
     }
     if (!isConfigured) return { success: false, error: 'Purchase system not ready' };
+    if (!Purchases) return { success: false, error: 'Purchase system not available' };
     
     setIsPurchasing(true);
     try {
@@ -312,7 +340,7 @@ export function useRevenueCat() {
   };
 
   const logout = useCallback(async () => {
-    if (!isConfigured) return;
+    if (!isConfigured || !Purchases) return;
     
     try {
       await Purchases.logOut();

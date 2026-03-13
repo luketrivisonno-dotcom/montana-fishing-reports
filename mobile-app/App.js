@@ -29,7 +29,9 @@ import AdManager from './components/AdManager';
 let mobileAds = null;
 try {
   const adsModule = require('react-native-google-mobile-ads');
-  mobileAds = adsModule.default || adsModule;
+  // The module exports an object with methods, not a function
+  mobileAds = adsModule;
+  console.log('Google Mobile Ads module loaded:', !!mobileAds);
 } catch (e) {
   console.log('Google Mobile Ads SDK not available:', e.message);
 }
@@ -1053,6 +1055,42 @@ function RiversStack() {
   );
 }
 
+// Error Boundary Component to catch and display errors
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('App Error:', error);
+    console.error('Error Info:', errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: COLORS.background }}>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: COLORS.error, marginBottom: 10 }}>
+            Something went wrong
+          </Text>
+          <Text style={{ fontSize: 14, color: COLORS.text, textAlign: 'center', marginBottom: 20 }}>
+            {this.state.error?.toString()}
+          </Text>
+          <Text style={{ fontSize: 12, color: COLORS.textLight, textAlign: 'center' }}>
+            Check the console for more details
+          </Text>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [isPremium, setIsPremium] = useState(DEV_MODE);
@@ -1117,13 +1155,17 @@ export default function App() {
     });
     
     // Initialize Google Mobile Ads SDK if available
-    if (mobileAds) {
-      mobileAds()
-        .initialize()
-        .then(() => console.log('Google Mobile Ads initialized'))
-        .catch(err => console.log('Ad initialization error:', err));
+    if (mobileAds && mobileAds.default) {
+      try {
+        mobileAds.default()
+          .initialize()
+          .then(() => console.log('Google Mobile Ads initialized'))
+          .catch(err => console.log('Ad initialization error:', err));
+      } catch (err) {
+        console.log('Google Mobile Ads init error:', err.message);
+      }
     } else {
-      console.log('Google Mobile Ads not available (running in Expo Go)');
+      console.log('Google Mobile Ads not available (running in Expo Go or development)');
     }
   }, []);
   
@@ -1138,30 +1180,32 @@ export default function App() {
   };
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) => <TabIcon name={route.name} focused={focused} color={color} />,
-          tabBarActiveTintColor: COLORS.primary,
-          tabBarInactiveTintColor: COLORS.textLight,
-          tabBarStyle: styles.tabBar,
-          tabBarLabelStyle: styles.tabLabel,
-        })}
-      >
-        <Tab.Screen name="Rivers" component={RiversStack} />
-        <Tab.Screen name="Map" component={MapScreen} />
-        <Tab.Screen name="Favorites" component={FavoritesScreen} />
-        <Tab.Screen name="Premium" component={PremiumScreen} />
-      </Tab.Navigator>
-      
-      {/* RevenueCat Paywall */}
-      <Paywall 
-        visible={showPaywall} 
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={handlePurchaseSuccess}
-      />
-    </NavigationContainer>
+    <ErrorBoundary>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            headerShown: false,
+            tabBarIcon: ({ focused, color }) => <TabIcon name={route.name} focused={focused} color={color} />,
+            tabBarActiveTintColor: COLORS.primary,
+            tabBarInactiveTintColor: COLORS.textLight,
+            tabBarStyle: styles.tabBar,
+            tabBarLabelStyle: styles.tabLabel,
+          })}
+        >
+          <Tab.Screen name="Rivers" component={RiversStack} />
+          <Tab.Screen name="Map" component={MapScreen} />
+          <Tab.Screen name="Favorites" component={FavoritesScreen} />
+          <Tab.Screen name="Premium" component={PremiumScreen} />
+        </Tab.Navigator>
+        
+        {/* RevenueCat Paywall */}
+        <Paywall 
+          visible={showPaywall} 
+          onClose={() => setShowPaywall(false)}
+          onPurchaseSuccess={handlePurchaseSuccess}
+        />
+      </NavigationContainer>
+    </ErrorBoundary>
   );
 }
 
