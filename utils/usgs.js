@@ -3,27 +3,27 @@ const axios = require('axios');
 // USGS Site IDs with location names for display
 const USGS_SITES = {
   'Gallatin River': { id: '06043500', location: 'Gallatin Gateway, MT' },
-  'Upper Madison River': { id: '06037500', location: 'Cameron Bridge, MT' },
-  'Lower Madison River': { id: '06041000', location: 'Black\'s Ford, MT' },
-  'Yellowstone River': { id: '06192500', location: 'Corwin Springs, MT' },
+  'Upper Madison River': { id: '06040000', location: 'Cameron, MT' },
+  'Lower Madison River': { id: '06041000', location: 'McAllister, MT' },
+  'Yellowstone River': { id: '06191500', location: 'Corwin Springs, MT' },
   'Missouri River': { id: '06066500', location: 'Holter Dam, MT' },
-  'Clark Fork River': { id: '12331800', location: 'Deer Lodge, MT' },
+  'Clark Fork River': { id: '12331800', location: 'Drummond, MT' },
   'Blackfoot River': { id: '12340000', location: 'Bonner, MT' },
   'Bitterroot River': { id: '12344000', location: 'Darby, MT' },
   'Rock Creek': { id: '12334510', location: 'Clinton, MT' },
-  'Bighorn River': { id: '06294500', location: 'Bighorn, MT' },
+  'Bighorn River': { id: '06287800', location: 'St. Xavier, MT' },
   'Beaverhead River': { id: '06017000', location: 'Dillon, MT' },
   'Big Hole River': { id: '06025500', location: 'Melrose, MT' },
   'Flathead River': { id: '12363000', location: 'Columbia Falls, MT' },
   'Jefferson River': { id: '06026500', location: 'Twin Bridges, MT' },
   'Ruby River': { id: '06019500', location: 'Alder, MT' },
   'Stillwater River': { id: '06205000', location: 'Absarokee, MT' },
-  'Boulder River': { id: '06207500', location: 'Big Timber, MT' },
+  'Boulder River': { id: '06200000', location: 'Big Timber, MT' },
   'Swan River': { id: '12370000', location: 'Big Fork, MT' },
   // YNP Rivers
   'Firehole River': { id: '06036905', location: 'Near West Yellowstone, YNP' },
   'Soda Butte Creek': { id: '06187915', location: 'Near Lamar Ranger Station, YNP' },
-  'Lamar River': { id: '06188000', location: 'Near Tower Falls Ranger Station, YNP' },
+  'Lamar River': { id: '06188000', location: 'Tower Station, YNP' },
   'Gardner River': { id: '06191000', location: 'Near Mammoth, YNP' }
 };
 
@@ -31,7 +31,6 @@ const USGS_SITES = {
 const SEASONAL_GAUGES = [
   'Beaverhead River',   // Typically ice-affected in winter
   'Big Hole River',     // Often seasonal ice effects
-  'Jefferson River',    // Seasonal/intermittent flows
   'Ruby River',         // Small stream, seasonal patterns
   'Swan River',         // Seasonal high/low flows
   // YNP Rivers - high elevation, ice-affected in winter
@@ -189,6 +188,18 @@ async function getUSGSData(riverName) {
           isSeasonal
         };
       }
+      
+      // Station exists but no flow data (iced over/offline) - still provide link
+      return {
+        river: riverName,
+        flow: 'Ice/No Data',
+        temp: `${getSeasonalTemp(riverName)}°F (est.)`,
+        tempSource: 'Seasonal Estimate',
+        siteId: site.id,
+        location: site.location,
+        url: `https://waterdata.usgs.gov/monitoring-location/${site.id}`,
+        isSeasonal
+      };
     } catch (error) {
       console.error(`USGS fetch failed for ${riverName}:`, error.message);
     }
