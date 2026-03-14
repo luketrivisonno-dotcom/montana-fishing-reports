@@ -8,7 +8,6 @@ const COLORS = {
   text: '#2c2416',
   textSecondary: '#6b5d4d',
   textLight: '#9a8b7a',
-  success: '#5a7d5a',
   surface: '#faf8f3',
 };
 
@@ -46,46 +45,28 @@ function getMoonEmoji(phase) {
   return emojis[phase];
 }
 
-// Calculate solunar periods (major and minor feeding times)
-function getSolunarPeriods(date, lat = 47) {
-  // Simplified solunar calculation
-  const sunrise = new Date(date);
-  sunrise.setHours(6, 30, 0); // Approximate for Montana
+// Approximate sun times for Montana
+function getSunTimes(date = new Date()) {
+  // Simplified - assumes roughly 6:30 AM sunrise, 8:30 PM sunset for summer
+  // In a real app, you'd calculate based on latitude and date
+  const month = date.getMonth();
   
-  const sunset = new Date(date);
-  sunset.setHours(20, 30, 0);
+  // Adjust for season (very approximate for Montana)
+  let sunriseHour = 6;
+  let sunsetHour = 20;
   
-  // Major periods: moonrise/moonset (approximate)
-  const major1 = new Date(sunrise);
-  major1.setHours(6, 0);
-  
-  const major2 = new Date(sunset);
-  major2.setHours(18, 30);
-  
-  // Minor periods: halfway between
-  const minor1 = new Date(major1);
-  minor1.setHours(12, 0);
+  if (month < 2 || month > 10) { // Winter
+    sunriseHour = 8;
+    sunsetHour = 17;
+  } else if (month > 4 && month < 8) { // Summer
+    sunriseHour = 5;
+    sunsetHour = 21;
+  }
   
   return {
-    major1: formatTime(major1),
-    major2: formatTime(major2),
-    minor1: formatTime(minor1),
-    sunrise: formatTime(sunrise),
-    sunset: formatTime(sunset)
+    sunrise: `${sunriseHour}:30 AM`,
+    sunset: `${sunsetHour > 12 ? sunsetHour - 12 : sunsetHour}:30 PM`
   };
-}
-
-function formatTime(date) {
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-}
-
-// Calculate fishing quality score (1-5 stars)
-function getFishingQuality(phase) {
-  // Full moon and new moon are best
-  if (phase === 4 || phase === 0) return { score: 5, label: 'Excellent' };
-  if (phase === 3 || phase === 5) return { score: 4, label: 'Good' };
-  if (phase === 2 || phase === 6) return { score: 3, label: 'Fair' };
-  return { score: 2, label: 'Poor' };
 }
 
 const SolunarTimes = ({ riverName }) => {
@@ -93,10 +74,7 @@ const SolunarTimes = ({ riverName }) => {
   const moonPhase = getMoonPhase(today);
   const moonName = getMoonPhaseName(moonPhase);
   const moonEmoji = getMoonEmoji(moonPhase);
-  const periods = getSolunarPeriods(today);
-  const quality = getFishingQuality(moonPhase);
-  
-
+  const sunTimes = getSunTimes(today);
 
   return (
     <View style={styles.container}>
@@ -110,7 +88,7 @@ const SolunarTimes = ({ riverName }) => {
         <Text style={styles.moonEmoji}>{moonEmoji}</Text>
         <View>
           <Text style={styles.moonPhase}>{moonName}</Text>
-          <Text style={styles.moonSubtext}>Moon Phase</Text>
+          <Text style={styles.moonSubtext}>Current Phase</Text>
         </View>
       </View>
       
@@ -118,13 +96,13 @@ const SolunarTimes = ({ riverName }) => {
       <View style={styles.sunBox}>
         <View style={styles.sunItem}>
           <Ionicons name="sunny" size={18} color={COLORS.accent} />
-          <Text style={styles.sunTime}>{periods.sunrise}</Text>
+          <Text style={styles.sunTime}>{sunTimes.sunrise}</Text>
           <Text style={styles.sunLabel}>Sunrise</Text>
         </View>
         <View style={styles.sunDivider} />
         <View style={styles.sunItem}>
           <Ionicons name="moon" size={18} color={COLORS.primary} />
-          <Text style={styles.sunTime}>{periods.sunset}</Text>
+          <Text style={styles.sunTime}>{sunTimes.sunset}</Text>
           <Text style={styles.sunLabel}>Sunset</Text>
         </View>
       </View>
@@ -145,26 +123,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 12,
-  },
-  qualityBox: {
-    backgroundColor: COLORS.primary + '10',
-    borderRadius: 10,
-    padding: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  qualityLabel: {
-    fontSize: 11,
-    color: COLORS.textLight,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-
-  qualityText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.primary,
   },
   moonBox: {
     flexDirection: 'row',
@@ -178,7 +136,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     marginRight: 12,
   },
-
   moonPhase: {
     fontSize: 14,
     fontWeight: '600',
@@ -187,34 +144,6 @@ const styles = StyleSheet.create({
   moonSubtext: {
     fontSize: 11,
     color: COLORS.textLight,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-  },
-  timeRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 12,
-  },
-  timeBox: {
-    flex: 1,
-    backgroundColor: '#f5f1e8',
-    borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
-  },
-  timeValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  timeLabel: {
-    fontSize: 11,
-    color: COLORS.textLight,
-    marginTop: 2,
   },
   sunBox: {
     flexDirection: 'row',
@@ -231,7 +160,7 @@ const styles = StyleSheet.create({
   sunDivider: {
     width: 1,
     height: 30,
-    backgroundColor: COLORS.border,
+    backgroundColor: '#e8e4da',
   },
   sunTime: {
     fontSize: 14,

@@ -330,9 +330,9 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData, on
       </View>
       
       {/* Water temp - subtle inline display */}
-      {hatchData?.waterTemp && (
+      {hatchData?.waterTemp && !hatchData.waterTemp.includes('-999') && !hatchData.waterTemp.includes('N/A') && (
         <Text style={styles.waterTempSubtle}>
-          Water: {hatchData.waterTemp}
+          Water: {hatchData.waterTemp.replace('°F', '').replace('(est.)', '').trim()}°F
           {hatchData.tempSource && hatchData.tempSource !== 'USGS Live' && (
             <Text style={styles.tempSourceSubtle}> • {hatchData.tempSource}</Text>
           )}

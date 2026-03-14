@@ -135,7 +135,7 @@ const RiverMileCalculator = ({ riverName }) => {
                 >
                   <View style={styles.markerInfo}>
                     <Text style={styles.markerName}>{marker.name}</Text>
-                    <Text style={styles.markerMile}>Mile {marker.mile}</Text>
+                    <Text style={styles.markerMile}>Mile {marker.mile.toFixed(1)}</Text>
                   </View>
                   <View style={[styles.typeDot, { backgroundColor: getAccessTypeColor(marker.type) }]} />
                 </TouchableOpacity>
