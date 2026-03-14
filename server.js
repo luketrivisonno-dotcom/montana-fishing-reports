@@ -1378,6 +1378,19 @@ app.get('/api/premium/hatch-charts/:river',
             // Try to get dynamic hatch data from database
             let hatchData = await getCurrentHatches(river);
             
+            // Get real water temperature from USGS (prioritize over scraped data)
+            const usgsData = await getUSGSData(river);
+            let waterTemp = hatchData?.water_temp;
+            let tempSource = hatchData?.source;
+            
+            if (usgsData && usgsData.temp) {
+                const tempMatch = usgsData.temp.match(/(\d+)/);
+                if (tempMatch && !usgsData.temp.includes('-999')) {
+                    waterTemp = usgsData.temp;
+                    tempSource = usgsData.tempSource || 'USGS';
+                }
+            }
+            
             // If no dynamic data, fall back to static seasonal data
             if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
                 const staticHatches = getStaticHatches(river);
@@ -1394,9 +1407,9 @@ app.get('/api/premium/hatch-charts/:river',
                 month,
                 currentHatches: hatchData.hatches,
                 recommendedFlies: hatchData.fly_recommendations || generateFlyRecommendations(hatchData.hatches),
-                waterTemp: hatchData.water_temp,
+                waterTemp: waterTemp,
                 waterConditions: hatchData.water_conditions,
-                source: hatchData.source,
+                source: tempSource || hatchData.source,
                 reportDate: hatchData.report_date,
                 isForecast: hatchData.is_forecast || false,
                 tips: generateFishingTips(river, month)
