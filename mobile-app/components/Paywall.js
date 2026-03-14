@@ -222,6 +222,12 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                     <Text style={styles.noOfferingsText}>
                       Subscription options not available.{'\n'}Please try again later.
                     </Text>
+                    {__DEV__ && (
+                      <Text style={[styles.noOfferingsText, {fontSize: 10, marginTop: 8, color: '#999'}]}>
+                        Debug: isLoading={isLoading.toString()}{'\n'}
+                        inExpoGo={inExpoGo.toString()}
+                      </Text>
+                    )}
                   </View>
                 )}
               </View>

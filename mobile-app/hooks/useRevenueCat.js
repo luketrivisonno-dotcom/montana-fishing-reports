@@ -239,6 +239,13 @@ export function useRevenueCat() {
     
     try {
       const offerings = await Purchases.getOfferings();
+      console.log('📦 RevenueCat offerings:', JSON.stringify({
+        current: offerings.current?.identifier,
+        all: Object.keys(offerings.all || {}),
+        monthly: offerings.current?.monthly?.product?.identifier,
+        yearly: offerings.current?.yearly?.product?.identifier,
+        availablePackages: offerings.current?.availablePackages?.length || 0
+      }, null, 2));
       setOfferings(offerings);
     } catch (error) {
       console.error('Error loading offerings:', error);
