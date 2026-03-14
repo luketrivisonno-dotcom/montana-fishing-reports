@@ -1322,10 +1322,18 @@ export default function App() {
   
   useEffect(() => {
     // Initialize RevenueCat first
+    console.log('[APP] Initializing RevenueCat...');
     initializePurchases().then((success) => {
+      console.log('[APP] RevenueCat init result:', success);
       if (success) {
-        console.log('RevenueCat ready for purchases');
+        console.log('[APP] RevenueCat ready for purchases');
+      } else {
+        console.error('[APP] RevenueCat failed to initialize');
+        Alert.alert('Purchase System Error', 'RevenueCat failed to initialize. Check console logs.');
       }
+    }).catch(err => {
+      console.error('[APP] RevenueCat init threw:', err);
+      Alert.alert('Purchase System Error', err.message);
     });
     
     // Check cached premium status for faster UI

@@ -222,11 +222,17 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                     <Text style={styles.noOfferingsText}>
                       Subscription options not available.{'\n'}Please try again later.
                     </Text>
+                    <Text style={[styles.noOfferingsText, {fontSize: 11, marginTop: 8, color: '#666'}]}>
+                      Loading: {isLoading ? 'Yes' : 'No'}{'\n'}
+                      Expo Go: {inExpoGo ? 'Yes' : 'No'}
+                    </Text>
                     {__DEV__ && (
-                      <Text style={[styles.noOfferingsText, {fontSize: 10, marginTop: 8, color: '#999'}]}>
-                        Debug: isLoading={isLoading.toString()}{'\n'}
-                        inExpoGo={inExpoGo.toString()}
-                      </Text>
+                      <TouchableOpacity 
+                        style={{marginTop: 12, padding: 8, backgroundColor: '#ddd', borderRadius: 4}}
+                        onPress={() => Alert.alert('Debug Info', `isLoading: ${isLoading}\ninExpoGo: ${inExpoGo}\nisPremium: ${isPremium}\nmonthly: ${monthlyPackage?.product?.identifier || 'none'}\nyearly: ${yearlyPackage?.product?.identifier || 'none'}`)}
+                      >
+                        <Text style={{fontSize: 12}}>Show Debug Info</Text>
+                      </TouchableOpacity>
                     )}
                   </View>
                 )}

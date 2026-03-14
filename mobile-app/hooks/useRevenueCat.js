@@ -62,50 +62,57 @@ export const initializePurchases = async () => {
   try {
     // Check if already configured
     if (isConfigured) {
-      console.log('✅ RevenueCat already initialized');
+      console.log('[REVENUECAT] Already initialized');
       return true;
     }
     
+    console.log('[REVENUECAT] Starting initialization...');
+    console.log('[REVENUECAT] Purchases module:', Purchases ? 'FOUND' : 'NOT FOUND');
+    
     // Check if Purchases module is available
     if (!Purchases) {
-      console.log('📱 RevenueCat module not available - purchases disabled');
+      console.log('[REVENUECAT] Module not available - purchases disabled');
       isExpoGo = true;
-      isConfigured = true;  // Mark as "configured" to prevent further errors
+      isConfigured = true;
       return true;
     }
     
     // Check if running in Expo Go
-    if (checkIsExpoGo()) {
-      console.log('📱 Running in Expo Go - RevenueCat native purchases not available');
+    const inExpoGo = checkIsExpoGo();
+    console.log('[REVENUECAT] Expo Go check:', inExpoGo);
+    if (inExpoGo) {
+      console.log('[REVENUECAT] Running in Expo Go - native purchases not available');
       isExpoGo = true;
-      isConfigured = true;  // Mark as "configured" to prevent further errors
+      isConfigured = true;
       return true;
     }
     
-    // Enable debug logs in development
-    if (__DEV__ && LOG_LEVEL) {
+    // Enable debug logs - ALWAYS use DEBUG for troubleshooting
+    if (LOG_LEVEL) {
       Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-    } else if (LOG_LEVEL) {
-      Purchases.setLogLevel(LOG_LEVEL.INFO);
+      console.log('[REVENUECAT] Log level set to DEBUG');
     }
 
     const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;
+    console.log('[REVENUECAT] Using API key:', apiKey.substring(0, 10) + '...');
     
     // Configure with anonymous user ID (RevenueCat generates one)
+    console.log('[REVENUECAT] Calling configure...');
     Purchases.configure({ apiKey });
     
     isConfigured = true;
-    console.log('✅ RevenueCat initialized');
+    console.log('[REVENUECAT] ✅ SUCCESS - RevenueCat initialized');
     return true;
   } catch (error) {
+    console.error('[REVENUECAT] ❌ FAILED:', error.message);
+    console.error('[REVENUECAT] Stack:', error.stack);
+    
     // Check if this is the Expo Go error
     if (error.message && error.message.includes('Expo Go')) {
-      console.log('📱 Running in Expo Go - RevenueCat native purchases not available');
       isExpoGo = true;
-      isConfigured = true;  // Mark as "configured" to prevent further errors
+      isConfigured = true;
       return true;
     }
-    console.error('❌ RevenueCat init error:', error);
     return false;
   }
 };
