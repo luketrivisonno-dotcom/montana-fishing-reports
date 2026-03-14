@@ -246,12 +246,14 @@ export function useRevenueCat() {
     
     try {
       const offerings = await Purchases.getOfferings();
+      const useOffering = offerings.current || offerings.all?.['default'];
       console.log('📦 RevenueCat offerings:', JSON.stringify({
-        current: offerings.current?.identifier,
+        current: offerings.current?.identifier || 'null (using default fallback)',
+        default: offerings.all?.['default']?.identifier,
         all: Object.keys(offerings.all || {}),
-        monthly: offerings.current?.monthly?.product?.identifier,
-        yearly: offerings.current?.yearly?.product?.identifier,
-        availablePackages: offerings.current?.availablePackages?.length || 0
+        monthly: useOffering?.monthly?.product?.identifier,
+        yearly: useOffering?.yearly?.product?.identifier,
+        availablePackages: useOffering?.availablePackages?.length || 0
       }, null, 2));
       setOfferings(offerings);
     } catch (error) {
@@ -368,7 +370,8 @@ export function useRevenueCat() {
   }, []);
 
   // Get current offering (monthly/yearly packages)
-  const currentOffering = offerings?.current;
+  // Try 'current' first, then fall back to 'default' offering by ID
+  const currentOffering = offerings?.current || offerings?.all?.['default'];
   const monthlyPackage = currentOffering?.monthly;
   const yearlyPackage = currentOffering?.yearly;
 
