@@ -20,8 +20,7 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        "ITSAppUsesNonExemptEncryption": false
       },
     },
     "android": {
