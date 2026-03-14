@@ -936,4 +936,213 @@ export const RIVER_MILES = {
       "type": "GREEN"
     },
   ],
+  "Clark Fork River": [
+    {
+      "name": "Kohrs",
+      "mile": 0.0,
+      "type": "GREEN"
+    },
+    {
+      "name": "Drummond",
+      "mile": 30.72,
+      "type": "GREEN"
+    },
+    {
+      "name": "Beavertail Hill",
+      "mile": 58.93,
+      "type": "GREEN"
+    },
+    {
+      "name": "Bearmouth",
+      "mile": 60.99,
+      "type": "GREEN"
+    },
+    {
+      "name": "Schwartz Creek",
+      "mile": 68.32,
+      "type": "GREEN"
+    },
+    {
+      "name": "Turah",
+      "mile": 76.43,
+      "type": "GREEN"
+    },
+    {
+      "name": "Sha-Ron",
+      "mile": 85.03,
+      "type": "GREEN"
+    },
+    {
+      "name": "Kelly Island",
+      "mile": 95.6,
+      "type": "GREEN"
+    },
+    {
+      "name": "Council Grove",
+      "mile": 101.25,
+      "type": "GREEN"
+    },
+    {
+      "name": "Deep Creek",
+      "mile": 104.47,
+      "type": "GREEN"
+    },
+    {
+      "name": "Erskine",
+      "mile": 113.71,
+      "type": "GREEN"
+    },
+    {
+      "name": "Petty Creek",
+      "mile": 126.6,
+      "type": "GREEN"
+    },
+    {
+      "name": "Natural Pier",
+      "mile": 130.21,
+      "type": "GREEN"
+    },
+    {
+      "name": "St. Johns",
+      "mile": 132.26,
+      "type": "GREEN"
+    },
+    {
+      "name": "Cyr Bridge",
+      "mile": 134.57,
+      "type": "GREEN"
+    },
+    {
+      "name": "Middle Osprey",
+      "mile": 137.1,
+      "type": "GREEN"
+    },
+    {
+      "name": "Lower Osprey",
+      "mile": 138.1,
+      "type": "GREEN"
+    },
+    {
+      "name": "Tarkio East",
+      "mile": 138.61,
+      "type": "GREEN"
+    },
+    {
+      "name": "Tarkio",
+      "mile": 144.18,
+      "type": "GREEN"
+    },
+    {
+      "name": "Forest Grove",
+      "mile": 149.29,
+      "type": "GREEN"
+    },
+    {
+      "name": "Big Eddy",
+      "mile": 161.04,
+      "type": "GREEN"
+    },
+    {
+      "name": "Dry Creek",
+      "mile": 166.01,
+      "type": "GREEN"
+    },
+    {
+      "name": "St. Regis",
+      "mile": 176.17,
+      "type": "GREEN"
+    },
+    {
+      "name": "Paradise Creek",
+      "mile": 203.1,
+      "type": "GREEN"
+    },
+    {
+      "name": "Mckay Landing",
+      "mile": 223.52,
+      "type": "GREEN"
+    },
+    {
+      "name": "Thompson Falls",
+      "mile": 241.24,
+      "type": "GREEN"
+    },
+    {
+      "name": "Flatiron Ridge",
+      "mile": 243.1,
+      "type": "GREEN"
+    },
+  ],
+  "Bitterroot River": [
+    {
+      "name": "Forest Cooper",
+      "mile": 0.0,
+      "type": "GREEN"
+    },
+    {
+      "name": "Hannon Memorial",
+      "mile": 0.1,
+      "type": "GREEN"
+    },
+    {
+      "name": "Darby Bridge",
+      "mile": 3.97,
+      "type": "GREEN"
+    },
+    {
+      "name": "Wally Crawford",
+      "mile": 10.36,
+      "type": "GREEN"
+    },
+    {
+      "name": "Anglers Roost",
+      "mile": 20.2,
+      "type": "GREEN"
+    },
+    {
+      "name": "Demmons",
+      "mile": 24.54,
+      "type": "GREEN"
+    },
+    {
+      "name": "Woodside Bridge",
+      "mile": 29.99,
+      "type": "GREEN"
+    },
+    {
+      "name": "Tucker Crossing",
+      "mile": 35.11,
+      "type": "GREEN"
+    },
+    {
+      "name": "Bell Crossing",
+      "mile": 41.36,
+      "type": "GREEN"
+    },
+    {
+      "name": "Brass Creek",
+      "mile": 51.74,
+      "type": "GREEN"
+    },
+    {
+      "name": "Poker Joe",
+      "mile": 53.98,
+      "type": "GREEN"
+    },
+    {
+      "name": "Florence Bridge",
+      "mile": 58.49,
+      "type": "GREEN"
+    },
+    {
+      "name": "Chief Looking Glass",
+      "mile": 60.59,
+      "type": "GREEN"
+    },
+    {
+      "name": "Clark Fork Confulence",
+      "mile": 81.94,
+      "type": "GREEN"
+    },
+  ],
 };
