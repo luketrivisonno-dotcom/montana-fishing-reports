@@ -21,19 +21,22 @@ const USGS_SITES = {
   'Boulder River': { id: '06207500', location: 'Big Timber, MT' },
   'Swan River': { id: '12370000', location: 'Big Fork, MT' },
   // YNP Rivers
-  'Firehole River': { id: '06036900', location: 'Near West Yellowstone, YNP' },
-  'Soda Butte Creek': { id: '06187500', location: 'Near Lamar Ranger Station, YNP' },
+  'Firehole River': { id: '06036905', location: 'Near West Yellowstone, YNP' },
+  'Soda Butte Creek': { id: '06187915', location: 'Near Lamar Ranger Station, YNP' },
   'Lamar River': { id: '06188000', location: 'Near Tower Falls Ranger Station, YNP' },
-  'Gardner River': { id: '06186200', location: 'Near Mammoth, YNP' }
+  'Gardner River': { id: '06191000', location: 'Near Mammoth, YNP' }
 };
 
 // Seasonal gauges - USGS stations that only run part of the year
 const SEASONAL_GAUGES = [
-  'Beaverhead River',  // Typically ice-affected in winter
-  'Big Hole River',    // Often seasonal ice effects
-  'Jefferson River',   // Seasonal/intermittent flows
-  'Ruby River',        // Small stream, seasonal patterns
-  'Swan River'         // Seasonal high/low flows
+  'Beaverhead River',   // Typically ice-affected in winter
+  'Big Hole River',     // Often seasonal ice effects
+  'Jefferson River',    // Seasonal/intermittent flows
+  'Ruby River',         // Small stream, seasonal patterns
+  'Swan River',         // Seasonal high/low flows
+  // YNP Rivers - high elevation, ice-affected in winter
+  'Soda Butte Creek',   // Ice-affected Nov-May
+  'Lamar River'         // Ice-affected Nov-May
 ];
 
 // Nearby rivers to use as temp backup (in order of preference)
