@@ -700,4 +700,240 @@ export const RIVER_MILES = {
       "type": "BROWN"
     },
   ],
+  "Missouri River": [
+    {
+      "name": "Missouri Headwaters",
+      "mile": 0.0,
+      "type": "GREEN"
+    },
+    {
+      "name": "Toston",
+      "mile": 16.1,
+      "type": "GREEN"
+    },
+    {
+      "name": "Yorks Island",
+      "mile": 25.3,
+      "type": "GREEN"
+    },
+    {
+      "name": "Bull Pasture",
+      "mile": 100.23,
+      "type": "GREEN"
+    },
+    {
+      "name": "Lone Tree",
+      "mile": 106.23,
+      "type": "GREEN"
+    },
+    {
+      "name": "Craig",
+      "mile": 107.23,
+      "type": "GREEN"
+    },
+    {
+      "name": "Stickney Creek",
+      "mile": 110.95,
+      "type": "GREEN"
+    },
+    {
+      "name": "Spite Hill",
+      "mile": 111.58,
+      "type": "GREEN"
+    },
+    {
+      "name": "Dearborn",
+      "mile": 113.17,
+      "type": "GREEN"
+    },
+    {
+      "name": "Eagle Island",
+      "mile": 113.98,
+      "type": "GREEN"
+    },
+    {
+      "name": "Mid Canon",
+      "mile": 114.61,
+      "type": "GREEN"
+    },
+    {
+      "name": "Devils Kitchen",
+      "mile": 117.68,
+      "type": "GREEN"
+    },
+    {
+      "name": "Mountian Palace",
+      "mile": 120.59,
+      "type": "GREEN"
+    },
+    {
+      "name": "Hardy Bridge",
+      "mile": 121.41,
+      "type": "GREEN"
+    },
+    {
+      "name": "Prewett",
+      "mile": 121.86,
+      "type": "GREEN"
+    },
+    {
+      "name": "Townsend",
+      "mile": 143.42,
+      "type": "GREEN"
+    },
+    {
+      "name": "Deep Creek",
+      "mile": 155.46,
+      "type": "GREEN"
+    },
+    {
+      "name": "Cavic",
+      "mile": 167.61,
+      "type": "GREEN"
+    },
+    {
+      "name": "Manhattan",
+      "mile": 180.79,
+      "type": "GREEN"
+    },
+    {
+      "name": "Church Hill",
+      "mile": 184.03,
+      "type": "GREEN"
+    },
+    {
+      "name": "Logan",
+      "mile": 186.07,
+      "type": "GREEN"
+    },
+    {
+      "name": "Missouri River Ranch",
+      "mile": 188.04,
+      "type": "GREEN"
+    },
+    {
+      "name": "Williams Bridge",
+      "mile": 192.33,
+      "type": "GREEN"
+    },
+    {
+      "name": "Great Springs",
+      "mile": 193.31,
+      "type": "GREEN"
+    },
+    {
+      "name": "Widow Coulee",
+      "mile": 207.9,
+      "type": "GREEN"
+    },
+    {
+      "name": "Carter Ferry",
+      "mile": 220.06,
+      "type": "GREEN"
+    },
+  ],
+  "Big Hole River": [
+    {
+      "name": "Fishtrap",
+      "mile": 0.0,
+      "type": "GREEN"
+    },
+    {
+      "name": "Sportsmans Park",
+      "mile": 3.61,
+      "type": "GREEN"
+    },
+    {
+      "name": "George Gant",
+      "mile": 24.33,
+      "type": "GREEN"
+    },
+    {
+      "name": "Greenwood Bottoms",
+      "mile": 24.85,
+      "type": "GREEN"
+    },
+    {
+      "name": "Powerhouse",
+      "mile": 27.21,
+      "type": "GREEN"
+    },
+    {
+      "name": "Maiden Rock",
+      "mile": 41.79,
+      "type": "GREEN"
+    },
+    {
+      "name": "Salmon Fly",
+      "mile": 45.31,
+      "type": "GREEN"
+    },
+    {
+      "name": "Browns Bridge",
+      "mile": 51.54,
+      "type": "GREEN"
+    },
+    {
+      "name": "Jerry Creek",
+      "mile": 54.34,
+      "type": "GREEN"
+    },
+    {
+      "name": "Glen",
+      "mile": 56.49,
+      "type": "GREEN"
+    },
+    {
+      "name": "Notch Bottom",
+      "mile": 63.5,
+      "type": "GREEN"
+    },
+    {
+      "name": "Pennington Bridge",
+      "mile": 72.85,
+      "type": "GREEN"
+    },
+  ],
+  "Beaverhead River": [
+    {
+      "name": "High Bridge",
+      "mile": 0.0,
+      "type": "GREEN"
+    },
+    {
+      "name": "Henneberry",
+      "mile": 3.43,
+      "type": "GREEN"
+    },
+    {
+      "name": "Pipe Organ",
+      "mile": 5.69,
+      "type": "GREEN"
+    },
+    {
+      "name": "Grasshopper",
+      "mile": 9.83,
+      "type": "GREEN"
+    },
+    {
+      "name": "Corrals",
+      "mile": 11.85,
+      "type": "GREEN"
+    },
+    {
+      "name": "Poindexter Slough",
+      "mile": 19.83,
+      "type": "GREEN"
+    },
+    {
+      "name": "Clarks Lookout",
+      "mile": 25.83,
+      "type": "GREEN"
+    },
+    {
+      "name": "Beaverhead Rock",
+      "mile": 47.97,
+      "type": "GREEN"
+    },
+  ],
 };
