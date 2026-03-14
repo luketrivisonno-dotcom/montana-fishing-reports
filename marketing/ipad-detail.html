@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>iPad River Detail</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f1e8;
+            width: 1024px;
+            height: 1366px;
+            overflow: hidden;
+        }
+        .status-bar {
+            height: 24px;
+            background: #1a2f27;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+        }
+        .detail-header {
+            height: 400px;
+            background: linear-gradient(135deg, #2d4a3e 0%, #1a2f27 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .heart-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .flow-badge {
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            background: #5a7d5a;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .detail-title {
+            color: white;
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .detail-stats {
+            display: flex;
+            gap: 30px;
+        }
+        .detail-stat {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+        }
+        .detail-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .detail-stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .detail-content {
+            padding: 30px;
+            overflow-y: auto;
+            height: calc(100% - 424px);
+        }
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c2416;
+            margin-bottom: 16px;
+        }
+        .report-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .report-source {
+            font-weight: 700;
+            color: #2d4a3e;
+            font-size: 16px;
+        }
+        .report-date {
+            font-size: 14px;
+            color: #9a8b7a;
+        }
+        .report-text {
+            color: #2c2416;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .hatch-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .hatch-tag {
+            background: rgba(45, 74, 62, 0.1);
+            color: #2d4a3e;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .premium-banner {
+            background: linear-gradient(135deg, #b87333, #8b5520);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .premium-text {
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .premium-btn {
+            background: white;
+            color: #b87333;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .hatch-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .hatch-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e8e4da;
+        }
+        .hatch-item:last-child {
+            border-bottom: none;
+        }
+        .hatch-name {
+            font-weight: 600;
+            color: #2c2416;
+        }
+        .hatch-details {
+            color: #6b5d4d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span>9:41</span>
+        <span>📶 🔋</span>
+    </div>
+    <div class="detail-header">
+        <div class="back-btn">←</div>
+        <div class="heart-btn">♡</div>
+        <div class="flow-badge">Good Flow</div>
+        <div class="detail-title">Yellowstone River</div>
+        <div class="detail-stats">
+            <div class="detail-stat">
+                <div class="detail-stat-value">1,245 CFS</div>
+                <div class="detail-stat-label">Flow</div>
+            </div>
+            <div class="detail-stat">
+                <div class="detail-stat-value">52°F</div>
+                <div class="detail-stat-label">Water Temp</div>
+            </div>
+            <div class="detail-stat">
+                <div class="detail-stat-value">68°F</div>
+                <div class="detail-stat-label">Air Temp</div>
+            </div>
+        </div>
+    </div>
+    <div class="detail-content">
+        <div class="premium-banner">
+            <div class="premium-text">💎 Upgrade for detailed hatch charts & more</div>
+            <div class="premium-btn">Go Premium</div>
+        </div>
+        
+        <div class="section-title">Latest Reports</div>
+        
+        <div class="report-card">
+            <div class="report-header">
+                <div class="report-source">Dan Bailey's</div>
+                <div class="report-date">Today</div>
+            </div>
+            <div class="report-text">
+                Excellent fishing in the upper river. Salmonflies are starting to move on sunny afternoons. Best fishing from 10am-4pm. Try big dries along the banks.
+            </div>
+            <div class="hatch-tags">
+                <span class="hatch-tag">🦟 Salmonfly</span>
+                <span class="hatch-tag">🪱 Caddis</span>
+                <span class="hatch-tag">🦟 PMD</span>
+            </div>
+        </div>
+        
+        <div class="report-card">
+            <div class="report-header">
+                <div class="report-source">Blue Ribbon Flies</div>
+                <div class="report-date">Yesterday</div>
+            </div>
+            <div class="report-text">
+                Water clarity is excellent below Springdale. Streamers producing big browns in the mornings. Switch to dries after lunch when temps rise.
+            </div>
+            <div class="hatch-tags">
+                <span class="hatch-tag">🐟 Streamers</span>
+                <span class="hatch-tag">🦟 Stoneflies</span>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 24px;">Current Hatches</div>
+        <div class="hatch-section">
+            <div class="hatch-item">
+                <div>
+                    <div class="hatch-name">🦟 Salmonfly</div>
+                    <div class="hatch-details">Adults on the water</div>
+                </div>
+                <div class="hatch-tag">Size 4-6</div>
+            </div>
+            <div class="hatch-item">
+                <div>
+                    <div class="hatch-name">🪱 Golden Stone</div>
+                    <div class="hatch-details">Afternoon activity</div>
+                </div>
+                <div class="hatch-tag">Size 6-8</div>
+            </div>
+            <div class="hatch-item">
+                <div>
+                    <div class="hatch-name">🦟 PMD</div>
+                    <div class="hatch-details">Morning spinner falls</div>
+                </div>
+                <div class="hatch-tag">Size 16-18</div>
+            </div>
+            <div class="hatch-item">
+                <div>
+                    <div class="hatch-name">🪱 Caddis</div>
+                    <div class="hatch-details">Evening hatch</div>
+                </div>
+                <div class="hatch-tag">Size 14-16</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -69,11 +69,18 @@ async function main() {
     DIMENSIONS.iphone
   );
   
-  // iPad screenshots (need to capture each iPad in the mockup separately)
+  // iPad screenshots
   // First: iPad River List
   await captureScreenshot(
     'ipad-mockup.html',
     'screenshot-ipad-rivers.png',
+    DIMENSIONS.ipad
+  );
+  
+  // Second: iPad River Detail
+  await captureScreenshot(
+    'ipad-detail.html',
+    'screenshot-ipad-detail.png',
     DIMENSIONS.ipad
   );
   
