@@ -1863,6 +1863,19 @@ function generateFishingTips(river, month) {
 async function getDynamicHatchData(riverName) {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
     
+    // Get USGS water temp first (to override scraped air temps)
+    const usgsData = await getUSGSData(riverName);
+    let usgsWaterTemp = null;
+    let usgsTempSource = null;
+    
+    if (usgsData && usgsData.temp) {
+        const tempMatch = usgsData.temp.match(/(\d+)/);
+        if (tempMatch && !usgsData.temp.includes('-999')) {
+            usgsWaterTemp = usgsData.temp;
+            usgsTempSource = usgsData.tempSource || 'USGS';
+        }
+    }
+    
     // FIRST: Try to get REAL scraped hatch data from fly shop reports
     // Get the MOST RECENT hatch report across ALL sources
     try {
@@ -1879,12 +1892,16 @@ async function getDynamicHatchData(riverName) {
             const scraped = scrapedResult.rows[0];
             console.log(`Using scraped hatch data for ${riverName} from ${scraped.source}`);
             
+            // Use USGS water temp if available, otherwise fall back to scraped temp
+            const finalWaterTemp = usgsWaterTemp || scraped.water_temp;
+            const finalTempSource = usgsTempSource || scraped.source;
+            
             return {
                 hatches: scraped.hatches,
                 flies: scraped.fly_recommendations || generateFlyRecommendations(scraped.hatches),
-                waterTemp: scraped.water_temp,
+                waterTemp: finalWaterTemp,
                 waterConditions: scraped.water_conditions,
-                source: scraped.source,
+                source: finalTempSource,
                 reportDate: scraped.report_date,
                 isScraped: true,
                 isForecast: false
@@ -1897,18 +1914,9 @@ async function getDynamicHatchData(riverName) {
     // FALLBACK: Use seasonal forecast if no scraped data available
     const seasonalHatches = getStaticHatches(riverName) || getDefaultHatches(month);
     
-    // Get water temperature (real, nearby, or estimated)
-    const usgsData = await getUSGSData(riverName);
-    let waterTemp = null;
-    let tempSource = 'Seasonal forecast';
-    
-    if (usgsData && usgsData.temp) {
-        const tempMatch = usgsData.temp.match(/(\d+)/);
-        if (tempMatch) {
-            waterTemp = parseInt(tempMatch[1]);
-            tempSource = usgsData.tempSource || 'USGS';
-        }
-    }
+    // Use already-fetched USGS water temperature
+    let waterTemp = usgsWaterTemp ? parseInt(usgsWaterTemp.match(/(\d+)/)[1]) : null;
+    let tempSource = usgsTempSource || 'Seasonal forecast';
     
     // Adjust recommendations based on conditions
     let adjustedHatches = [...seasonalHatches];
