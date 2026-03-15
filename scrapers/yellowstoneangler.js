@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/yellowstone-angler.jpg';
+
 // NOTE: These URLs redirect to georgeanderson.com which has the actual reports
 // Keeping for reference but georgeanderson.js handles these rivers
 const YELLOWSTONE_ANGLER_URLS = {
@@ -55,7 +57,7 @@ async function scrapeYellowstoneAngler() {
         last_updated: dateMatch ? dateMatch[1] : null,
         last_updated_text: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity
       });
 
