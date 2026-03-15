@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const ICON_URL = 'https://bighornangler.com/wp-content/uploads/2022/01/BFavicon.png';
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/bighorn-angler.png';
 
 async function scrapeBighornAngler() {
   const url = 'https://bighornangler.com/reports';

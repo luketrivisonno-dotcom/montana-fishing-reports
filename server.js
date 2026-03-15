@@ -846,8 +846,8 @@ app.get('/api/reports/:river',
                  ORDER BY CASE WHEN last_updated IS NULL THEN 1 ELSE 0 END, last_updated DESC, scraped_at DESC`, 
                 [river]
             );
-            const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
-            const MONTANA_ANGLER_ICON = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
+            const FINS_FEATHERS_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.svg';
+            const MONTANA_ANGLER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = result.rows.map(report => ({ 
@@ -1261,8 +1261,8 @@ app.get('/api/river-details/:river',
                 getDynamicHatchData(river)
             ]);
             
-            const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
-            const MONTANA_ANGLER_ICON = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
+            const FINS_FEATHERS_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.svg';
+            const MONTANA_ANGLER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = reportsResult.rows.map(report => ({ 

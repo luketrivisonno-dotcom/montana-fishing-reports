@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const ICON_URL = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
 
 const MONTANA_ANGLER_URLS = {
   'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
