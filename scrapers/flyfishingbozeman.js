@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.svg';
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.png';
 
 const FLY_FISHING_BOZEMAN_URLS = {
   'Gallatin River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/gallatin-river-fishing-report',

@@ -1,6 +1,9 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const MONTANA_ANGLER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
+const SWEETWATER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/sweetwater.png';
+
 async function scrapeBoulderMontanaAngler() {
   const url = 'https://www.montanaangler.com/montana-fishing-report/boulder-river-report';
   
@@ -39,7 +42,7 @@ async function scrapeBoulderMontanaAngler() {
       last_updated: lastUpdated,
       last_updated_text: lastUpdatedText,
       scraped_at: new Date(),
-      icon_url: null,
+      icon_url: MONTANA_ANGLER_ICON,
       water_clarity: null
     };
     
@@ -52,7 +55,7 @@ async function scrapeBoulderMontanaAngler() {
       last_updated: null,
       last_updated_text: null,
       scraped_at: new Date(),
-      icon_url: null,
+      icon_url: MONTANA_ANGLER_ICON,
       water_clarity: null
     };
   }
@@ -66,7 +69,7 @@ async function scrapeBoulderSweetwater() {
     last_updated: null,
     last_updated_text: null,
     scraped_at: new Date(),
-    icon_url: null,
+    icon_url: SWEETWATER_ICON,
     water_clarity: null
   };
 }

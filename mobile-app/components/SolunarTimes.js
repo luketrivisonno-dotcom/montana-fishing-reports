@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -40,18 +40,25 @@ function getMoonPhaseName(phase) {
   return phases[phase];
 }
 
-function getMoonEmoji(phase) {
-  const emojis = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
-  return emojis[phase];
+// Professional moon icons from MaterialCommunityIcons
+function getMoonIcon(phase) {
+  // Returns icon name and color
+  const icons = [
+    { name: 'moon-new', color: '#5a5a5a' },           // New
+    { name: 'moon-waxing-crescent', color: '#8b7355' }, // Waxing Crescent
+    { name: 'moon-first-quarter', color: '#c9a227' },   // First Quarter
+    { name: 'moon-waxing-gibbous', color: '#c9a227' },  // Waxing Gibbous
+    { name: 'moon-full', color: '#c9a227' },            // Full
+    { name: 'moon-waning-gibbous', color: '#c9a227' },  // Waning Gibbous
+    { name: 'moon-last-quarter', color: '#8b7355' },    // Last Quarter
+    { name: 'moon-waning-crescent', color: '#5a5a5a' }, // Waning Crescent
+  ];
+  return icons[phase];
 }
 
 // Approximate sun times for Montana
 function getSunTimes(date = new Date()) {
-  // Simplified - assumes roughly 6:30 AM sunrise, 8:30 PM sunset for summer
-  // In a real app, you'd calculate based on latitude and date
   const month = date.getMonth();
-  
-  // Adjust for season (very approximate for Montana)
   let sunriseHour = 6;
   let sunsetHour = 20;
   
@@ -73,37 +80,49 @@ const SolunarTimes = ({ riverName }) => {
   const today = new Date();
   const moonPhase = getMoonPhase(today);
   const moonName = getMoonPhaseName(moonPhase);
-  const moonEmoji = getMoonEmoji(moonPhase);
+  const moonIcon = getMoonIcon(moonPhase);
   const sunTimes = getSunTimes(today);
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-        <Ionicons name="moon" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
-        <Text style={styles.title}>Sun & Moon</Text>
-      </View>
-      
-      {/* Moon Phase */}
-      <View style={styles.moonBox}>
-        <Text style={styles.moonEmoji}>{moonEmoji}</Text>
-        <View>
-          <Text style={styles.moonPhase}>{moonName}</Text>
-          <Text style={styles.moonSubtext}>Current Phase</Text>
+      <View style={styles.content}>
+        {/* Moon Phase */}
+        <View style={styles.item}>
+          <MaterialCommunityIcons 
+            name={moonIcon.name} 
+            size={28} 
+            color={moonIcon.color} 
+          />
+          <Text style={styles.value}>{moonName}</Text>
+          <Text style={styles.label}>Moon</Text>
         </View>
-      </View>
-      
-      {/* Sun Times */}
-      <View style={styles.sunBox}>
-        <View style={styles.sunItem}>
-          <Ionicons name="sunny" size={18} color={COLORS.accent} />
-          <Text style={styles.sunTime}>{sunTimes.sunrise}</Text>
-          <Text style={styles.sunLabel}>Sunrise</Text>
+        
+        {/* Divider */}
+        <View style={styles.divider} />
+        
+        {/* Sunrise */}
+        <View style={styles.item}>
+          <MaterialCommunityIcons 
+            name="weather-sunset-up" 
+            size={28} 
+            color={COLORS.accent} 
+          />
+          <Text style={styles.value}>{sunTimes.sunrise}</Text>
+          <Text style={styles.label}>Sunrise</Text>
         </View>
-        <View style={styles.sunDivider} />
-        <View style={styles.sunItem}>
-          <Ionicons name="moon" size={18} color={COLORS.primary} />
-          <Text style={styles.sunTime}>{sunTimes.sunset}</Text>
-          <Text style={styles.sunLabel}>Sunset</Text>
+        
+        {/* Divider */}
+        <View style={styles.divider} />
+        
+        {/* Sunset */}
+        <View style={styles.item}>
+          <MaterialCommunityIcons 
+            name="weather-sunset-down" 
+            size={28} 
+            color={COLORS.primary} 
+          />
+          <Text style={styles.value}>{sunTimes.sunset}</Text>
+          <Text style={styles.label}>Sunset</Text>
         </View>
       </View>
     </View>
@@ -113,65 +132,38 @@ const SolunarTimes = ({ riverName }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: '#e8e4da',
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  moonBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f1e8',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-  },
-  moonEmoji: {
-    fontSize: 32,
-    marginRight: 12,
-  },
-  moonPhase: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  moonSubtext: {
-    fontSize: 11,
-    color: COLORS.textLight,
-  },
-  sunBox: {
+  content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#f5f1e8',
-    borderRadius: 10,
-    padding: 10,
   },
-  sunItem: {
+  item: {
     alignItems: 'center',
     flex: 1,
   },
-  sunDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#e8e4da',
-  },
-  sunTime: {
-    fontSize: 14,
+  value: {
+    fontSize: 12,
     fontWeight: '600',
     color: COLORS.text,
     marginTop: 4,
+    textAlign: 'center',
   },
-  sunLabel: {
+  label: {
     fontSize: 10,
     color: COLORS.textLight,
     marginTop: 2,
+  },
+  divider: {
+    width: 1,
+    height: 32,
+    backgroundColor: '#e8e4da',
+    marginHorizontal: 12,
   },
 });
 
