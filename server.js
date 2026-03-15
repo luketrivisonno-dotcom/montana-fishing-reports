@@ -104,10 +104,10 @@ const cacheMiddleware = (duration = 300) => {  // default 5 minutes
     };
 };
 
-// Rate limiting
+// Rate limiting - increased for production
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 500,                    // Increased from 100
     message: { error: 'Too many requests, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -115,7 +115,7 @@ const generalLimiter = rateLimit({
 
 const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 30,
+    max: 100,                    // Increased from 30
     message: { error: 'API rate limit exceeded. Please slow down.' },
 });
 

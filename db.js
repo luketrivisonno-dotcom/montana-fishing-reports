@@ -6,7 +6,16 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:543
 
 const pool = new Pool({
     connectionString: connectionString,
-    ssl: connectionString.includes('railway.app') ? { rejectUnauthorized: false } : false
+    ssl: connectionString.includes('railway.app') ? { rejectUnauthorized: false } : false,
+    // Production connection pool settings
+    max: 20,                    // Maximum 20 connections
+    idleTimeoutMillis: 30000,   // Close idle connections after 30s
+    connectionTimeoutMillis: 5000, // 5s timeout for new connections
+});
+
+// Handle pool errors
+pool.on('error', (err) => {
+    console.error('Unexpected database pool error:', err);
 });
 
 // Test connection
@@ -19,5 +28,6 @@ pool.query('SELECT NOW()', (err, res) => {
 });
 
 module.exports = {
-    query: (text, params) => pool.query(text, params)
+    query: (text, params) => pool.query(text, params),
+    pool // Export pool for graceful shutdown
 };
