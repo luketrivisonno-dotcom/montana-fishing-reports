@@ -18,7 +18,7 @@ const RIVER_LOCATIONS = {
   'Jefferson River': { lat: 45.4819, lon: -112.3320, station: 'Twin Bridges' },
   'Ruby River': { lat: 45.3295, lon: -112.1076, station: 'Alder' },
   'Stillwater River': { lat: 45.5291, lon: -109.4229, station: 'Absarokee' },
-  'Boulder River': { lat: 45.3300, lon: -109.9800, station: 'McLeod' },
+  'Boulder River': { lat: 45.662, lon: -110.114, station: 'McLeod' },
   'Swan River': { lat: 48.0833, lon: -114.0665, station: 'Big Fork' },
   'Yellowstone National Park': { lat: 44.6608, lon: -111.1040, station: 'West Yellowstone' },
   'Spring Creeks': { lat: 45.6625, lon: -110.5610, station: 'Livingston' }
