@@ -846,8 +846,14 @@ app.get('/api/reports/:river',
                  ORDER BY CASE WHEN last_updated IS NULL THEN 1 ELSE 0 END, last_updated DESC, scraped_at DESC`, 
                 [river]
             );
+            const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
+            
             const reports = result.rows.map(report => ({ 
                 ...report, 
+                // Normalize source names for display
+                source: report.source === 'Fly Fishing Bozeman' ? 'Fins and Feathers' : report.source,
+                // Add favicon for old Fly Fishing Bozeman reports
+                icon_url: report.source === 'Fly Fishing Bozeman' ? FINS_FEATHERS_ICON : report.icon_url,
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
