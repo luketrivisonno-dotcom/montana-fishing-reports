@@ -6,6 +6,7 @@ import {
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
 import { getAllAccessPoints } from '../data/accessPoints';
 import { getUSGSStations, getUSGSUrl } from '../data/usgsStations';
 import { openDirections, openMapLocation } from '../utils/mapUtils';
@@ -67,10 +68,23 @@ export default function RiverMap({ isPremium }) {
   const usgsStations = useMemo(() => getUSGSStations(), []);
 
   // Load personal pins from storage
+  // Request location permission and load data
   useEffect(() => {
+    requestLocationPermission();
     loadPersonalPins();
     loadCatchLocations();
   }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Location permission denied');
+      }
+    } catch (e) {
+      console.error('Error requesting location permission:', e);
+    }
+  };
 
   const loadPersonalPins = async () => {
     try {
@@ -191,6 +205,29 @@ export default function RiverMap({ isPremium }) {
 
   const toggleMapType = () => {
     setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid');
+  };
+
+  const centerOnUserLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required to show your position on the map.');
+        return;
+      }
+      
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced
+      });
+      
+      mapRef.current?.animateToRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5,
+      }, 1000);
+    } catch (error) {
+      Alert.alert('Error', 'Could not get your location. Please check your location settings.');
+    }
   };
 
   const filteredPersonalPins = useMemo(() => {
@@ -325,7 +362,7 @@ export default function RiverMap({ isPremium }) {
             coordinate={{ latitude: station.lat, longitude: station.lon }}
             pinColor="#0066cc"
           >
-            <Callout>
+            <Callout tooltip>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{station.river}</Text>
                 <Text style={styles.calloutRiver}>USGS Gauge #{station.siteId}</Text>
@@ -350,7 +387,7 @@ export default function RiverMap({ isPremium }) {
             coordinate={{ latitude: point.lat, longitude: point.lon }}
             pinColor={getMarkerColor(point.type)}
           >
-            <Callout>
+            <Callout tooltip>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{point.name}</Text>
                 {point.source === 'BLM' && (
@@ -422,7 +459,7 @@ export default function RiverMap({ isPremium }) {
             pinColor={PERSONAL_PIN_COLORS[pin.type] || COLORS.personalPin}
             onPress={() => handleMarkerPress(pin)}
           >
-            <Callout onPress={() => handleMarkerPress(pin)}>
+            <Callout tooltip>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{pin.name}</Text>
                 <Text style={[styles.calloutSource, { color: PERSONAL_PIN_COLORS[pin.type] || COLORS.personalPin }]}>
@@ -443,10 +480,13 @@ export default function RiverMap({ isPremium }) {
                   <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
                 </TouchableOpacity>
 
-                <View style={styles.calloutButton}>
-                  <Text style={styles.calloutButtonText}>Tap to Edit</Text>
+                <TouchableOpacity 
+                  style={styles.calloutButton}
+                  onPress={() => handleMarkerPress(pin)}
+                >
+                  <Text style={styles.calloutButtonText}>Edit Pin</Text>
                   <Ionicons name="create-outline" size={14} color={COLORS.primary} />
-                </View>
+                </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
@@ -459,7 +499,7 @@ export default function RiverMap({ isPremium }) {
             coordinate={catchItem.coordinate}
             pinColor={COLORS.catchPin}
           >
-            <Callout>
+            <Callout tooltip>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Fish Caught</Text>
                 <Text style={[styles.calloutSource, { color: COLORS.catchPin }]}>
@@ -506,9 +546,17 @@ export default function RiverMap({ isPremium }) {
         ))}
       </MapView>
 
+      {/* My Location Button */}
+      <TouchableOpacity 
+        style={[styles.mapButton, { top: selectedType === 'personal' || selectedType === 'catches' ? 110 : 65 }]}
+        onPress={centerOnUserLocation}
+      >
+        <Ionicons name="locate" size={22} color={COLORS.primary} />
+      </TouchableOpacity>
+
       {/* Map Type Toggle */}
       <TouchableOpacity 
-        style={styles.mapTypeButton}
+        style={[styles.mapButton, { top: selectedType === 'personal' || selectedType === 'catches' ? 165 : 120 }]}
         onPress={toggleMapType}
       >
         <Ionicons 
@@ -615,10 +663,9 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  mapTypeButton: {
+  mapButton: {
     position: 'absolute',
     right: 14,
-    top: selectedType => selectedType === 'personal' || selectedType === 'catches' ? 110 : 65,
     backgroundColor: COLORS.surface,
     width: 44,
     height: 44,
@@ -635,7 +682,14 @@ const styles = StyleSheet.create({
   },
   callout: {
     width: 220,
-    padding: 4,
+    padding: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    elevation: 8,
+    shadowColor: COLORS.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
   calloutTitle: {
     fontSize: 15,
