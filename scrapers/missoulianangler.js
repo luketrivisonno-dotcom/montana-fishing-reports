@@ -52,7 +52,8 @@ async function scrapeMissoulianAngler() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdated,
         scraped_at: new Date().toISOString(),
-        icon_url: ICON_URL
+        icon_url: ICON_URL,
+        content: pageText.substring(0, 10000)
       });
       
       console.log(`  ✓ ${river}: ${lastUpdated}`);
