@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/kingfisher.png';
+
 async function scrapeKingfisher() {
     const url = 'https://kingfisherflyshop.com/blog/';
     
@@ -44,7 +46,7 @@ async function scrapeKingfisher() {
             last_updated: lastUpdated,
             last_updated_text: lastUpdatedText,
             scraped_at: new Date(),
-            icon_url: null,
+            icon_url: ICON_URL,
             water_clarity: null
         };
         
@@ -58,7 +60,7 @@ async function scrapeKingfisher() {
             last_updated: null,
             last_updated_text: null,
             scraped_at: new Date(),
-            icon_url: null,
+            icon_url: ICON_URL,
             water_clarity: null
         };
     }
