@@ -29,7 +29,7 @@ async function scrapeFlyFishingBozeman() {
         pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
       reports.push({
-        source: 'Fly Fishing Bozeman',
+        source: 'Fins and Feathers',
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
