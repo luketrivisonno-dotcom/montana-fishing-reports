@@ -1,5 +1,6 @@
 const db = require('../db');
 const { standardizeDate, formatForDisplay, extractDateFromText } = require('./dateStandardizer');
+const { extractHatches, getFlyRecommendations, extractWaterTemp, extractWaterConditions } = require('./hatchExtractor');
 
 function normalizeSource(source) {
     if (!source) return '';
@@ -136,10 +137,66 @@ async function saveReports(reports) {
     return results;
 }
 
+// Extract and save hatch data from report content
+async function extractAndSaveHatchData(report, content) {
+    try {
+        if (!report.river || !content) return null;
+        
+        // Extract hatch data from content
+        const hatches = extractHatches(content);
+        
+        // Only save if we found hatches
+        if (hatches.length === 0) return null;
+        
+        const flyRecommendations = getFlyRecommendations(hatches);
+        const waterTemp = extractWaterTemp(content);
+        const waterConditions = extractWaterConditions(content);
+        
+        // Parse date
+        let reportDate = new Date();
+        if (report.last_updated) {
+            const parsed = standardizeDate(report.last_updated);
+            if (parsed) reportDate = new Date(parsed);
+        }
+        
+        // Mark previous reports for this river as not current
+        await db.query(
+            `UPDATE hatch_reports SET is_current = false WHERE river = $1`,
+            [report.river]
+        );
+        
+        // Insert new hatch data
+        const result = await db.query(
+            `INSERT INTO hatch_reports 
+             (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
+             RETURNING *`,
+            [
+                report.river,
+                report.source,
+                hatches,
+                flyRecommendations,
+                JSON.stringify({ extracted_from: 'fishing report', confidence: 'medium' }),
+                waterTemp,
+                waterConditions,
+                reportDate
+            ]
+        );
+        
+        console.log(`  Extracted ${hatches.length} hatches: ${hatches.join(', ')}`);
+        return result.rows[0];
+        
+    } catch (error) {
+        console.error(`Error extracting hatch data:`, error.message);
+        return null;
+    }
+}
+
 module.exports = {
     normalizeSource,
     standardizeDate,
     isValidUrl,
     saveReport,
-    saveReports
+    saveReports,
+    extractAndSaveHatchData
 };

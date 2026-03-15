@@ -1,6 +1,7 @@
 const db = require('../db');
 const { notifyNewReports } = require('../utils/pushNotifications');
 const { standardizeDate, formatForDisplay } = require('../utils/dateStandardizer');
+const { extractAndSaveHatchData } = require('../utils/scraperHelpers');
 
 // Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
@@ -132,6 +133,10 @@ async function runAllScrapers() {
               url: item.url,
               last_updated: displayDate
             });
+            // Extract hatch data from content if available
+            if (item.content) {
+              await extractAndSaveHatchData(item, item.content);
+            }
             successCount++;
           } else {
             const existingDateStr = existing.rows[0].last_updated;
@@ -180,6 +185,10 @@ async function runAllScrapers() {
                   url: item.url,
                   last_updated: displayDate
                 });
+              }
+              // Extract hatch data from content if available
+              if (item.content) {
+                await extractAndSaveHatchData(item, item.content);
               }
               successCount++;
             } else {

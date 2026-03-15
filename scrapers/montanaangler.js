@@ -69,7 +69,8 @@ async function scrapeMontanaAngler() {
         last_updated_text: lastUpdatedText,
         scraped_at: new Date(),
         icon_url: ICON_URL,
-        water_clarity: waterClarity
+        water_clarity: waterClarity,
+        content: pageText.substring(0, 10000) // Include content for hatch extraction
       });
       
       console.log(`  → Montana Angler - ${river}: ${lastUpdatedText || 'No date'}`);
