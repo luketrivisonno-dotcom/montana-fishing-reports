@@ -848,26 +848,33 @@ app.get('/api/reports/:river',
             );
             const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
             
-            // Normalize and deduplicate reports
-            const seenSources = new Set();
-            const reports = result.rows.map(report => ({ 
+            // First, normalize all reports and group by source
+            const normalizedReports = result.rows.map(report => ({ 
                 ...report, 
                 // Normalize source names for display
                 source: report.source === 'Fly Fishing Bozeman' ? 'Fins and Feathers' : report.source,
-                // Add favicon for old Fly Fishing Bozeman reports
-                icon_url: report.source === 'Fly Fishing Bozeman' ? FINS_FEATHERS_ICON : report.icon_url,
+                // Add favicon for old Fly Fishing Bozeman reports or any Fins and Feathers without icon
+                icon_url: (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers') ? 
+                    (report.icon_url || FINS_FEATHERS_ICON) : report.icon_url,
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
                 original_date: report.last_updated_text || report.last_updated
-            })).filter(report => {
-                // Remove duplicate sources (keep first/most recent)
-                if (seenSources.has(report.source)) {
-                    return false;
+            }));
+            
+            // Deduplicate - keep the one with icon if possible
+            const sourceMap = new Map();
+            for (const report of normalizedReports) {
+                const key = report.source;
+                const existing = sourceMap.get(key);
+                // Keep this report if: no existing, or this one has an icon and existing doesn't, or this one is newer
+                if (!existing || 
+                    (report.icon_url && !existing.icon_url) ||
+                    (report.icon_url && existing.icon_url && new Date(report.scraped_at) > new Date(existing.scraped_at))) {
+                    sourceMap.set(key, report);
                 }
-                seenSources.add(report.source);
-                return true;
-            });
+            }
+            const reports = Array.from(sourceMap.values());
             res.json({ river: river, count: reports.length, reports: reports });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -1252,23 +1259,34 @@ app.get('/api/river-details/:river',
             ]);
             
             const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
-            const seenSources = new Set();
-            const reports = reportsResult.rows.map(report => ({ 
+            
+            // First, normalize all reports and group by source
+            const normalizedReports = reportsResult.rows.map(report => ({ 
                 ...report, 
                 // Normalize source names for display
                 source: report.source === 'Fly Fishing Bozeman' ? 'Fins and Feathers' : report.source,
-                // Add favicon for old Fly Fishing Bozeman reports
-                icon_url: report.source === 'Fly Fishing Bozeman' ? FINS_FEATHERS_ICON : report.icon_url,
+                // Add favicon for old Fly Fishing Bozeman reports or any Fins and Feathers without icon
+                icon_url: (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers') ? 
+                    (report.icon_url || FINS_FEATHERS_ICON) : report.icon_url,
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
                 original_date: report.last_updated_text || report.last_updated
-            })).filter(report => {
-                const normalized = normalizeSource(report.source);
-                if (seenSources.has(normalized)) return false;
-                seenSources.add(normalized);
-                return true;
-            });
+            }));
+            
+            // Deduplicate - keep the one with icon if possible
+            const sourceMap = new Map();
+            for (const report of normalizedReports) {
+                const key = report.source;
+                const existing = sourceMap.get(key);
+                // Keep this report if: no existing, or this one has an icon and existing doesn't, or this one is newer
+                if (!existing || 
+                    (report.icon_url && !existing.icon_url) ||
+                    (report.icon_url && existing.icon_url && new Date(report.scraped_at) > new Date(existing.scraped_at))) {
+                    sourceMap.set(key, report);
+                }
+            }
+            const reports = Array.from(sourceMap.values());
 
             // Aggregate water clarity from reports
             let clarity = null;
