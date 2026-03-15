@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 
 const COLORS = {
   primary: '#2d4a3e',
@@ -25,6 +26,8 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
   const [fly, setFly] = useState('');
   const [notes, setNotes] = useState('');
   const [photo, setPhoto] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
@@ -34,6 +37,37 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
     setFly('');
     setNotes('');
     setPhoto(null);
+    setLocation(null);
+  };
+
+  const getCurrentLocation = async () => {
+    setGettingLocation(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please allow location access to tag your catch location');
+        setGettingLocation(false);
+        return;
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.BestForNavigation
+      });
+      
+      setLocation({
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+        accuracy: currentLocation.coords.accuracy
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Could not get your location. Please try again.');
+    } finally {
+      setGettingLocation(false);
+    }
+  };
+
+  const clearLocation = () => {
+    setLocation(null);
   };
 
   const pickImage = async () => {
@@ -89,6 +123,7 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
         fly: fly || null,
         notes: notes || null,
         photo: photo || null,
+        location: location || null,
       });
       
       if (success) {
@@ -201,6 +236,50 @@ const FishingLogModal = ({ visible, onClose, riverName, onSave }) => {
                 </View>
               )}
               
+              {/* Location Section */}
+              <Text style={styles.label}>Location</Text>
+              {location ? (
+                <View style={styles.locationContainer}>
+                  <View style={styles.locationInfo}>
+                    <Ionicons name="location" size={18} color={COLORS.accent} />
+                    <View style={styles.locationTextContainer}>
+                      <Text style={styles.locationText}>
+                        {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+                      </Text>
+                      {location.accuracy && (
+                        <Text style={styles.locationAccuracy}>
+                          Accuracy: ±{Math.round(location.accuracy)}m
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.clearLocationButton}
+                    onPress={clearLocation}
+                  >
+                    <Ionicons name="close-circle" size={22} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity 
+                  style={styles.locationButton}
+                  onPress={getCurrentLocation}
+                  disabled={gettingLocation}
+                >
+                  {gettingLocation ? (
+                    <ActivityIndicator size="small" color={COLORS.primary} />
+                  ) : (
+                    <>
+                      <Ionicons name="location-outline" size={20} color={COLORS.primary} />
+                      <Text style={styles.locationButtonText}>Tag Current Location</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              )}
+              <Text style={styles.locationHint}>
+                This will show your catch on the map
+              </Text>
+
               {/* Spacer for keyboard */}
               <View style={{ height: 100 }} />
             </ScrollView>
@@ -355,6 +434,62 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.primary,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f1e8',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderStyle: 'dashed',
+  },
+  locationButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f1e8',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+  },
+  locationInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  locationTextContainer: {
+    flex: 1,
+  },
+  locationText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    fontFamily: 'monospace',
+  },
+  locationAccuracy: {
+    fontSize: 11,
+    color: COLORS.textLight,
+    marginTop: 2,
+  },
+  clearLocationButton: {
+    padding: 4,
+  },
+  locationHint: {
+    fontSize: 11,
+    color: COLORS.textLight,
+    marginTop: 6,
+    fontStyle: 'italic',
   },
 });
 

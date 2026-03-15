@@ -1,12 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   View, Text, StyleSheet, TouchableOpacity, 
-  ScrollView, Linking, Dimensions
+  ScrollView, Linking, Dimensions, Alert, Modal
 } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAllAccessPoints } from '../data/accessPoints';
 import { getUSGSStations, getUSGSUrl } from '../data/usgsStations';
+import { openDirections, openMapLocation } from '../utils/mapUtils';
+import PersonalPinModal from './PersonalPinModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -24,12 +27,22 @@ const COLORS = {
   textSecondary: '#6b5d4d',
   textLight: '#9a8b7a',
   border: '#d4cfc3',
-  wade: '#5a7d5a',      // Sage green
-  boat: '#8b4513',      // Saddle brown  
-  both: '#cd853f',      // Peru/tan
+  wade: '#5a7d5a',
+  boat: '#8b4513',
+  both: '#cd853f',
+  personalPin: '#9b59b6', // Purple for personal pins
+  catchPin: '#e74c3c', // Red for catch locations
 };
 
-// Initial region centered on Montana
+// Pin type colors for personal pins
+const PERSONAL_PIN_COLORS = {
+  fishing_spot: '#4a90d9',
+  access_point: '#5a9e6e',
+  camp_spot: '#8b4513',
+  hazard: '#e74c3c',
+  note: '#c9a227',
+};
+
 const INITIAL_REGION = {
   latitude: 47.0,
   longitude: -109.5,
@@ -37,25 +50,126 @@ const INITIAL_REGION = {
   longitudeDelta: 8,
 };
 
+const STORAGE_KEY = 'personal_fishing_pins';
+
 export default function RiverMap({ isPremium }) {
   const [selectedType, setSelectedType] = useState('all');
   const [mapType, setMapType] = useState('hybrid');
+  const [personalPins, setPersonalPins] = useState([]);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [editingPin, setEditingPin] = useState(null);
+  const [tempCoordinate, setTempCoordinate] = useState(null);
+  const [showCatchLocations, setShowCatchLocations] = useState(true);
+  const [catchLocations, setCatchLocations] = useState([]);
   const mapRef = React.useRef(null);
 
   const allPoints = useMemo(() => getAllAccessPoints(), []);
   const usgsStations = useMemo(() => getUSGSStations(), []);
 
+  // Load personal pins from storage
+  useEffect(() => {
+    loadPersonalPins();
+    loadCatchLocations();
+  }, []);
+
+  const loadPersonalPins = async () => {
+    try {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setPersonalPins(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Error loading personal pins:', e);
+    }
+  };
+
+  const loadCatchLocations = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('fishingLog');
+      if (saved) {
+        const logs = JSON.parse(saved);
+        const locations = logs
+          .filter(log => log.location && log.location.latitude && log.location.longitude)
+          .map(log => ({
+            id: log.id,
+            coordinate: log.location,
+            river: log.river,
+            species: log.species,
+            size: log.size,
+            date: log.date,
+            fly: log.fly,
+          }));
+        setCatchLocations(locations);
+      }
+    } catch (e) {
+      console.error('Error loading catch locations:', e);
+    }
+  };
+
+  const savePersonalPins = async (pins) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(pins));
+      setPersonalPins(pins);
+    } catch (e) {
+      console.error('Error saving personal pins:', e);
+    }
+  };
+
+  const handleMapLongPress = (e) => {
+    if (!isPremium) {
+      Alert.alert(
+        'Premium Feature',
+        'Adding personal pins is a premium feature. Upgrade to unlock this feature.',
+        [
+          { text: 'Not Now', style: 'cancel' },
+          { text: 'Upgrade', onPress: () => {/* Open paywall */} }
+        ]
+      );
+      return;
+    }
+
+    const { coordinate } = e.nativeEvent;
+    setTempCoordinate(coordinate);
+    setEditingPin(null);
+    setShowPinModal(true);
+  };
+
+  const handleSavePin = (pinData) => {
+    let updatedPins;
+    if (editingPin) {
+      // Update existing pin
+      updatedPins = personalPins.map(p => p.id === pinData.id ? pinData : p);
+    } else {
+      // Add new pin
+      updatedPins = [...personalPins, pinData];
+    }
+    savePersonalPins(updatedPins);
+  };
+
+  const handleDeletePin = (pinId) => {
+    const updatedPins = personalPins.filter(p => p.id !== pinId);
+    savePersonalPins(updatedPins);
+  };
+
+  const handleMarkerPress = (pin) => {
+    setEditingPin(pin);
+    setTempCoordinate(pin.coordinate);
+    setShowPinModal(true);
+  };
+
+  const handleGetDirections = (coordinate, name) => {
+    openDirections(coordinate.latitude, coordinate.longitude, name);
+  };
+
   const filteredPoints = useMemo(() => {
-    console.log('Filtering by type:', selectedType, 'Total points:', allPoints.length);
-    if (selectedType === 'usgs') return []; // No access points when USGS selected
+    if (selectedType === 'usgs') return [];
     if (selectedType === 'all') return allPoints;
-    const filtered = allPoints.filter(point => {
+    if (selectedType === 'personal') return []; // Personal pins handled separately
+    return allPoints.filter(point => {
       if (selectedType === 'boat') return point.type === 'boat' || point.type === 'both';
       if (selectedType === 'wade') return point.type === 'wade' || point.type === 'both';
       return true;
     });
-    console.log('Filtered count:', filtered.length);
-    return filtered;
   }, [allPoints, selectedType]);
 
   const getMarkerColor = (type) => {
@@ -68,20 +182,31 @@ export default function RiverMap({ isPremium }) {
   };
 
   const openFWP = (url) => {
-    if (url) {
-      Linking.openURL(url).catch(() => {});
-    }
+    if (url) Linking.openURL(url).catch(() => {});
   };
 
   const openUSGS = (siteId) => {
-    if (siteId) {
-      Linking.openURL(getUSGSUrl(siteId)).catch(() => {});
-    }
+    if (siteId) Linking.openURL(getUSGSUrl(siteId)).catch(() => {});
   };
 
   const toggleMapType = () => {
     setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid');
   };
+
+  const filteredPersonalPins = useMemo(() => {
+    if (selectedType === 'personal' || selectedType === 'all') {
+      return personalPins;
+    }
+    return [];
+  }, [personalPins, selectedType]);
+
+  const filteredCatchLocations = useMemo(() => {
+    if (!showCatchLocations) return [];
+    if (selectedType === 'all' || selectedType === 'catches') {
+      return catchLocations;
+    }
+    return [];
+  }, [catchLocations, selectedType, showCatchLocations]);
 
   return (
     <View style={styles.container}>
@@ -142,10 +267,46 @@ export default function RiverMap({ isPremium }) {
               USGS
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.filterButton, selectedType === 'personal' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('personal')}
+          >
+            <Ionicons 
+              name="location" 
+              size={16} 
+              color={selectedType === 'personal' ? '#f5f1e8' : COLORS.personalPin} 
+            />
+            <Text style={[styles.filterText, selectedType === 'personal' && styles.filterTextActive]}>
+              My Pins
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.filterButton, selectedType === 'catches' && styles.filterButtonActive]}
+            onPress={() => setSelectedType('catches')}
+          >
+            <MaterialCommunityIcons 
+              name="fish" 
+              size={16} 
+              color={selectedType === 'catches' ? '#f5f1e8' : COLORS.catchPin} 
+            />
+            <Text style={[styles.filterText, selectedType === 'catches' && styles.filterTextActive]}>
+              Catches
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
-      {/* Map with Satellite/Hybrid View */}
+      {/* Long Press Hint */}
+      {isPremium && (
+        <View style={styles.hintBar}>
+          <Ionicons name="information-circle" size={14} color={COLORS.textLight} />
+          <Text style={styles.hintText}>Long press anywhere to add a personal pin</Text>
+        </View>
+      )}
+
+      {/* Map */}
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -155,42 +316,41 @@ export default function RiverMap({ isPremium }) {
         showsCompass={true}
         showsScale={true}
         moveOnMarkerPress={false}
+        onLongPress={handleMapLongPress}
       >
+        {/* USGS Stations */}
         {(selectedType === 'all' || selectedType === 'usgs') && usgsStations.map((station, index) => (
           <Marker
             key={`usgs-${index}`}
-            coordinate={{ 
-              latitude: station.lat, 
-              longitude: station.lon 
-            }}
+            coordinate={{ latitude: station.lat, longitude: station.lon }}
             pinColor="#0066cc"
           >
-            <Callout onPress={() => openUSGS(station.siteId)}>
+            <Callout>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{station.river}</Text>
                 <Text style={styles.calloutRiver}>USGS Gauge #{station.siteId}</Text>
                 <Text style={styles.calloutText}>{station.location}</Text>
-                <View style={styles.calloutButton}>
+                
+                <TouchableOpacity 
+                  style={styles.calloutButton}
+                  onPress={() => openUSGS(station.siteId)}
+                >
                   <Text style={styles.calloutButtonText}>View on USGS</Text>
                   <Ionicons name="open-outline" size={14} color={COLORS.primary} />
-                </View>
+                </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
         ))}
 
+        {/* Access Points */}
         {filteredPoints.map((point, index) => (
           <Marker
-            key={`${selectedType}-${index}-${point.name}`}
-            coordinate={{ 
-              latitude: point.lat, 
-              longitude: point.lon 
-            }}
+            key={`access-${index}-${point.name}`}
+            coordinate={{ latitude: point.lat, longitude: point.lon }}
             pinColor={getMarkerColor(point.type)}
-            title={point.name}
-            description={point.type === 'both' ? 'Boat & Wade Access' : point.type === 'boat' ? 'Boat Ramp' : 'Wade Access'}
           >
-            <Callout onPress={() => point.source === 'BLM' ? null : openFWP(point.fwpUrl)}>
+            <Callout>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{point.name}</Text>
                 {point.source === 'BLM' && (
@@ -227,12 +387,119 @@ export default function RiverMap({ isPremium }) {
                     </View>
                   )}
                 </View>
+
+                {/* Directions Button */}
+                <TouchableOpacity 
+                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
+                  onPress={() => handleGetDirections(
+                    { latitude: point.lat, longitude: point.lon },
+                    point.name
+                  )}
+                >
+                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                </TouchableOpacity>
+
                 {point.source !== 'BLM' && point.fwpUrl && (
-                  <View style={styles.calloutButton}>
+                  <TouchableOpacity 
+                    style={styles.calloutButton}
+                    onPress={() => openFWP(point.fwpUrl)}
+                  >
                     <Text style={styles.calloutButtonText}>View on FWP</Text>
                     <Ionicons name="open-outline" size={14} color={COLORS.primary} />
-                  </View>
+                  </TouchableOpacity>
                 )}
+              </View>
+            </Callout>
+          </Marker>
+        ))}
+
+        {/* Personal Pins */}
+        {filteredPersonalPins.map((pin) => (
+          <Marker
+            key={`personal-${pin.id}`}
+            coordinate={pin.coordinate}
+            pinColor={PERSONAL_PIN_COLORS[pin.type] || COLORS.personalPin}
+            onPress={() => handleMarkerPress(pin)}
+          >
+            <Callout onPress={() => handleMarkerPress(pin)}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{pin.name}</Text>
+                <Text style={[styles.calloutSource, { color: PERSONAL_PIN_COLORS[pin.type] || COLORS.personalPin }]}>
+                  {pin.type === 'fishing_spot' ? 'Fishing Spot' :
+                   pin.type === 'access_point' ? 'Access Point' :
+                   pin.type === 'camp_spot' ? 'Camp Spot' :
+                   pin.type === 'hazard' ? 'Hazard' : 'Note'}
+                </Text>
+                {pin.notes && (
+                  <Text style={styles.calloutText} numberOfLines={3}>{pin.notes}</Text>
+                )}
+                
+                <TouchableOpacity 
+                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
+                  onPress={() => handleGetDirections(pin.coordinate, pin.name)}
+                >
+                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                </TouchableOpacity>
+
+                <View style={styles.calloutButton}>
+                  <Text style={styles.calloutButtonText}>Tap to Edit</Text>
+                  <Ionicons name="create-outline" size={14} color={COLORS.primary} />
+                </View>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
+
+        {/* Catch Locations */}
+        {filteredCatchLocations.map((catchItem) => (
+          <Marker
+            key={`catch-${catchItem.id}`}
+            coordinate={catchItem.coordinate}
+            pinColor={COLORS.catchPin}
+          >
+            <Callout>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>Fish Caught</Text>
+                <Text style={[styles.calloutSource, { color: COLORS.catchPin }]}>
+                  {catchItem.river}
+                </Text>
+                
+                <View style={styles.calloutDetails}>
+                  {catchItem.species && (
+                    <View style={styles.calloutRow}>
+                      <MaterialCommunityIcons name="fish" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>{catchItem.species}</Text>
+                    </View>
+                  )}
+                  {catchItem.size && (
+                    <View style={styles.calloutRow}>
+                      <Ionicons name="resize" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>{catchItem.size}"</Text>
+                    </View>
+                  )}
+                  {catchItem.fly && (
+                    <View style={styles.calloutRow}>
+                      <MaterialCommunityIcons name="hook" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>{catchItem.fly}</Text>
+                    </View>
+                  )}
+                  {catchItem.date && (
+                    <View style={styles.calloutRow}>
+                      <Ionicons name="calendar" size={14} color={COLORS.textSecondary} />
+                      <Text style={styles.calloutText}>{new Date(catchItem.date).toLocaleDateString()}</Text>
+                    </View>
+                  )}
+                </View>
+
+                <TouchableOpacity 
+                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
+                  onPress={() => handleGetDirections(catchItem.coordinate, `Catch on ${catchItem.river}`)}
+                >
+                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
@@ -264,16 +531,33 @@ export default function RiverMap({ isPremium }) {
             <Text style={styles.legendText}>Boat Launch</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: COLORS.both }]} />
-            <Text style={styles.legendText}>Both</Text>
-          </View>
-          <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#0066cc' }]} />
             <Text style={styles.legendText}>USGS Gauge</Text>
           </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: COLORS.personalPin }]} />
+            <Text style={styles.legendText}>My Pins</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: COLORS.catchPin }]} />
+            <Text style={styles.legendText}>Catches</Text>
+          </View>
         </View>
-
       </View>
+
+      {/* Personal Pin Modal */}
+      <PersonalPinModal
+        visible={showPinModal}
+        onClose={() => {
+          setShowPinModal(false);
+          setEditingPin(null);
+          setTempCoordinate(null);
+        }}
+        onSave={handleSavePin}
+        onDelete={handleDeletePin}
+        editingPin={editingPin}
+        coordinate={tempCoordinate}
+      />
     </View>
   );
 }
@@ -316,13 +600,25 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: '#f5f1e8',
   },
+  hintBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+    paddingVertical: 6,
+    gap: 6,
+  },
+  hintText: {
+    fontSize: 12,
+    color: COLORS.textLight,
+  },
   map: {
     flex: 1,
   },
   mapTypeButton: {
     position: 'absolute',
     right: 14,
-    top: 65,
+    top: selectedType => selectedType === 'personal' || selectedType === 'catches' ? 110 : 65,
     backgroundColor: COLORS.surface,
     width: 44,
     height: 44,
@@ -338,7 +634,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   callout: {
-    width: 200,
+    width: 220,
     padding: 4,
   },
   calloutTitle: {
@@ -417,5 +713,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-
 });
