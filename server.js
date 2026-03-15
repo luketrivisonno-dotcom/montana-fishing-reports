@@ -848,6 +848,8 @@ app.get('/api/reports/:river',
             );
             const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
             
+            // Normalize and deduplicate reports
+            const seenSources = new Set();
             const reports = result.rows.map(report => ({ 
                 ...report, 
                 // Normalize source names for display
@@ -858,7 +860,14 @@ app.get('/api/reports/:river',
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
                 original_date: report.last_updated_text || report.last_updated
-            }));
+            })).filter(report => {
+                // Remove duplicate sources (keep first/most recent)
+                if (seenSources.has(report.source)) {
+                    return false;
+                }
+                seenSources.add(report.source);
+                return true;
+            });
             res.json({ river: river, count: reports.length, reports: reports });
         } catch (error) {
             res.status(500).json({ error: error.message });
