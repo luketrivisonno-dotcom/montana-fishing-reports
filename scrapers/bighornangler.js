@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://bighornangler.com/wp-content/uploads/2022/01/BFavicon.png';
+
 async function scrapeBighornAngler() {
   const url = 'https://bighornangler.com/reports';
   
@@ -25,7 +27,7 @@ async function scrapeBighornAngler() {
       url: url,
       last_updated: dateMatch ? dateMatch[1] : null,
       scraped_at: new Date(),
-      icon_url: null
+      icon_url: ICON_URL
     }];
     
   } catch (error) {
