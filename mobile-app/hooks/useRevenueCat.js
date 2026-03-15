@@ -21,7 +21,7 @@ try {
 // RevenueCat Configuration
 const API_KEYS = {
   ios: 'appl_walHurkTWBJnXkKnGsJUAsTilHm',
-  android: 'goog_YOUR_ANDROID_API_KEY',
+  android: 'goog_YOUR_ACTUAL_ANDROID_API_KEY', // Replace with your RevenueCat Android key
 };
 
 const ENTITLEMENT_ID = 'Montana Fishing Reports Pro';
