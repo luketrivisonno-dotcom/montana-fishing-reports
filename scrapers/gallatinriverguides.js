@@ -5,7 +5,14 @@ const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favi
 
 const GALLATIN_RIVER_GUIDES_URLS = {
   'Gallatin River': 'https://www.montanaflyfishing.com/gallatin-river-fishing-report',
-  'Yellowstone River': 'https://www.montanaflyfishing.com/yellowstone-river-fishing-report'
+  'Upper Madison River': 'https://www.montanaflyfishing.com/upper-madison-river-fishing-report',
+  'Lower Madison River': 'https://www.montanaflyfishing.com/lower-madison-river-fishing-report',
+  'Yellowstone River': 'https://www.montanaflyfishing.com/yellowstone-river-fishing-report',
+  'Slough Creek': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+  'Soda Butte Creek': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+  'Lamar River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+  'Gardner River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+  'Firehole River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report'
 };
 
 async function scrapeGallatinRiverGuides() {
