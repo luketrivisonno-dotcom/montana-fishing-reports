@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://troutfitters.com/assets/images/troutfitter-logo.png';
+
 const TROUTFITTERS_URLS = {
   'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
   'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
@@ -54,7 +56,7 @@ async function scrapeTroutfitters() {
         last_updated: dateMatch ? dateMatch[1] : null,
         last_updated_text: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity
       });
       
