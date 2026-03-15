@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/perfect-fly.png';
+
 const PERFECT_FLY_URLS = {
   'Stillwater River': 'https://perfectflystore.com/your-streams/fly-fishing-stillwater-river-montana/',
   'Ruby River': 'https://perfectflystore.com/your-streams/fly-fishing-ruby-river-montana/',
@@ -55,7 +57,7 @@ async function scrapePerfectFly() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdated,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity
       });
       
