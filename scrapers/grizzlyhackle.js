@@ -11,7 +11,7 @@ const RIVERS = [
     { name: 'Missouri River', path: 'missouri-river-fishing-report' }
 ];
 
-const ICON_URL = null;
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/grizzly-hackle.jpg';
 
 async function scrapeGrizzlyHackle() {
     let reports = [];
