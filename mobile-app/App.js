@@ -1277,9 +1277,20 @@ export default function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [isPremium, setIsPremium] = useState(DEV_MODE);
   const [favoritesCount, setFavoritesCount] = useState(0);
+  const [isInitializing, setIsInitializing] = useState(true);
   
   // Use RevenueCat hook for real premium status
   const { isPremium: revenueCatPremium, isLoading: rcLoading } = useRevenueCat();
+  
+  // Track initialization state
+  useEffect(() => {
+    // App is ready when RevenueCat is done loading (or after max 3 seconds)
+    const initTimer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 2500);
+    
+    return () => clearTimeout(initTimer);
+  }, []);
   
   // Sync RevenueCat status with app state
   useEffect(() => {
@@ -1368,6 +1379,20 @@ export default function App() {
   const openPaywall = () => {
     setShowPaywall(true);
   };
+
+  // Loading Screen
+  if (isInitializing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={styles.loadingContent}>
+          <Text style={styles.loadingIcon}>🏔️</Text>
+          <Text style={styles.loadingTitle}>Montana Fishing Reports</Text>
+          <ActivityIndicator size="large" color={COLORS.primary} style={styles.loadingSpinner} />
+          <Text style={styles.loadingText}>Loading river data...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -1716,5 +1741,34 @@ const styles = StyleSheet.create({
   reportChipText: {
     fontSize: 12,
     color: COLORS.text,
+  },
+  // Loading Screen Styles
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContent: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingIcon: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  loadingTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: COLORS.primary,
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  loadingSpinner: {
+    marginBottom: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });
