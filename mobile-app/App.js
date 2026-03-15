@@ -1282,14 +1282,78 @@ export default function App() {
   // Use RevenueCat hook for real premium status
   const { isPremium: revenueCatPremium, isLoading: rcLoading } = useRevenueCat();
   
-  // Track initialization state
+  // Loading progress state
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingStatus, setLoadingStatus] = useState('Initializing...');
+  
+  // Preload all necessary data
   useEffect(() => {
-    // App is ready when RevenueCat is done loading (or after max 3 seconds)
-    const initTimer = setTimeout(() => {
-      setIsInitializing(false);
-    }, 2500);
+    const preloadData = async () => {
+      try {
+        // Step 1: Initialize RevenueCat
+        setLoadingStatus('Setting up purchases...');
+        setLoadingProgress(0.1);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Step 2: Load cached favorites
+        setLoadingStatus('Loading your favorites...');
+        setLoadingProgress(0.3);
+        const saved = await AsyncStorage.getItem('favorites');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          globalFavorites = parsed;
+          setFavoritesCount(parsed.length);
+        }
+        
+        // Step 3: Preload river list from API
+        setLoadingStatus('Loading river data...');
+        setLoadingProgress(0.5);
+        try {
+          const response = await fetch(`${API_URL}/api/rivers`, { timeout: 5000 });
+          if (response.ok) {
+            const data = await response.json();
+            // Cache river list
+            await AsyncStorage.setItem('river_list_cache', JSON.stringify(data));
+          }
+        } catch (e) {
+          console.log('River preload failed, will use cache');
+        }
+        
+        // Step 4: Preload critical river images
+        setLoadingStatus('Loading images...');
+        setLoadingProgress(0.7);
+        const criticalRivers = ['Upper Madison River', 'Lower Madison River', 'Yellowstone River', 'Gallatin River', 'Bighorn River'];
+        for (let i = 0; i < criticalRivers.length; i++) {
+          const river = criticalRivers[i];
+          const image = getRiverImage(river);
+          // Preload image
+          if (image && image.uri) {
+            await Image.prefetch(image.uri).catch(() => {});
+          }
+          setLoadingProgress(0.7 + (0.2 * (i + 1) / criticalRivers.length));
+        }
+        
+        // Step 5: Check cached premium status
+        setLoadingStatus('Finalizing...');
+        setLoadingProgress(0.95);
+        await checkCachedPremiumStatus();
+        
+        // Done
+        setLoadingProgress(1);
+        setTimeout(() => {
+          setIsInitializing(false);
+        }, 300);
+        
+      } catch (error) {
+        console.error('Preload error:', error);
+        // Even if preload fails, show the app after max 5 seconds
+        setTimeout(() => {
+          setIsInitializing(false);
+        }, 5000);
+      }
+    };
     
-    return () => clearTimeout(initTimer);
+    preloadData();
   }, []);
   
   // Sync RevenueCat status with app state
@@ -1380,15 +1444,32 @@ export default function App() {
     setShowPaywall(true);
   };
 
-  // Loading Screen
+  // Professional Loading Screen
   if (isInitializing) {
     return (
-      <View style={styles.loadingContainer}>
-        <View style={styles.loadingContent}>
-          <Text style={styles.loadingIcon}>🏔️</Text>
-          <Text style={styles.loadingTitle}>Montana Fishing Reports</Text>
-          <ActivityIndicator size="large" color={COLORS.primary} style={styles.loadingSpinner} />
-          <Text style={styles.loadingText}>Loading river data...</Text>
+      <View style={loadingStyles.container}>
+        <View style={loadingStyles.gradient}>
+          <View style={loadingStyles.content}>
+            {/* Logo Icon */}
+            <View style={loadingStyles.logoContainer}>
+              <MaterialCommunityIcons name="waves" size={64} color={COLORS.accent} />
+            </View>
+            
+            {/* Title */}
+            <Text style={loadingStyles.title}>Montana Fishing</Text>
+            <Text style={loadingStyles.subtitle}>Reports</Text>
+            
+            {/* Progress Bar */}
+            <View style={loadingStyles.progressContainer}>
+              <View style={loadingStyles.progressBar}>
+                <View style={[loadingStyles.progressFill, { width: `${Math.max(loadingProgress * 100, 5)}%` }]} />
+              </View>
+              <Text style={loadingStyles.statusText}>{loadingStatus}</Text>
+            </View>
+            
+            {/* Loading Spinner */}
+            <ActivityIndicator size="small" color={COLORS.accent} style={loadingStyles.spinner} />
+          </View>
         </View>
       </View>
     );
@@ -1770,5 +1851,73 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 14,
     color: COLORS.textSecondary,
+  },
+});
+
+// Professional Loading Screen Styles
+const loadingStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.primaryDark,
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primaryDark,
+  },
+  content: {
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  logoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: COLORS.accent,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#f5f1e8',
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: COLORS.accent,
+    marginBottom: 40,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+  },
+  progressContainer: {
+    width: 250,
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: '100%',
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.accent,
+    borderRadius: 2,
+  },
+  statusText: {
+    fontSize: 14,
+    color: 'rgba(245, 241, 232, 0.7)',
+    marginBottom: 20,
+  },
+  spinner: {
+    marginTop: 10,
   },
 });
