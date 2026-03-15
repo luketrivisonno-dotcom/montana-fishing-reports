@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
+
 const MONTANA_ANGLER_URLS = {
   'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
   'Upper Madison River': 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
@@ -66,7 +68,7 @@ async function scrapeMontanaAngler() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdatedText,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity
       });
       
@@ -82,7 +84,7 @@ async function scrapeMontanaAngler() {
         last_updated: null,
         last_updated_text: null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: null
       });
     }
