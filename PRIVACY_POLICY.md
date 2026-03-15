@@ -86,7 +86,7 @@ You have the right to:
 - **Opt-out**: Unsubscribe from notifications anytime
 - **Control**: Enable/disable location services
 
-To exercise these rights, contact us at: [YOUR_EMAIL]
+To exercise these rights, contact us at: Dhaul12@protonmail.com
 
 ## Children's Privacy
 
@@ -101,8 +101,8 @@ We may update this Privacy Policy from time to time. We will notify you of any c
 If you have questions about this Privacy Policy, please contact:
 
 **Montana Fishing Reports**
-Email: [YOUR_SUPPORT_EMAIL]
-Website: [YOUR_WEBSITE]
+Email: Dhaul12@protonmail.com
+Website: https://snazzy-lily-3ac29f.netlify.app
 
 ## Compliance
 
