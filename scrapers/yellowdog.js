@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/yellowdog.webp';
+
 const YELLOWDOG_URLS = {
   'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report',
   'Upper Madison River': 'https://www.yellowdogflyfishing.com/pages/upper-madison-fishing-reports',
@@ -100,7 +102,7 @@ async function scrapeYellowDog() {
         last_updated: dateMatch ? dateMatch[1] : null,
         last_updated_text: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity,
         hatches: hatchData.hatches
       });
