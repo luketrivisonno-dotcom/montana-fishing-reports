@@ -55,7 +55,7 @@ const YNP_RIVERS = ['Slough Creek', 'Soda Butte Creek', 'Lamar River', 'Gardner 
 // ============================================
 // DEVELOPMENT MODE
 // ============================================
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 // Force free mode for testing (set to true to simulate free user)
 const FORCE_FREE_MODE = false;

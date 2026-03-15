@@ -34,7 +34,7 @@ const getProductionBannerId = () => {
 };
 
 // Use test ID for development
-const USE_TEST_ADS = true;
+const USE_TEST_ADS = false;
 
 const AdBanner = ({ 
   size = 'BANNER',
