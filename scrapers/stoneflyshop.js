@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/stonefly.png';
+
 async function scrapeStoneflyShop() {
   const url = 'https://www.thestonefly.com/pages/fishing-reports';
   
@@ -35,7 +37,8 @@ async function scrapeStoneflyShop() {
       river: river,
       url: url,
       last_updated: dateMatch ? dateMatch[1] : null,
-      scraped_at: new Date()
+      scraped_at: new Date(),
+      icon_url: ICON_URL
     }));
     
   } catch (error) {
