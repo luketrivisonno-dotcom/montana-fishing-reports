@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/gallatin-river-guides.ico';
+
 const GALLATIN_RIVER_GUIDES_URLS = {
   'Gallatin River': 'https://www.montanaflyfishing.com/gallatin-river-fishing-report',
   'Yellowstone River': 'https://www.montanaflyfishing.com/yellowstone-river-fishing-report'
@@ -13,15 +15,14 @@ async function scrapeGallatinRiverGuides() {
     try {
       const { data } = await axios.get(url, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
-        timeout: 10000
+        timeout: 10000,
+        responseType: 'text'
       });
       
-      // Gallatin River Guides uses format like "3/6/2026" in HTML
-      // Search in raw HTML since cheerio text extraction doesn't work well for this site
+      // Gallatin River Guides uses format like "PublicationDate: 'Fri Mar 06 19:50:10 UTC 2026'"
       const dateMatch = 
-        data.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) ||
-        data.match(/Updated[:\s]+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i) ||
-        data.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
+        data.match(/PublicationDate:\s*'([^']+)'/) ||
+        data.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
       
       reports.push({
         source: 'Gallatin River Guides',
@@ -29,7 +30,7 @@ async function scrapeGallatinRiverGuides() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: ICON_URL
       });
       
     } catch (error) {
