@@ -36,20 +36,28 @@ let isExpoGo = false;  // True if running in Expo Go (no native purchases)
  */
 const checkIsExpoGo = () => {
   try {
+    // Check for Expo Go specific globals first (most reliable)
+    // @ts-ignore
+    if (!!global.Expo || !!global.__expo) {
+      console.log('[REVENUECAT] Detected Expo Go via global flags');
+      return true;
+    }
+    
     // Check if the native module exists - if it does, we're in a native build
     const NativeModules = require('react-native').NativeModules;
     const hasRevenueCat = !!NativeModules.RNPurchases;
     
-    // If we have the native module, we're NOT in Expo Go
-    if (hasRevenueCat) {
-      return false;
+    // If we don't have the native module, we're in Expo Go
+    if (!hasRevenueCat) {
+      console.log('[REVENUECAT] No native RevenueCat module - assuming Expo Go');
+      return true;
     }
     
-    // Check for Expo Go specific globals as fallback
-    // @ts-ignore
-    return !!global.Expo || !!global.__expo;
+    // We have the module, not in Expo Go
+    return false;
   } catch (e) {
     // If we can't check, assume Expo Go to be safe
+    console.log('[REVENUECAT] Error checking Expo Go status, assuming Expo Go');
     return true;
   }
 };
@@ -97,18 +105,48 @@ export const initializePurchases = async () => {
     console.log('[REVENUECAT] Using API key:', apiKey.substring(0, 10) + '...');
     
     // Configure with anonymous user ID (RevenueCat generates one)
-    console.log('[REVENUECAT] Calling configure...');
-    Purchases.configure({ apiKey });
+    console.log('[REVENUECAT] Calling configure with API key:', apiKey.substring(0, 15) + '...');
+    
+    try {
+      Purchases.configure({ apiKey });
+    } catch (configureError) {
+      // Check if this is an Expo Go error
+      if (configureError.message && (
+        configureError.message.includes('Expo Go') ||
+        configureError.message.includes('Test Store') ||
+        configureError.message.includes('native store is not available')
+      )) {
+        console.log('[REVENUECAT] Detected Expo Go from configure error - native purchases not available');
+        isExpoGo = true;
+        isConfigured = true;
+        return true;
+      }
+      throw configureError;
+    }
     
     isConfigured = true;
-    console.log('[REVENUECAT] ✅ SUCCESS - RevenueCat initialized');
+    
+    // Get and log the configured app user ID
+    try {
+      const customerInfo = await Purchases.getCustomerInfo();
+      console.log('[REVENUECAT] ✅ SUCCESS - RevenueCat initialized');
+      console.log('[REVENUECAT] App User ID:', customerInfo.originalAppUserId);
+    } catch (e) {
+      console.log('[REVENUECAT] ✅ SUCCESS - RevenueCat initialized (could not get initial customer info)');
+    }
+    
     return true;
   } catch (error) {
     console.error('[REVENUECAT] ❌ FAILED:', error.message);
     console.error('[REVENUECAT] Stack:', error.stack);
     
     // Check if this is the Expo Go error
-    if (error.message && error.message.includes('Expo Go')) {
+    if (error.message && (
+      error.message.includes('Expo Go') ||
+      error.message.includes('Test Store') ||
+      error.message.includes('native store is not available')
+    )) {
+      console.log('[REVENUECAT] Treating as Expo Go mode due to error');
       isExpoGo = true;
       isConfigured = true;
       return true;
@@ -245,19 +283,45 @@ export function useRevenueCat() {
     if (!isConfigured || !Purchases) return;
     
     try {
+      console.log('[REVENUECAT] Fetching offerings...');
       const offerings = await Purchases.getOfferings();
-      const useOffering = offerings.current || offerings.all?.['default'];
-      console.log('📦 RevenueCat offerings:', JSON.stringify({
-        current: offerings.current?.identifier || 'null (using default fallback)',
-        default: offerings.all?.['default']?.identifier,
-        all: Object.keys(offerings.all || {}),
-        monthly: useOffering?.monthly?.product?.identifier,
-        yearly: useOffering?.yearly?.product?.identifier,
-        availablePackages: useOffering?.availablePackages?.length || 0
+      
+      // Detailed logging for debugging
+      console.log('[REVENUECAT] Raw offerings response:', JSON.stringify({
+        current: offerings.current?.identifier || null,
+        allKeys: Object.keys(offerings.all || {}),
+        allOfferings: Object.entries(offerings.all || {}).map(([key, val]) => ({
+          key,
+          identifier: val.identifier,
+          serverDescription: val.serverDescription,
+          availablePackagesCount: val.availablePackages?.length || 0,
+          packages: val.availablePackages?.map(p => ({
+            identifier: p.identifier,
+            packageType: p.packageType,
+            productIdentifier: p.product?.identifier,
+            productTitle: p.product?.title,
+            productPrice: p.product?.price,
+            productPriceString: p.product?.priceString,
+          })) || []
+        }))
       }, null, 2));
+      
+      const useOffering = offerings.current || offerings.all?.['default'];
+      
+      if (!useOffering) {
+        console.error('[REVENUECAT] ❌ No offering found! Check that "default" offering exists in RevenueCat dashboard.');
+      } else if (!useOffering.monthly && !useOffering.yearly) {
+        console.error('[REVENUECAT] ❌ Offering found but no monthly/yearly packages. Products may not be configured correctly in App Store Connect.');
+      } else {
+        console.log('[REVENUECAT] ✅ Using offering:', useOffering.identifier);
+        console.log('[REVENUECAT] Monthly:', useOffering.monthly?.product?.identifier || 'NOT FOUND');
+        console.log('[REVENUECAT] Yearly:', useOffering.yearly?.product?.identifier || 'NOT FOUND');
+      }
+      
       setOfferings(offerings);
     } catch (error) {
-      console.error('Error loading offerings:', error);
+      console.error('[REVENUECAT] ❌ Error loading offerings:', error.message);
+      console.error('[REVENUECAT] Stack:', error.stack);
     }
   }, []);
 
