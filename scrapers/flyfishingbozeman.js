@@ -24,15 +24,24 @@ async function scrapeFlyFishingBozeman() {
       const pageText = $('body').text();
       
       // Fly Fishing Bozeman uses "Last Updated: 03/12/2026" format
-      const dateMatch = 
-        pageText.match(/Last Updated[:\s]+(\d{1,2}\/\d{1,2}\/\d{4})/i) ||
-        pageText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+      // Find all dates and pick the most recent one
+      const allDates = pageText.match(/\d{1,2}\/\d{1,2}\/\d{4}/g);
+      let mostRecentDate = null;
+      if (allDates) {
+        // Parse all dates and find the most recent
+        const parsedDates = allDates.map(d => {
+          const [m, day, y] = d.split('/').map(Number);
+          return { dateStr: d, timestamp: new Date(y, m - 1, day).getTime() };
+        });
+        parsedDates.sort((a, b) => b.timestamp - a.timestamp);
+        mostRecentDate = parsedDates[0].dateStr;
+      }
       
       reports.push({
         source: 'Fins and Feathers',
         river: river,
         url: url,
-        last_updated: dateMatch ? dateMatch[1] : null,
+        last_updated: mostRecentDate,
         scraped_at: new Date(),
         icon_url: ICON_URL
       });
