@@ -130,18 +130,6 @@ export default function RiverMap({ isPremium }) {
   };
 
   const handleMapLongPress = (e) => {
-    if (!isPremium) {
-      Alert.alert(
-        'Premium Feature',
-        'Adding personal pins is a premium feature. Upgrade to unlock this feature.',
-        [
-          { text: 'Not Now', style: 'cancel' },
-          { text: 'Upgrade', onPress: () => {/* Open paywall */} }
-        ]
-      );
-      return;
-    }
-
     const { coordinate } = e.nativeEvent;
     setTempCoordinate(coordinate);
     setEditingPin(null);
@@ -334,14 +322,6 @@ export default function RiverMap({ isPremium }) {
           </TouchableOpacity>
         </ScrollView>
       </View>
-
-      {/* Long Press Hint */}
-      {isPremium && (
-        <View style={styles.hintBar}>
-          <Ionicons name="information-circle" size={14} color={COLORS.textLight} />
-          <Text style={styles.hintText}>Long press anywhere to add a personal pin</Text>
-        </View>
-      )}
 
       {/* Map */}
       <MapView
@@ -647,18 +627,6 @@ const styles = StyleSheet.create({
   },
   filterTextActive: {
     color: '#f5f1e8',
-  },
-  hintBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.background,
-    paddingVertical: 6,
-    gap: 6,
-  },
-  hintText: {
-    fontSize: 12,
-    color: COLORS.textLight,
   },
   map: {
     flex: 1,
