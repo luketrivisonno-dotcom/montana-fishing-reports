@@ -1,7 +1,7 @@
 // RevenueCat Paywall Component
 // Modern implementation using useRevenueCat hook
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,10 @@ import {
   ActivityIndicator,
   ScrollView,
   Alert,
+  TextInput,
 } from 'react-native';
 import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRevenueCat, isRunningInExpoGo } from '../hooks/useRevenueCat';
 
 const COLORS = {
@@ -54,6 +56,23 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
   
   // Check if running in Expo Go (purchases not available)
   const inExpoGo = isRunningInExpoGo();
+  
+  // Secret code for friends/family
+  const [secretCode, setSecretCode] = useState('');
+  const [showSecretInput, setShowSecretInput] = useState(false);
+  const SECRET_CODES = ['FISH2026', 'TROUT', 'BIGSKY']; // Add your codes here
+  
+  const checkSecretCode = async () => {
+    if (SECRET_CODES.includes(secretCode.toUpperCase())) {
+      // Unlock premium locally
+      await AsyncStorage.setItem('isPremium', 'true');
+      await AsyncStorage.setItem('premiumSource', 'friend');
+      Alert.alert('Premium Unlocked!', 'Enjoy your free premium access!');
+      onPurchaseSuccess?.();
+    } else {
+      Alert.alert('Invalid Code', 'That code is not recognized.');
+    }
+  };
 
   // If already premium, show different UI
   if (isPremium && visible) {
@@ -251,7 +270,29 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                 )}
               </TouchableOpacity>
 
-              {/* Terms */}
+              {/* Secret Code for Friends/Family */}
+              {showSecretInput ? (
+                <View style={styles.secretContainer}>
+                  <TextInput
+                    style={styles.secretInput}
+                    placeholder="Enter code"
+                    placeholderTextColor={COLORS.textLight}
+                    value={secretCode}
+                    onChangeText={setSecretCode}
+                    autoCapitalize="characters"
+                    maxLength={10}
+                  />
+                  <TouchableOpacity style={styles.secretButton} onPress={checkSecretCode}>
+                    <Text style={styles.secretButtonText}>Unlock</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity onPress={() => setShowSecretInput(true)}>
+                  <Text style={styles.secretHint}>Have a code?</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Terms -->
               <Text style={styles.termsText}>
                 Subscriptions auto-renew unless cancelled.{'\n'}
                 Manage in App Store settings.
@@ -432,6 +473,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 24,
+  },
+  // Secret Code Styles
+  secretContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  secretInput: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: COLORS.text,
+    backgroundColor: COLORS.surface,
+    width: 120,
+  },
+  secretButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  secretButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  secretHint: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: 12,
+    textDecorationLine: 'underline',
   },
   // Premium User Styles
   premiumHeader: {
