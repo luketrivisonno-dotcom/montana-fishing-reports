@@ -148,7 +148,7 @@ async function getUSGSData(riverName) {
       if (temp) {
         return {
           river: riverName,
-          flow: flow ? `${flow} CFS` : 'Ice/No Data',
+          flow: flow ? `${flow} CFS` : 'Seasonal',
           temp: `${temp}°F`,
           tempSource: 'USGS Live',
           siteId: site.id,
@@ -192,7 +192,7 @@ async function getUSGSData(riverName) {
       // Station exists but no flow data (iced over/offline) - still provide link
       return {
         river: riverName,
-        flow: 'Ice/No Data',
+        flow: 'Seasonal',
         temp: `${getSeasonalTemp(riverName)}°F (est.)`,
         tempSource: 'Seasonal Estimate',
         siteId: site.id,
