@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/rising-trout.ico';
+
 const RISING_TROUT_URLS = {
   'Gallatin River': 'https://www.risingtroutflyfishing.com/gallatin-river-fly-fishing-report',
   'Lower Madison River': 'https://www.risingtroutflyfishing.com/lower-madison-river-fly-fishing-report',
@@ -31,7 +33,7 @@ async function scrapeRisingTrout() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: ICON_URL
       });
       
     } catch (error) {
