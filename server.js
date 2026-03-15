@@ -847,15 +847,18 @@ app.get('/api/reports/:river',
                 [river]
             );
             const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
+            const MONTANA_ANGLER_ICON = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = result.rows.map(report => ({ 
                 ...report, 
                 // Normalize source names for display
                 source: report.source === 'Fly Fishing Bozeman' ? 'Fins and Feathers' : report.source,
-                // Add favicon for old Fly Fishing Bozeman reports or any Fins and Feathers without icon
-                icon_url: (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers') ? 
-                    (report.icon_url || FINS_FEATHERS_ICON) : report.icon_url,
+                // Add favicon for reports without icons
+                icon_url: report.icon_url || 
+                    (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers' ? FINS_FEATHERS_ICON :
+                     report.source === 'Montana Angler' ? MONTANA_ANGLER_ICON :
+                     report.icon_url),
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
@@ -1259,15 +1262,18 @@ app.get('/api/river-details/:river',
             ]);
             
             const FINS_FEATHERS_ICON = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
+            const MONTANA_ANGLER_ICON = 'https://www.montanaangler.com/sites/default/files/mta_icon_1_2.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = reportsResult.rows.map(report => ({ 
                 ...report, 
                 // Normalize source names for display
                 source: report.source === 'Fly Fishing Bozeman' ? 'Fins and Feathers' : report.source,
-                // Add favicon for old Fly Fishing Bozeman reports or any Fins and Feathers without icon
-                icon_url: (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers') ? 
-                    (report.icon_url || FINS_FEATHERS_ICON) : report.icon_url,
+                // Add favicon for reports without icons
+                icon_url: report.icon_url || 
+                    (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers' ? FINS_FEATHERS_ICON :
+                     report.source === 'Montana Angler' ? MONTANA_ANGLER_ICON :
+                     report.icon_url),
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
                 relative_time: getReportFreshness(report.last_updated),
