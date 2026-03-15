@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
 
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/bozeman-fly-supply.png';
+
 const BOZEMAN_FLY_SUPPLY_URLS = {
   'Gallatin River': 'https://www.bozemanflysupply.com/river-report/gallatin',
   'Upper Madison River': 'https://www.bozemanflysupply.com/river-report/upper-madison',
@@ -55,7 +57,7 @@ async function scrapeBozemanFlySupply() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         hatches: hatchData.hatches
       });
       
