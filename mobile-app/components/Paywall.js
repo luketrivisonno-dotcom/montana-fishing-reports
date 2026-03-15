@@ -31,7 +31,7 @@ const COLORS = {
 const FEATURES = [
   { icon: 'bug', iconType: 'material-community', text: 'Detailed hatch charts & timing' },
   { icon: 'hook', iconType: 'material-community', text: 'Exact fly recommendations & sizes' },
-  { icon: 'show-chart', iconType: 'material', text: '7-Day flow history & trends' },
+  { icon: 'chart-line', iconType: 'material-community', text: '7-Day flow history & trends' },
   { icon: 'straighten', iconType: 'material', text: 'River mile calculator' },
   { icon: 'format-list-bulleted', iconType: 'material', text: 'Personal fishing log' },
   { icon: 'gavel', iconType: 'material', text: 'Detailed regulations & seasons' },

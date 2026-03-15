@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -113,7 +113,7 @@ const FlowChart = ({ riverName }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>📊 7-Day Flow History</Text>
+        <Text style={styles.title}><MaterialCommunityIcons name="chart-line" size={18} color={COLORS.primary} /> 7-Day Flow History</Text>
         <ActivityIndicator size="small" color={COLORS.primary} />
       </View>
     );
@@ -130,7 +130,7 @@ const FlowChart = ({ riverName }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📊 7-Day Flow History</Text>
+      <Text style={styles.title}><MaterialCommunityIcons name="chart-line" size={18} color={COLORS.primary} /> 7-Day Flow History</Text>
       
       {/* Current Stats */}
       <View style={styles.statsRow}>
