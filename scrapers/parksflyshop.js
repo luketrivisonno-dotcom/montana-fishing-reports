@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/parks.png';
 const cheerio = require('cheerio');
 const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');
@@ -77,7 +79,7 @@ async function scrapeParksFlyShop() {
         last_updated: dateMatch ? dateMatch[1] : null,
         last_updated_text: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null,
+        icon_url: ICON_URL,
         water_clarity: waterClarity,
         hatches: hatchData.hatches
       });

@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/fly-fish-food.jpg';
 const cheerio = require('cheerio');
 
 async function scrapeFlyFishFood() {
@@ -27,7 +29,7 @@ async function scrapeFlyFishFood() {
       url: url,
       last_updated: dateMatch ? dateMatch[1] : null,
       scraped_at: new Date(),
-      icon_url: null
+      icon_url: ICON_URL
     }];
     
   } catch (error) {

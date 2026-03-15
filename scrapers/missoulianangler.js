@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/missoulian-angler.jpg';
 const cheerio = require('cheerio');
 
 // Missoulian Angler - Individual river report URLs
@@ -50,7 +52,7 @@ async function scrapeMissoulianAngler() {
         last_updated: lastUpdated,
         last_updated_text: lastUpdated,
         scraped_at: new Date().toISOString(),
-        icon_url: null
+        icon_url: ICON_URL
       });
       
       console.log(`  ✓ ${river}: ${lastUpdated}`);
@@ -107,7 +109,7 @@ async function scrapeSingleRiver(riverName) {
       last_updated: lastUpdated,
       last_updated_text: lastUpdated,
       scraped_at: new Date().toISOString(),
-      icon_url: null
+      icon_url: ICON_URL
     };
   } catch (error) {
     console.error(`Error scraping ${riverName}:`, error.message);
