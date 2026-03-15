@@ -292,7 +292,7 @@ export default function Paywall({ visible, onClose, onPurchaseSuccess }) {
                 </TouchableOpacity>
               )}
 
-              {/* Terms -->
+              {/* Terms */}
               <Text style={styles.termsText}>
                 Subscriptions auto-renew unless cancelled.{'\n'}
                 Manage in App Store settings.
