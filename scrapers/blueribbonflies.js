@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/blue-ribbon-flies.png';
 const cheerio = require('cheerio');
 const { extractHatchData } = require('../utils/hatchExtractor');
 const db = require('../db');

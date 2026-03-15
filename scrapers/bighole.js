@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/headhunters.png';
 const cheerio = require('cheerio');
 const { extractDateFromText } = require('../utils/dateStandardizer');
 

@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers-inc.png';
 const cheerio = require('cheerio');
 
 async function scrapeFinsFeathers() {

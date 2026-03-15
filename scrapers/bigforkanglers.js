@@ -1,4 +1,6 @@
 const axios = require('axios');
+
+const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/bigfork-anglers.png';
 const cheerio = require('cheerio');
 
 async function scrapeBigforkAnglers() {
