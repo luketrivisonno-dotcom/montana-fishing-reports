@@ -848,6 +848,7 @@ app.get('/api/reports/:river',
             );
             const FINS_FEATHERS_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.png';
             const MONTANA_ANGLER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
+            const SWEETWATER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/sweetwater.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = result.rows.map(report => ({ 
@@ -858,6 +859,7 @@ app.get('/api/reports/:river',
                 icon_url: report.icon_url || 
                     (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers' ? FINS_FEATHERS_ICON :
                      report.source === 'Montana Angler' ? MONTANA_ANGLER_ICON :
+                     report.source === 'Sweetwater Fly Shop' ? SWEETWATER_ICON :
                      report.icon_url),
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
@@ -1263,6 +1265,7 @@ app.get('/api/river-details/:river',
             
             const FINS_FEATHERS_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/fins-feathers.png';
             const MONTANA_ANGLER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/montana-angler.png';
+            const SWEETWATER_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/sweetwater.png';
             
             // First, normalize all reports and group by source
             const normalizedReports = reportsResult.rows.map(report => ({ 
@@ -1273,6 +1276,7 @@ app.get('/api/river-details/:river',
                 icon_url: report.icon_url || 
                     (report.source === 'Fly Fishing Bozeman' || report.source === 'Fins and Feathers' ? FINS_FEATHERS_ICON :
                      report.source === 'Montana Angler' ? MONTANA_ANGLER_ICON :
+                     report.source === 'Sweetwater Fly Shop' ? SWEETWATER_ICON :
                      report.icon_url),
                 // Use centralized date formatting
                 last_updated: formatDateForDisplay(report.last_updated),
