@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ICON_URL = 'https://flyfishingbozeman.com/assets/images/F&FGuide_SpaceTrout_CircleBadge_F&FGuide_SpaceTrout_CircleBadge.svg';
+
 const FLY_FISHING_BOZEMAN_URLS = {
   'Gallatin River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/gallatin-river-fishing-report',
   'Upper Madison River': 'https://flyfishingbozeman.com/montana-fly-fishing-reports/upper-madison-river-fishing-report',
@@ -32,7 +34,7 @@ async function scrapeFlyFishingBozeman() {
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
         scraped_at: new Date(),
-        icon_url: null
+        icon_url: ICON_URL
       });
       
     } catch (error) {
