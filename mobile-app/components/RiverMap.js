@@ -1,9 +1,12 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   View, Text, StyleSheet, TouchableOpacity, 
-  ScrollView, Linking, Dimensions, Alert, Modal
+  ScrollView, Linking, Dimensions, Alert, Modal, Platform
 } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
+
+// For iOS callout buttons to work, we need CalloutSubview
+const CalloutSubview = Platform.OS === 'ios' ? require('react-native-maps').CalloutSubview : View;
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
@@ -348,13 +351,12 @@ export default function RiverMap({ isPremium }) {
                 <Text style={styles.calloutRiver}>USGS Gauge #{station.siteId}</Text>
                 <Text style={styles.calloutText}>{station.location}</Text>
                 
-                <TouchableOpacity 
-                  style={styles.calloutButton}
-                  onPress={() => openUSGS(station.siteId)}
-                >
-                  <Text style={styles.calloutButtonText}>View on USGS</Text>
-                  <Ionicons name="open-outline" size={14} color={COLORS.primary} />
-                </TouchableOpacity>
+                <CalloutSubview onPress={() => openUSGS(station.siteId)}>
+                  <View style={styles.calloutButton}>
+                    <Text style={styles.calloutButtonText}>View on USGS</Text>
+                    <Ionicons name="open-outline" size={14} color={COLORS.primary} />
+                  </View>
+                </CalloutSubview>
               </View>
             </Callout>
           </Marker>
@@ -406,25 +408,23 @@ export default function RiverMap({ isPremium }) {
                 </View>
 
                 {/* Directions Button */}
-                <TouchableOpacity 
-                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
-                  onPress={() => handleGetDirections(
-                    { latitude: point.lat, longitude: point.lon },
-                    point.name
-                  )}
-                >
-                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
-                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
-                </TouchableOpacity>
+                <CalloutSubview onPress={() => handleGetDirections(
+                  { latitude: point.lat, longitude: point.lon },
+                  point.name
+                )}>
+                  <View style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}>
+                    <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                    <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                  </View>
+                </CalloutSubview>
 
                 {point.source !== 'BLM' && point.fwpUrl && (
-                  <TouchableOpacity 
-                    style={styles.calloutButton}
-                    onPress={() => openFWP(point.fwpUrl)}
-                  >
-                    <Text style={styles.calloutButtonText}>View on FWP</Text>
-                    <Ionicons name="open-outline" size={14} color={COLORS.primary} />
-                  </TouchableOpacity>
+                  <CalloutSubview onPress={() => openFWP(point.fwpUrl)}>
+                    <View style={styles.calloutButton}>
+                      <Text style={styles.calloutButtonText}>View on FWP</Text>
+                      <Ionicons name="open-outline" size={14} color={COLORS.primary} />
+                    </View>
+                  </CalloutSubview>
                 )}
               </View>
             </Callout>
@@ -437,7 +437,6 @@ export default function RiverMap({ isPremium }) {
             key={`personal-${pin.id}`}
             coordinate={pin.coordinate}
             pinColor={PERSONAL_PIN_COLORS[pin.type] || COLORS.personalPin}
-            onPress={() => handleMarkerPress(pin)}
           >
             <Callout tooltip>
               <View style={styles.callout}>
@@ -452,21 +451,19 @@ export default function RiverMap({ isPremium }) {
                   <Text style={styles.calloutText} numberOfLines={3}>{pin.notes}</Text>
                 )}
                 
-                <TouchableOpacity 
-                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
-                  onPress={() => handleGetDirections(pin.coordinate, pin.name)}
-                >
-                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
-                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
-                </TouchableOpacity>
+                <CalloutSubview onPress={() => handleGetDirections(pin.coordinate, pin.name)}>
+                  <View style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}>
+                    <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                    <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                  </View>
+                </CalloutSubview>
 
-                <TouchableOpacity 
-                  style={styles.calloutButton}
-                  onPress={() => handleMarkerPress(pin)}
-                >
-                  <Text style={styles.calloutButtonText}>Edit Pin</Text>
-                  <Ionicons name="create-outline" size={14} color={COLORS.primary} />
-                </TouchableOpacity>
+                <CalloutSubview onPress={() => handleMarkerPress(pin)}>
+                  <View style={styles.calloutButton}>
+                    <Text style={styles.calloutButtonText}>Edit Pin</Text>
+                    <Ionicons name="create-outline" size={14} color={COLORS.primary} />
+                  </View>
+                </CalloutSubview>
               </View>
             </Callout>
           </Marker>
@@ -513,13 +510,12 @@ export default function RiverMap({ isPremium }) {
                   )}
                 </View>
 
-                <TouchableOpacity 
-                  style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}
-                  onPress={() => handleGetDirections(catchItem.coordinate, `Catch on ${catchItem.river}`)}
-                >
-                  <Ionicons name="navigate" size={14} color={COLORS.accent} />
-                  <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
-                </TouchableOpacity>
+                <CalloutSubview onPress={() => handleGetDirections(catchItem.coordinate, `Catch on ${catchItem.river}`)}>
+                  <View style={[styles.calloutButton, { backgroundColor: COLORS.accent + '20' }]}>
+                    <Ionicons name="navigate" size={14} color={COLORS.accent} />
+                    <Text style={[styles.calloutButtonText, { color: COLORS.accent }]}>Get Directions</Text>
+                  </View>
+                </CalloutSubview>
               </View>
             </Callout>
           </Marker>
