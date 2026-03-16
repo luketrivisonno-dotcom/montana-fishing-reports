@@ -4,42 +4,96 @@ const db = require('../db');
 const { getUSGSData } = require('../utils/usgs');
 const { extractHatches, getFlyRecommendations } = require('../utils/hatchExtractor');
 
-// Fly shop URLs that include hatch info
+// Hatch sources mapped to specific rivers as requested
 const HATCH_SOURCES = {
+  // Yellowstone, Gallatin, Madison rivers - priority sources
+  'Troutfitters': {
+    'Gallatin River': 'https://troutfitters.com/reports/gallatin-river',
+    'Yellowstone River': 'https://troutfitters.com/reports/yellowstone-river',
+    'Upper Madison River': 'https://troutfitters.com/reports/upper-madison',
+    'Lower Madison River': 'https://troutfitters.com/reports/lower-madison-river',
+  },
+  'Yellow Dog': {
+    'Gallatin River': 'https://www.yellowdogflyfishing.com/pages/gallatin-river-fishing-report',
+    'Upper Madison River': 'https://www.yellowdogflyfishing.com/pages/upper-madison-fishing-reports',
+    'Lower Madison River': 'https://www.yellowdogflyfishing.com/pages/lower-madison-fishing-reports',
+    'Yellowstone River': 'https://www.yellowdogflyfishing.com/pages/yellowstone-river-fishing-reports',
+    'Missouri River': 'https://www.yellowdogflyfishing.com/pages/missouri-river-fishing-reports',
+    'Bighorn River': 'https://www.yellowdogflyfishing.com/pages/bighorn-river-fishing-reports',
+  },
+  'Fins and Feathers': {
+    // Single page covers all these rivers
+    rivers: ['Gallatin River', 'Upper Madison River', 'Lower Madison River', 'Yellowstone River', 'Bighorn River'],
+    url: 'https://www.finsandfeathers.com/fishing-reports'
+  },
+  'Bozeman Fly Supply': {
+    'Gallatin River': 'https://www.bozemanflysupply.com/river-report/gallatin',
+    'Upper Madison River': 'https://www.bozemanflysupply.com/river-report/upper-madison',
+    'Lower Madison River': 'https://www.bozemanflysupply.com/river-report/lower-madison',
+    'Yellowstone River': 'https://www.bozemanflysupply.com/river-report/yellowstone',
+  },
+  
+  // Missouri River - priority sources
+  'Grizzly Hackle': {
+    'Missouri River': 'https://grizzlyhackle.com/pages/missouri-river-fishing-report',
+    'Bitterroot River': 'https://grizzlyhackle.com/pages/bitterroot-river-fishing-report',
+    'Blackfoot River': 'https://grizzlyhackle.com/pages/blackfoot-river-fishing-report',
+    'Clark Fork River': 'https://grizzlyhackle.com/pages/clark-fork-river-fishing-report',
+    'Rock Creek': 'https://grizzlyhackle.com/pages/rock-creek-fishing-report',
+  },
+  
+  // Missoula area rivers (Bitterroot, Blackfoot, Clark Fork, Rock Creek)
+  'The Missoulian': {
+    'Bitterroot River': 'https://www.missoulianangler.com/pages/bitterroot-river-fishing-report',
+    'Blackfoot River': 'https://www.missoulianangler.com/pages/blackfoot-river-fly-fishing',
+    'Clark Fork River': 'https://www.missoulianangler.com/pages/clark-fork-river-fishing-report',
+    'Rock Creek': 'https://www.missoulianangler.com/pages/rock-creek-fishing-report',
+  },
+  'Blackfoot River Outfitters': {
+    'Blackfoot River': 'https://blackfootriver.com/blogs/fishing-reports',
+  },
+  
+  // Bighorn River
+  'Bighorn Angler': {
+    'Bighorn River': 'https://bighornangler.com/reports',
+  },
+  
+  // YNP Rivers
+  'Gallatin River Guides': {
+    'Gallatin River': 'https://www.montanaflyfishing.com/gallatin-river-fishing-report',
+    'Upper Madison River': 'https://www.montanaflyfishing.com/upper-madison-river-fishing-report',
+    'Lower Madison River': 'https://www.montanaflyfishing.com/lower-madison-river-fishing-report',
+    'Yellowstone River': 'https://www.montanaflyfishing.com/yellowstone-river-fishing-report',
+    // YNP specific
+    'Slough Creek': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+    'Soda Butte Creek': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+    'Lamar River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+    'Gardner River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+    'Firehole River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+    'Gibbon River': 'https://www.montanaflyfishing.com/yellowstone-national-park-fishing-report',
+  },
+  
+  // Ruby River
   'Montana Angler': {
-    'Upper Madison River': 'https://www.montanaangler.com/montana-fishing-report/upper-madison-river-fishing-report',
-    'Yellowstone River': 'https://www.montanaangler.com/montana-fishing-report/yellowstone-river-fishing-report',
-    'Gallatin River': 'https://www.montanaangler.com/montana-fishing-report/gallatin-river-fishing-report',
-    'Missouri River': 'https://www.montanaangler.com/montana-fishing-report/missouri-river-fishing-report',
-    'Jefferson River': 'https://www.montanaangler.com/montana-fishing-report/jefferson-river-fishing-report',
     'Ruby River': 'https://www.montanaangler.com/montana-fishing-report/ruby-river-fishing-report',
-    'Stillwater River': 'https://www.montanaangler.com/montana-fishing-report/stillwater-river-fishing-report',
-    'Boulder River': 'https://www.montanaangler.com/montana-fishing-report/boulder-river-report',
-    'Spring Creeks': 'https://www.montanaangler.com/montana-fishing-report/spring-creeks-fishing-report',
   },
-  'Blue Ribbon Flies': {
-    'Upper Madison River': 'https://www.blueribbonflies.com/fishing-report/',
-    'Firehole River': 'https://www.blueribbonflies.com/fishing-report/',
-    'Gibbon River': 'https://www.blueribbonflies.com/fishing-report/',
-    'Slough Creek': 'https://www.blueribbonflies.com/fishing-report/',
-    'Soda Butte Creek': 'https://www.blueribbonflies.com/fishing-report/',
-    'Lamar River': 'https://www.blueribbonflies.com/fishing-report/',
-    'Gardner River': 'https://www.blueribbonflies.com/fishing-report/',
+  'Perfect Fly Store': {
+    'Ruby River': 'https://perfectflystore.com/your-streams/fly-fishing-ruby-river-montana/',
   },
+  
+  // Other rivers not covered above
   'Stonefly Shop': {
     'Beaverhead River': 'https://www.thestonefly.com/pages/fishing-reports',
   },
-  'Troutfitters': {
-    'Big Hole River': 'https://troutfitters.com/reports/big-hole-river',
-  }
 };
 
-async function scrapeMontanaAnglerHatches() {
+// Generic scraper for sources with individual river URLs
+async function scrapeIndividualUrls(sourceName, urlMap) {
   const results = [];
   
-  for (const [river, url] of Object.entries(HATCH_SOURCES['Montana Angler'])) {
+  for (const [river, url] of Object.entries(urlMap)) {
     try {
-      console.log(`Scraping hatch data for ${river}...`);
+      console.log(`Scraping ${sourceName} for ${river}...`);
       
       const { data } = await axios.get(url, {
         headers: {
@@ -58,66 +112,45 @@ async function scrapeMontanaAnglerHatches() {
       // Extract hatches from text
       const hatches = extractHatches(contentText);
       
-      // Get water temp from USGS first (most accurate), then fall back to scraped text
-      let waterTemp = null;
-      try {
-        const usgsData = await getUSGSData(river);
-        if (usgsData && usgsData.temp && !usgsData.temp.includes('est')) {
-          waterTemp = usgsData.temp;
-        }
-      } catch (e) {
-        // USGS failed, will try scraping
-      }
-      
-      // If no USGS temp, try to extract from page text
-      if (!waterTemp) {
-        const tempMatch = contentText.match(/(\d{2,3})\s*(?:°|degrees?\s*[Ff]|[Ff])/);
-        waterTemp = tempMatch ? `${tempMatch[1]}°F` : null;
-      }
-      
-      // Extract water conditions
-      let waterConditions = null;
-      const conditionsMatch = contentText.match(/(clear|off.?color|muddy|low|high|flow[^.]*\d+[^.]*cfs)/i);
-      if (conditionsMatch) {
-        waterConditions = conditionsMatch[0];
-      }
-      
-      // Get fly recommendations
-      const flyRecommendations = getFlyRecommendations(hatches);
-      
       if (hatches.length > 0) {
+        const flyRecommendations = getFlyRecommendations(hatches);
+        
         results.push({
           river,
-          source: 'Montana Angler',
+          source: sourceName,
           hatches,
           fly_recommendations: flyRecommendations,
           hatch_details: {
-            extracted_from: 'fishing report text',
+            extracted_from: sourceName,
             confidence: 'medium'
           },
-          water_temp: waterTemp,
-          water_conditions: waterConditions,
+          water_temp: null,
+          water_conditions: null,
           report_date: reportDate,
           url
         });
         
         console.log(`  Found ${hatches.length} hatches: ${hatches.join(', ')}`);
+      } else {
+        console.log(`  No hatches found`);
       }
       
     } catch (error) {
-      console.error(`  Error scraping ${river}:`, error.message);
+      console.error(`  Error scraping ${sourceName} for ${river}:`, error.message);
     }
   }
   
   return results;
 }
 
-async function scrapeBlueRibbonFliesHatches() {
+// Scraper for Fins and Feathers (single page, multiple rivers)
+async function scrapeFinsAndFeathersHatches() {
   const results = [];
-  const url = 'https://www.blueribbonflies.net/fishing-report';
+  const url = HATCH_SOURCES['Fins and Feathers'].url;
+  const rivers = HATCH_SOURCES['Fins and Feathers'].rivers;
   
   try {
-    console.log(`Scraping Blue Ribbon Flies hatch data...`);
+    console.log(`Scraping Fins and Feathers...`);
     
     const { data } = await axios.get(url, {
       headers: {
@@ -129,28 +162,23 @@ async function scrapeBlueRibbonFliesHatches() {
     const $ = cheerio.load(data);
     const contentText = $('body').text();
     
-    // Extract date
-    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
     
-    // Extract hatches from text
+    // Extract hatches once, apply to all rivers
     const hatches = extractHatches(contentText);
     
-    // Get fly recommendations
-    const flyRecommendations = getFlyRecommendations(hatches);
-    
     if (hatches.length > 0) {
-      // Blue Ribbon Flies covers YNP rivers
-      const ynppRivers = ['Firehole River', 'Gibbon River', 'Madison River', 'Yellowstone River'];
+      const flyRecommendations = getFlyRecommendations(hatches);
       
-      for (const river of ynppRivers) {
+      for (const river of rivers) {
         results.push({
           river,
-          source: 'Blue Ribbon Flies',
+          source: 'Fins and Feathers',
           hatches,
           fly_recommendations: flyRecommendations,
           hatch_details: {
-            extracted_from: 'fishing report text',
+            extracted_from: 'Fins and Feathers fishing report',
             confidence: 'medium'
           },
           water_temp: null,
@@ -160,22 +188,25 @@ async function scrapeBlueRibbonFliesHatches() {
         });
       }
       
-      console.log(`  Found ${hatches.length} hatches for YNP rivers`);
+      console.log(`  Found ${hatches.length} hatches for ${rivers.length} rivers`);
+    } else {
+      console.log(`  No hatches found`);
     }
     
   } catch (error) {
-    console.error(`  Error scraping Blue Ribbon Flies:`, error.message);
+    console.error(`  Error scraping Fins and Feathers:`, error.message);
   }
   
   return results;
 }
 
-async function scrapeStoneflyShopHatches() {
+// Scraper for Blackfoot River Outfitters
+async function scrapeBlackfootOutfittersHatches() {
   const results = [];
-  const url = 'https://www.thestonefly.com/pages/fishing-reports';
+  const url = HATCH_SOURCES['Blackfoot River Outfitters']['Blackfoot River'];
   
   try {
-    console.log(`Scraping Stonefly Shop hatch data for Beaverhead...`);
+    console.log(`Scraping Blackfoot River Outfitters...`);
     
     const { data } = await axios.get(url, {
       headers: {
@@ -187,24 +218,21 @@ async function scrapeStoneflyShopHatches() {
     const $ = cheerio.load(data);
     const contentText = $('body').text();
     
-    // Extract date
-    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
     
-    // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Get fly recommendations
-    const flyRecommendations = getFlyRecommendations(hatches);
-    
     if (hatches.length > 0) {
+      const flyRecommendations = getFlyRecommendations(hatches);
+      
       results.push({
-        river: 'Beaverhead River',
-        source: 'Stonefly Shop',
+        river: 'Blackfoot River',
+        source: 'Blackfoot River Outfitters',
         hatches,
         fly_recommendations: flyRecommendations,
         hatch_details: {
-          extracted_from: 'fishing report text',
+          extracted_from: 'Blackfoot River Outfitters fishing report',
           confidence: 'medium'
         },
         water_temp: null,
@@ -213,22 +241,25 @@ async function scrapeStoneflyShopHatches() {
         url
       });
       
-      console.log(`  Found ${hatches.length} hatches: ${hatches.join(', ')}`);
+      console.log(`  Found ${hatches.length} hatches`);
+    } else {
+      console.log(`  No hatches found`);
     }
     
   } catch (error) {
-    console.error(`  Error scraping Stonefly Shop:`, error.message);
+    console.error(`  Error scraping Blackfoot River Outfitters:`, error.message);
   }
   
   return results;
 }
 
-async function scrapeTroutfittersHatches() {
+// Scraper for Bighorn Angler
+async function scrapeBighornAnglerHatches() {
   const results = [];
-  const url = 'https://troutfitters.com/reports/big-hole-river';
+  const url = HATCH_SOURCES['Bighorn Angler']['Bighorn River'];
   
   try {
-    console.log(`Scraping Troutfitters hatch data for Big Hole...`);
+    console.log(`Scraping Bighorn Angler...`);
     
     const { data } = await axios.get(url, {
       headers: {
@@ -240,24 +271,21 @@ async function scrapeTroutfittersHatches() {
     const $ = cheerio.load(data);
     const contentText = $('body').text();
     
-    // Extract date
-    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
     const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
     
-    // Extract hatches from text
     const hatches = extractHatches(contentText);
     
-    // Get fly recommendations
-    const flyRecommendations = getFlyRecommendations(hatches);
-    
     if (hatches.length > 0) {
+      const flyRecommendations = getFlyRecommendations(hatches);
+      
       results.push({
-        river: 'Big Hole River',
-        source: 'Troutfitters',
+        river: 'Bighorn River',
+        source: 'Bighorn Angler',
         hatches,
         fly_recommendations: flyRecommendations,
         hatch_details: {
-          extracted_from: 'fishing report text',
+          extracted_from: 'Bighorn Angler fishing report',
           confidence: 'medium'
         },
         water_temp: null,
@@ -266,11 +294,13 @@ async function scrapeTroutfittersHatches() {
         url
       });
       
-      console.log(`  Found ${hatches.length} hatches: ${hatches.join(', ')}`);
+      console.log(`  Found ${hatches.length} hatches`);
+    } else {
+      console.log(`  No hatches found`);
     }
     
   } catch (error) {
-    console.error(`  Error scraping Troutfitters:`, error.message);
+    console.error(`  Error scraping Bighorn Angler:`, error.message);
   }
   
   return results;
@@ -321,98 +351,186 @@ async function runHatchScraper() {
   const allReports = [];
   
   try {
-    // Scrape from Montana Angler
+    // 1. Troutfitters (Gallatin, Yellowstone, Upper/Lower Madison)
+    console.log('--- Troutfitters ---');
+    const troutfittersReports = await scrapeIndividualUrls('Troutfitters', HATCH_SOURCES['Troutfitters']);
+    if (troutfittersReports.length > 0) {
+      const saved = await saveHatchReports(troutfittersReports);
+      console.log(`✓ Saved ${saved.length} Troutfitters reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...troutfittersReports);
+    }
+    
+    // 2. Yellow Dog (Gallatin, Yellowstone, Madison, Missouri, Bighorn)
+    console.log('--- Yellow Dog ---');
+    const yellowDogReports = await scrapeIndividualUrls('Yellow Dog', HATCH_SOURCES['Yellow Dog']);
+    if (yellowDogReports.length > 0) {
+      const saved = await saveHatchReports(yellowDogReports);
+      console.log(`✓ Saved ${saved.length} Yellow Dog reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...yellowDogReports);
+    }
+    
+    // 3. Fins and Feathers (Gallatin, Yellowstone, Madison, Bighorn)
+    console.log('--- Fins and Feathers ---');
+    const finsReports = await scrapeFinsAndFeathersHatches();
+    if (finsReports.length > 0) {
+      const saved = await saveHatchReports(finsReports);
+      console.log(`✓ Saved ${saved.length} Fins and Feathers reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...finsReports);
+    }
+    
+    // 4. Bozeman Fly Supply (Gallatin, Yellowstone, Madison)
+    console.log('--- Bozeman Fly Supply ---');
+    const bozemanReports = await scrapeIndividualUrls('Bozeman Fly Supply', HATCH_SOURCES['Bozeman Fly Supply']);
+    if (bozemanReports.length > 0) {
+      const saved = await saveHatchReports(bozemanReports);
+      console.log(`✓ Saved ${saved.length} Bozeman Fly Supply reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...bozemanReports);
+    }
+    
+    // 5. Grizzly Hackle (Missouri, Bitterroot, Blackfoot, Clark Fork, Rock Creek)
+    console.log('--- Grizzly Hackle ---');
+    const grizzlyReports = await scrapeIndividualUrls('Grizzly Hackle', HATCH_SOURCES['Grizzly Hackle']);
+    if (grizzlyReports.length > 0) {
+      const saved = await saveHatchReports(grizzlyReports);
+      console.log(`✓ Saved ${saved.length} Grizzly Hackle reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...grizzlyReports);
+    }
+    
+    // 6. The Missoulian (Bitterroot, Blackfoot, Clark Fork, Rock Creek)
+    console.log('--- The Missoulian ---');
+    const missoulianReports = await scrapeIndividualUrls('The Missoulian', HATCH_SOURCES['The Missoulian']);
+    if (missoulianReports.length > 0) {
+      const saved = await saveHatchReports(missoulianReports);
+      console.log(`✓ Saved ${saved.length} The Missoulian reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...missoulianReports);
+    }
+    
+    // 7. Blackfoot River Outfitters (Blackfoot)
+    console.log('--- Blackfoot River Outfitters ---');
+    const blackfootReports = await scrapeBlackfootOutfittersHatches();
+    if (blackfootReports.length > 0) {
+      const saved = await saveHatchReports(blackfootReports);
+      console.log(`✓ Saved ${saved.length} Blackfoot River Outfitters reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...blackfootReports);
+    }
+    
+    // 8. Bighorn Angler (Bighorn)
+    console.log('--- Bighorn Angler ---');
+    const bighornReports = await scrapeBighornAnglerHatches();
+    if (bighornReports.length > 0) {
+      const saved = await saveHatchReports(bighornReports);
+      console.log(`✓ Saved ${saved.length} Bighorn Angler reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...bighornReports);
+    }
+    
+    // 9. Gallatin River Guides (YNP rivers + main rivers)
+    console.log('--- Gallatin River Guides ---');
+    const gallatinGuidesReports = await scrapeIndividualUrls('Gallatin River Guides', HATCH_SOURCES['Gallatin River Guides']);
+    if (gallatinGuidesReports.length > 0) {
+      const saved = await saveHatchReports(gallatinGuidesReports);
+      console.log(`✓ Saved ${saved.length} Gallatin River Guides reports\n`);
+      totalSaved += saved.length;
+      allReports.push(...gallatinGuidesReports);
+    }
+    
+    // 10. Montana Angler (Ruby)
     console.log('--- Montana Angler ---');
-    const montanaAnglerHatches = await scrapeMontanaAnglerHatches();
-    
-    if (montanaAnglerHatches.length > 0) {
-      const saved = await saveHatchReports(montanaAnglerHatches);
-      console.log(`✓ Saved ${saved.length} Montana Angler reports`);
+    const montanaAnglerReports = await scrapeIndividualUrls('Montana Angler', HATCH_SOURCES['Montana Angler']);
+    if (montanaAnglerReports.length > 0) {
+      const saved = await saveHatchReports(montanaAnglerReports);
+      console.log(`✓ Saved ${saved.length} Montana Angler reports\n`);
       totalSaved += saved.length;
-      allReports.push(...montanaAnglerHatches);
+      allReports.push(...montanaAnglerReports);
     }
     
-    // Scrape from Blue Ribbon Flies
-    console.log('\n--- Blue Ribbon Flies ---');
-    const blueRibbonHatches = await scrapeBlueRibbonFliesHatches();
-    
-    if (blueRibbonHatches.length > 0) {
-      const saved = await saveHatchReports(blueRibbonHatches);
-      console.log(`✓ Saved ${saved.length} Blue Ribbon Flies reports`);
+    // 11. Perfect Fly Store (Ruby)
+    console.log('--- Perfect Fly Store ---');
+    const perfectFlyReports = await scrapeIndividualUrls('Perfect Fly Store', HATCH_SOURCES['Perfect Fly Store']);
+    if (perfectFlyReports.length > 0) {
+      const saved = await saveHatchReports(perfectFlyReports);
+      console.log(`✓ Saved ${saved.length} Perfect Fly Store reports\n`);
       totalSaved += saved.length;
-      allReports.push(...blueRibbonHatches);
+      allReports.push(...perfectFlyReports);
     }
     
-    // Scrape from Stonefly Shop
-    console.log('\n--- Stonefly Shop ---');
-    const stoneflyHatches = await scrapeStoneflyShopHatches();
-    
-    if (stoneflyHatches.length > 0) {
-      const saved = await saveHatchReports(stoneflyHatches);
-      console.log(`✓ Saved ${stoneflyHatches.length} Stonefly Shop reports`);
+    // 12. Stonefly Shop (Beaverhead - not in priority list but kept for coverage)
+    console.log('--- Stonefly Shop ---');
+    const stoneflyReports = await scrapeIndividualUrls('Stonefly Shop', HATCH_SOURCES['Stonefly Shop']);
+    if (stoneflyReports.length > 0) {
+      const saved = await saveHatchReports(stoneflyReports);
+      console.log(`✓ Saved ${saved.length} Stonefly Shop reports\n`);
       totalSaved += saved.length;
-      allReports.push(...stoneflyHatches);
+      allReports.push(...stoneflyReports);
     }
     
-    // Scrape from Troutfitters
-    console.log('\n--- Troutfitters ---');
-    const troutfittersHatches = await scrapeTroutfittersHatches();
-    
-    if (troutfittersHatches.length > 0) {
-      const saved = await saveHatchReports(troutfittersHatches);
-      console.log(`✓ Saved ${troutfittersHatches.length} Troutfitters reports`);
-      totalSaved += saved.length;
-      allReports.push(...troutfittersHatches);
-    }
-    
-    console.log(`\n✓ Total: ${totalSaved} hatch reports saved`);
-    
-    // Process hatch alerts for premium subscribers
-    if (allReports.length > 0) {
-      try {
-        const { processHatchAlerts } = require('../utils/hatchNotifications');
-        await processHatchAlerts(allReports);
-      } catch (alertError) {
-        console.error('Hatch alert processing error:', alertError.message);
-      }
-    }
+    console.log(`=== Total: ${totalSaved} hatch reports saved ===\n`);
     
   } catch (error) {
-    console.error('Hatch scraper error:', error);
+    console.error('Error in hatch scraper:', error);
   }
   
-  console.log('\n=== Hatch Scraper Complete ===\n');
+  return allReports;
 }
 
-// Get current hatches for a river from database
-async function getCurrentHatches(riverName) {
+// Get current hatches for a river (returns array of current hatches)
+async function getCurrentHatches(river) {
   try {
     const result = await db.query(
       `SELECT * FROM hatch_reports 
-       WHERE river = $1 AND is_current = true 
-       ORDER BY scraped_at DESC LIMIT 1`,
-      [riverName]
+       WHERE river = $1 AND is_current = true
+       ORDER BY scraped_at DESC
+       LIMIT 1`,
+      [river]
     );
     
-    return result.rows[0] || null;
+    if (result.rows.length > 0) {
+      const report = result.rows[0];
+      return {
+        hatches: report.hatches,
+        flies: report.fly_recommendations,
+        source: report.source,
+        date: report.report_date,
+        waterTemp: report.water_temp,
+        waterConditions: report.water_conditions
+      };
+    }
+    
+    return null;
   } catch (error) {
-    console.error('Error fetching hatches:', error);
+    console.error('Error getting current hatches:', error);
     return null;
   }
 }
 
-// Fallback to static data if no dynamic data available
+// Get seasonal static hatches (fallback)
 function getStaticHatches(riverName) {
-  const staticHatches = require('../data/hatches');
-  return staticHatches.getCurrentHatches(riverName);
+  const staticData = {
+    'Madison River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Gallatin River': ['Midges', 'Blue Winged Olives', 'Caddis', 'Stoneflies'],
+    'Yellowstone River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Bighorn River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Missouri River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Bitterroot River': ['Midges', 'Blue Winged Olives', 'Skwalas', 'March Browns'],
+    'Blackfoot River': ['Midges', 'Blue Winged Olives', 'March Browns', 'Caddis'],
+    'Clark Fork River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Rock Creek': ['Midges', 'Blue Winged Olives', 'March Browns', 'Caddis'],
+    'Ruby River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+    'Beaverhead River': ['Midges', 'Blue Winged Olives', 'Caddis', 'PMDs'],
+  };
+  
+  return staticData[riverName] || null;
 }
 
 module.exports = {
   runHatchScraper,
   getCurrentHatches,
-  getStaticHatches,
-  scrapeMontanaAnglerHatches,
-  // Re-export for backward compatibility
-  extractHatches,
-  getFlyRecommendations
+  getStaticHatches
 };
