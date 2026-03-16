@@ -8,6 +8,11 @@ import {
   StyleSheet,
   Modal,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -19,6 +24,7 @@ const COLORS = {
   surface: '#faf8f3',
   text: '#2c2416',
   textSecondary: '#6b5d4d',
+  textLight: '#9a8b7a',
   border: '#d4cfc3',
   error: '#a65d57',
   success: '#5a7d5a',
@@ -109,111 +115,131 @@ export default function PersonalPinModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              {editingPin ? 'Edit Pin' : 'Add Personal Pin'}
-            </Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={COLORS.text} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Coordinate Display */}
-          {coordinate && (
-            <View style={styles.coordinateBox}>
-              <Ionicons name="location" size={16} color={COLORS.accent} />
-              <Text style={styles.coordinateText}>
-                {coordinate.latitude.toFixed(6)}, {coordinate.longitude.toFixed(6)}
-              </Text>
-            </View>
-          )}
-
-          {/* Pin Type Selection */}
-          <Text style={styles.sectionLabel}>Pin Type</Text>
-          <View style={styles.typeGrid}>
-            {PIN_TYPES.map((type) => (
-              <TouchableOpacity
-                key={type.id}
-                style={[
-                  styles.typeButton,
-                  selectedType === type.id && { 
-                    backgroundColor: type.color + '20',
-                    borderColor: type.color 
-                  }
-                ]}
-                onPress={() => setSelectedType(type.id)}
-              >
-                <MaterialCommunityIcons 
-                  name={type.icon} 
-                  size={20} 
-                  color={selectedType === type.id ? type.color : COLORS.textSecondary} 
-                />
-                <Text style={[
-                  styles.typeLabel,
-                  selectedType === type.id && { color: type.color }
-                ]}>
-                  {type.label}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.overlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardView}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          >
+            <View style={styles.container}>
+              {/* Header */}
+              <View style={styles.header}>
+                <Text style={styles.title}>
+                  {editingPin ? 'Edit Pin' : 'Add Personal Pin'}
                 </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                  <Ionicons name="close" size={24} color={COLORS.text} />
+                </TouchableOpacity>
+              </View>
 
-          {/* Name Input */}
-          <Text style={styles.sectionLabel}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g., Secret Hole, Good Wade Spot..."
-            placeholderTextColor={COLORS.textLight}
-            maxLength={50}
-          />
-
-          {/* Notes Input */}
-          <Text style={styles.sectionLabel}>Notes</Text>
-          <TextInput
-            style={[styles.input, styles.notesInput]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Add details about this spot..."
-            placeholderTextColor={COLORS.textLight}
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-          />
-
-          {/* Action Buttons */}
-          <View style={styles.buttonRow}>
-            {editingPin && (
-              <TouchableOpacity 
-                style={[styles.button, styles.deleteButton]}
-                onPress={handleDelete}
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
               >
-                <Ionicons name="trash-outline" size={18} color="#fff" />
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            )}
-            
-            <TouchableOpacity 
-              style={[styles.button, styles.cancelButton]}
-              onPress={onClose}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.button, styles.saveButton]}
-              onPress={handleSave}
-            >
-              <Ionicons name="checkmark" size={18} color="#fff" />
-              <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
-          </View>
+                {/* Coordinate Display */}
+                {coordinate && (
+                  <View style={styles.coordinateBox}>
+                    <Ionicons name="location" size={16} color={COLORS.accent} />
+                    <Text style={styles.coordinateText}>
+                      {coordinate.latitude.toFixed(6)}, {coordinate.longitude.toFixed(6)}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Pin Type Selection */}
+                <Text style={styles.sectionLabel}>Pin Type</Text>
+                <View style={styles.typeGrid}>
+                  {PIN_TYPES.map((type) => (
+                    <TouchableOpacity
+                      key={type.id}
+                      style={[
+                        styles.typeButton,
+                        selectedType === type.id && { 
+                          backgroundColor: type.color + '20',
+                          borderColor: type.color 
+                        }
+                      ]}
+                      onPress={() => setSelectedType(type.id)}
+                    >
+                      <MaterialCommunityIcons 
+                        name={type.icon} 
+                        size={20} 
+                        color={selectedType === type.id ? type.color : COLORS.textSecondary} 
+                      />
+                      <Text style={[
+                        styles.typeLabel,
+                        selectedType === type.id && { color: type.color }
+                      ]}>
+                        {type.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Name Input */}
+                <Text style={styles.sectionLabel}>Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="e.g., Secret Hole, Good Wade Spot..."
+                  placeholderTextColor={COLORS.textLight}
+                  maxLength={50}
+                  returnKeyType="next"
+                />
+
+                {/* Notes Input */}
+                <Text style={styles.sectionLabel}>Notes</Text>
+                <TextInput
+                  style={[styles.input, styles.notesInput]}
+                  value={notes}
+                  onChangeText={setNotes}
+                  placeholder="Add details about this spot..."
+                  placeholderTextColor={COLORS.textLight}
+                  multiline
+                  numberOfLines={4}
+                  maxLength={500}
+                  textAlignVertical="top"
+                />
+
+                {/* Spacer for keyboard */}
+                <View style={styles.spacer} />
+              </ScrollView>
+
+              {/* Action Buttons - Fixed at bottom */}
+              <View style={styles.buttonRow}>
+                {editingPin && (
+                  <TouchableOpacity 
+                    style={[styles.button, styles.deleteButton]}
+                    onPress={handleDelete}
+                  >
+                    <Ionicons name="trash-outline" size={18} color="#fff" />
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                )}
+                
+                <TouchableOpacity 
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={onClose}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.button, styles.saveButton]}
+                  onPress={handleSave}
+                >
+                  <Ionicons name="checkmark" size={18} color="#fff" />
+                  <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -224,18 +250,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
+  keyboardView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   container: {
     backgroundColor: COLORS.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
-    paddingBottom: 40,
+    maxHeight: '85%',
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   title: {
     fontSize: 20,
@@ -244,6 +276,13 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 4,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 10,
   },
   coordinateBox: {
     flexDirection: 'row',
@@ -300,10 +339,17 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  spacer: {
+    height: 20,
+  },
   buttonRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 24,
+    padding: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
   button: {
     flexDirection: 'row',
