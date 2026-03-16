@@ -32,7 +32,7 @@ const getProductionId = () => {
   });
 };
 
-const USE_TEST_ADS = false;
+const USE_TEST_ADS = true;
 
 class AdManager {
   constructor() {
