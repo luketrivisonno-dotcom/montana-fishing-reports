@@ -5,7 +5,7 @@ const cron = require('node-cron');
 const db = require('./db');
 const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
-const { getUSGSData, RIVER_TYPES } = require('./utils/usgs');
+const { getUSGSData, RIVER_TYPES, calculateFlowCondition } = require('./utils/usgs');
 const { runHatchScraper, getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
 const { formatForDisplay, getRelativeTime } = require('./utils/dateStandardizer');
 
@@ -987,12 +987,16 @@ app.get('/api/usgs/history/:river',
                 ? Math.round(dailyData.reduce((sum, d) => sum + d.flow, 0) / dailyData.length)
                 : null;
             
+            // Calculate flow condition using shared function
+            const flowCondition = currentFlow ? calculateFlowCondition(riverName, currentFlow) : null;
+            
             res.json({
                 river: riverName,
                 siteId: site.id,
                 currentFlow,
                 averageFlow: avgFlow,
                 flowHistory: dailyData,
+                flowCondition,
                 unit: 'CFS'
             });
             
@@ -1309,6 +1313,15 @@ app.get('/api/river-details/:river',
             // Get river type classification
             const riverType = RIVER_TYPES[river] || 'freestone';
             
+            // Add flow condition to USGS data
+            if (usgs && usgs.flow) {
+                const flowMatch = usgs.flow.match(/(\d+)/);
+                if (flowMatch) {
+                    const cfs = parseInt(flowMatch[1]);
+                    usgs.flowCondition = calculateFlowCondition(river, cfs);
+                }
+            }
+            
             res.json({ 
                 river, 
                 riverType,
@@ -1426,16 +1439,29 @@ app.get('/api/premium/hatch-charts/:river',
             // Try to get dynamic hatch data from database
             let hatchData = await getCurrentHatches(river);
             
-            // Get real water temperature from USGS (prioritize over scraped data)
+            // Get real water temperature and flow from USGS
             const usgsData = await getUSGSData(river);
             let waterTemp = hatchData?.water_temp;
             let tempSource = hatchData?.source;
+            let flowCondition = null;
             
-            if (usgsData && usgsData.temp) {
-                const tempMatch = usgsData.temp.match(/(\d+)/);
-                if (tempMatch && !usgsData.temp.includes('-999')) {
-                    waterTemp = usgsData.temp;
-                    tempSource = usgsData.tempSource || 'USGS';
+            if (usgsData) {
+                // Get temp
+                if (usgsData.temp) {
+                    const tempMatch = usgsData.temp.match(/(\d+)/);
+                    if (tempMatch && !usgsData.temp.includes('-999')) {
+                        waterTemp = usgsData.temp;
+                        tempSource = usgsData.tempSource || 'USGS';
+                    }
+                }
+                
+                // Get flow condition from USGS (consistent with other endpoints)
+                if (usgsData.flow) {
+                    const flowMatch = usgsData.flow.match(/(\d+)/);
+                    if (flowMatch) {
+                        const cfs = parseInt(flowMatch[1]);
+                        flowCondition = calculateFlowCondition(river, cfs);
+                    }
                 }
             }
             
@@ -1456,7 +1482,8 @@ app.get('/api/premium/hatch-charts/:river',
                 currentHatches: hatchData.hatches,
                 recommendedFlies: hatchData.fly_recommendations || generateFlyRecommendations(hatchData.hatches),
                 waterTemp: waterTemp,
-                waterConditions: hatchData.water_conditions,
+                waterConditions: flowCondition ? flowCondition.label : hatchData.water_conditions,
+                flowCondition: flowCondition,
                 source: tempSource || hatchData.source,
                 reportDate: hatchData.report_date,
                 isForecast: hatchData.is_forecast || false,
@@ -1480,6 +1507,16 @@ app.get('/api/hatches/:river',
             // Get dynamic hatch data
             let hatchData = await getCurrentHatches(river);
             
+            // Get USGS flow condition for consistency
+            const usgsData = await getUSGSData(river);
+            let flowCondition = null;
+            if (usgsData && usgsData.flow) {
+                const flowMatch = usgsData.flow.match(/(\d+)/);
+                if (flowMatch) {
+                    flowCondition = calculateFlowCondition(river, parseInt(flowMatch[1]));
+                }
+            }
+            
             // If no dynamic data, use static
             if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
                 const staticHatches = getStaticHatches(river);
@@ -1499,6 +1536,8 @@ app.get('/api/hatches/:river',
                 river,
                 currentHatches: hatchData.hatches,
                 source: hatchData.source,
+                waterConditions: flowCondition ? flowCondition.label : null,
+                flowCondition: flowCondition,
                 upgradeMessage: 'Upgrade to Premium for detailed fly recommendations and full hatch charts'
             });
         } catch (error) {

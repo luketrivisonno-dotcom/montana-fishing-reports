@@ -200,7 +200,8 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData, on
           hatches: hatches,
           flies: propHatchData.flies || propHatchData.recommendedFlies || getFlyRecommendations(hatches),
           waterTemp: propHatchData.waterTemp,
-          waterConditions: propHatchData.waterConditions,
+          waterConditions: propHatchData.flowCondition?.label || propHatchData.waterConditions,
+          flowCondition: propHatchData.flowCondition,
           source: propHatchData.source || 'Live conditions'
         });
         setLoading(false);
@@ -256,6 +257,8 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData, on
           setHatchData({
             hatches: data.currentHatches,
             flies: getFlyRecommendations(data.currentHatches),
+            waterConditions: data.flowCondition?.label || data.waterConditions,
+            flowCondition: data.flowCondition,
             source: data.source || 'report'
           });
           setLoading(false);

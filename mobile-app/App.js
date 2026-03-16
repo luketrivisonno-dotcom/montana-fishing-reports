@@ -173,7 +173,18 @@ const parseFlow = (flowString) => {
 };
 
 // Get flow condition badge text and color
-const getFlowCondition = (flowString, riverName) => {
+// If serverCondition is provided (from API), use that for consistency
+const getFlowCondition = (flowString, riverName, serverCondition) => {
+  // Use server-provided condition if available
+  if (serverCondition) {
+    return {
+      text: serverCondition.label || serverCondition.text,
+      color: serverCondition.color,
+      bgColor: serverCondition.bgColor
+    };
+  }
+  
+  // Fallback to local calculation
   const cfs = parseFlow(flowString);
   if (!cfs) return null;
   
@@ -813,7 +824,7 @@ function RiverDetailsScreen({ route, navigation }) {
                   )}
                 </Text>
                 {(() => {
-                  const flowCondition = getFlowCondition(data.usgs.flow, river);
+                  const flowCondition = getFlowCondition(data.usgs.flow, river, data.usgs?.flowCondition);
                   return flowCondition ? (
                     <View style={[styles.flowBadge, { backgroundColor: flowCondition.bgColor, marginTop: 6 }]}>
                       <Text style={[styles.flowBadgeText, { color: flowCondition.color }]}>

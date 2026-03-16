@@ -275,4 +275,98 @@ async function getNearbyRiverTemp(riverName) {
   return null;
 }
 
-module.exports = { getUSGSData, USGS_SITES, getSeasonalTemp, RIVER_TYPES };
+// River-specific flow thresholds (CFS) for determining flow conditions
+// Based on typical fishing conditions for each river
+const FLOW_THRESHOLDS = {
+  'Missouri River': { low: 3000, high: 8000, optimal: { min: 4000, max: 6000 } },
+  'Madison River': { low: 400, high: 2500, optimal: { min: 800, max: 1500 } },
+  'Upper Madison River': { low: 400, high: 2500, optimal: { min: 800, max: 1500 } },
+  'Lower Madison River': { low: 800, high: 3500, optimal: { min: 1200, max: 2500 } },
+  'Yellowstone River': { low: 1000, high: 5000, optimal: { min: 2000, max: 4000 } },
+  'Bighorn River': { low: 1500, high: 6000, optimal: { min: 2500, max: 4500 } },
+  'Gallatin River': { low: 200, high: 1500, optimal: { min: 400, max: 1000 } },
+  'Bitterroot River': { low: 300, high: 2500, optimal: { min: 600, max: 1500 } },
+  'Blackfoot River': { low: 200, high: 2000, optimal: { min: 400, max: 1200 } },
+  'Clark Fork River': { low: 800, high: 4000, optimal: { min: 1500, max: 3000 } },
+  'Rock Creek': { low: 100, high: 800, optimal: { min: 200, max: 500 } },
+  'Big Hole River': { low: 200, high: 1500, optimal: { min: 400, max: 1000 } },
+  'Beaverhead River': { low: 100, high: 800, optimal: { min: 200, max: 500 } },
+  'Jefferson River': { low: 300, high: 2000, optimal: { min: 600, max: 1200 } },
+  'Ruby River': { low: 100, high: 600, optimal: { min: 200, max: 400 } },
+  'Stillwater River': { low: 200, high: 1500, optimal: { min: 400, max: 1000 } },
+  'Boulder River': { low: 100, high: 800, optimal: { min: 200, max: 500 } },
+  'Flathead River': { low: 500, high: 4000, optimal: { min: 1000, max: 2500 } }
+};
+
+// Default thresholds for rivers not in the list
+const DEFAULT_THRESHOLDS = { low: 200, high: 3000, optimal: { min: 500, max: 1500 } };
+
+/**
+ * Calculate flow condition based on river and CFS value
+ * @param {string} riverName - Name of the river
+ * @param {number} cfs - Current flow in cubic feet per second
+ * @returns {object} Flow condition with text, color, and description
+ */
+function calculateFlowCondition(riverName, cfs) {
+  if (!cfs || cfs <= 0) return null;
+  
+  const thresholds = FLOW_THRESHOLDS[riverName] || DEFAULT_THRESHOLDS;
+  
+  // Determine condition
+  if (cfs < thresholds.low) {
+    return {
+      text: 'Low',
+      label: 'Low Flow',
+      color: '#e74c3c',
+      bgColor: '#ffebee',
+      description: 'Very low flows. Fish are concentrated in deeper pools.',
+      quality: 'poor'
+    };
+  }
+  
+  if (cfs > thresholds.high) {
+    return {
+      text: 'High',
+      label: 'High Flow',
+      color: '#e67e22',
+      bgColor: '#fff3e0',
+      description: 'High flows. Fish move to edges and slower water.',
+      quality: 'poor'
+    };
+  }
+  
+  // Check if in optimal range
+  if (cfs >= thresholds.optimal.min && cfs <= thresholds.optimal.max) {
+    return {
+      text: 'Good',
+      label: 'Good Flow',
+      color: '#27ae60',
+      bgColor: '#e8f5e9',
+      description: 'Optimal flows. Fish holding in typical spots.',
+      quality: 'excellent'
+    };
+  }
+  
+  // Between low and optimal, or optimal and high
+  if (cfs < thresholds.optimal.min) {
+    return {
+      text: 'Low',
+      label: 'Below Average',
+      color: '#f39c12',
+      bgColor: '#fff8e1',
+      description: 'Below average flows. Fish in deeper runs.',
+      quality: 'fair'
+    };
+  }
+  
+  return {
+    text: 'High',
+    label: 'Above Average',
+    color: '#f39c12',
+    bgColor: '#fff8e1',
+    description: 'Above average flows. Fish near banks.',
+    quality: 'fair'
+  };
+}
+
+module.exports = { getUSGSData, USGS_SITES, getSeasonalTemp, RIVER_TYPES, calculateFlowCondition };

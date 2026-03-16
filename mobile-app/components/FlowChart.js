@@ -100,7 +100,17 @@ const FlowChart = ({ riverName }) => {
     );
   };
 
-  const getFlowStatus = (current, average) => {
+  // Use server-provided flow condition or fall back to local calculation
+  const getFlowStatus = (current, average, serverCondition) => {
+    // Prefer server-provided condition for consistency
+    if (serverCondition) {
+      return { 
+        label: serverCondition.label || serverCondition.text, 
+        color: serverCondition.color || COLORS.success 
+      };
+    }
+    
+    // Fallback to local calculation
     if (!current || !average) return { label: 'Unknown', color: COLORS.textLight };
     const ratio = current / average;
     if (ratio > 1.5) return { label: 'High', color: COLORS.error };
@@ -125,7 +135,7 @@ const FlowChart = ({ riverName }) => {
 
   const current = flowData.currentFlow;
   const average = flowData.averageFlow;
-  const status = getFlowStatus(current, average);
+  const status = getFlowStatus(current, average, flowData.flowCondition);
   const history = flowData.flowHistory;
 
   return (

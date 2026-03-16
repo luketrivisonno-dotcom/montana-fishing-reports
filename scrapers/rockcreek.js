@@ -1,13 +1,17 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const ORVIS_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/orvis.png';
+const MISSOULIAN_ICON = 'https://montana-fishing-reports-production.up.railway.app/favicons/missoulian-angler.jpg';
+
 async function scrapeRockCreekOrvis() {
     return {
         source: 'Orvis',
         river: 'Rock Creek',
         url: 'https://fishingreports.orvis.com/west/montana/rock-creek',
         last_updated: null,
-        scraped_at: new Date().toISOString()
+        scraped_at: new Date().toISOString(),
+        icon_url: ORVIS_ICON
     };
 }
 
@@ -38,7 +42,7 @@ async function scrapeRockCreekMissoulian() {
             last_updated: lastUpdated,
             last_updated_text: lastUpdated,
             scraped_at: new Date().toISOString(),
-            icon_url: null,
+            icon_url: MISSOULIAN_ICON,
             content: pageText.substring(0, 10000)
         };
     } catch (error) {
