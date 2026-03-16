@@ -2080,7 +2080,7 @@ app.get('/api/hatches/:river',
             res.json({
                 river,
                 currentHatches: hatchData.hatches.slice(0, 2), // Limited for free tier
-                recommendedFlies: hatchData.flies.slice(0, 3), // Limited for free tier
+                recommendedFlies: (hatchData.flies || []).slice(0, 3), // Limited for free tier
                 waterTemp: hatchData.waterTemp,
                 waterConditions: hatchData.waterConditions,
                 source: hatchData.source
