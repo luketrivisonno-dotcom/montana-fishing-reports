@@ -53,63 +53,73 @@ const HATCH_SOURCES = {
   },
 };
 
-// Generic scraper for sources with individual river URLs
-async function scrapeIndividualUrls(sourceName, urlMap) {
-  const results = [];
-  
-  for (const [river, url] of Object.entries(urlMap)) {
-    try {
-      console.log(`Scraping ${sourceName} for ${river}...`);
+// Scrape a single URL
+async function scrapeUrl(sourceName, river, url) {
+  try {
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 12000
+    });
+    
+    const $ = cheerio.load(data);
+    const contentText = $('body').text();
+    
+    // Extract date
+    const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
+    const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
+    
+    // Extract hatches from text
+    const hatches = extractHatches(contentText);
+    
+    if (hatches.length > 0) {
+      const flyRecommendations = getFlyRecommendations(hatches);
       
-      const { data } = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      console.log(`  ✓ ${sourceName} - ${river}: ${hatches.length} hatches`);
+      
+      return {
+        river,
+        source: sourceName,
+        hatches,
+        fly_recommendations: flyRecommendations,
+        hatch_details: {
+          extracted_from: sourceName,
+          confidence: 'medium'
         },
-        timeout: 15000  // 15 second timeout
-      });
-      
-      const $ = cheerio.load(data);
-      const contentText = $('body').text();
-      
-      // Extract date
-      const dateMatch = contentText.match(/([A-Za-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}\/[\d/]+)/);
-      const reportDate = dateMatch ? new Date(dateMatch[0]) : new Date();
-      
-      // Extract hatches from text
-      const hatches = extractHatches(contentText);
-      
-      if (hatches.length > 0) {
-        const flyRecommendations = getFlyRecommendations(hatches);
-        
-        results.push({
-          river,
-          source: sourceName,
-          hatches,
-          fly_recommendations: flyRecommendations,
-          hatch_details: {
-            extracted_from: sourceName,
-            confidence: 'medium'
-          },
-          water_temp: null,
-          water_conditions: null,
-          report_date: reportDate,
-          url
-        });
-        
-        console.log(`  ✓ Found ${hatches.length} hatches: ${hatches.slice(0, 3).join(', ')}${hatches.length > 3 ? '...' : ''}`);
-      } else {
-        console.log(`  ⊘ No hatches found`);
-      }
-      
-    } catch (error) {
-      console.error(`  ✗ Error: ${error.message}`);
+        water_temp: null,
+        water_conditions: null,
+        report_date: reportDate,
+        url
+      };
+    } else {
+      console.log(`  ⊘ ${sourceName} - ${river}: No hatches found`);
+      return null;
     }
     
-    // Small delay between requests
-    await new Promise(resolve => setTimeout(resolve, 100));
+  } catch (error) {
+    console.error(`  ✗ ${sourceName} - ${river}: ${error.message}`);
+    return null;
   }
+}
+
+// Scrape all URLs for a source in parallel
+async function scrapeSource(sourceName, urlMap) {
+  console.log(`--- ${sourceName} ---`);
   
-  return results;
+  const entries = Object.entries(urlMap);
+  
+  // Scrape in parallel with Promise.all
+  const results = await Promise.all(
+    entries.map(([river, url]) => scrapeUrl(sourceName, river, url))
+  );
+  
+  // Filter out nulls
+  const validResults = results.filter(r => r !== null);
+  
+  console.log(`✓ ${sourceName}: ${validResults.length}/${entries.length} rivers with hatches\n`);
+  
+  return validResults;
 }
 
 async function saveHatchReports(reports) {
@@ -157,72 +167,60 @@ async function runHatchScraper() {
   const allReports = [];
   
   try {
-    // 1. Bozeman Fly Supply (Gallatin, Yellowstone, Madison) - Priority source
-    console.log('--- Bozeman Fly Supply ---');
-    const bozemanReports = await scrapeIndividualUrls('Bozeman Fly Supply', HATCH_SOURCES['Bozeman Fly Supply']);
+    // Run sources sequentially but requests within each source in parallel
+    
+    // 1. Bozeman Fly Supply (4 rivers in parallel)
+    const bozemanReports = await scrapeSource('Bozeman Fly Supply', HATCH_SOURCES['Bozeman Fly Supply']);
     if (bozemanReports.length > 0) {
       const saved = await saveHatchReports(bozemanReports);
-      console.log(`✓ Saved ${saved.length} Bozeman Fly Supply reports\n`);
       totalSaved += saved.length;
       allReports.push(...bozemanReports);
     }
     
-    // 2. Yellow Dog (Missouri)
-    console.log('--- Yellow Dog ---');
-    const yellowDogReports = await scrapeIndividualUrls('Yellow Dog', HATCH_SOURCES['Yellow Dog']);
+    // 2. Yellow Dog (1 river)
+    const yellowDogReports = await scrapeSource('Yellow Dog', HATCH_SOURCES['Yellow Dog']);
     if (yellowDogReports.length > 0) {
       const saved = await saveHatchReports(yellowDogReports);
-      console.log(`✓ Saved ${saved.length} Yellow Dog reports\n`);
       totalSaved += saved.length;
       allReports.push(...yellowDogReports);
     }
     
-    // 3. The Missoulian (Bitterroot, Blackfoot, Clark Fork, Rock Creek)
-    console.log('--- The Missoulian ---');
-    const missoulianReports = await scrapeIndividualUrls('The Missoulian', HATCH_SOURCES['The Missoulian']);
+    // 3. The Missoulian (4 rivers in parallel)
+    const missoulianReports = await scrapeSource('The Missoulian', HATCH_SOURCES['The Missoulian']);
     if (missoulianReports.length > 0) {
       const saved = await saveHatchReports(missoulianReports);
-      console.log(`✓ Saved ${saved.length} The Missoulian reports\n`);
       totalSaved += saved.length;
       allReports.push(...missoulianReports);
     }
     
-    // 4. Bighorn Angler (Bighorn)
-    console.log('--- Bighorn Angler ---');
-    const bighornReports = await scrapeIndividualUrls('Bighorn Angler', HATCH_SOURCES['Bighorn Angler']);
+    // 4. Bighorn Angler (1 river)
+    const bighornReports = await scrapeSource('Bighorn Angler', HATCH_SOURCES['Bighorn Angler']);
     if (bighornReports.length > 0) {
       const saved = await saveHatchReports(bighornReports);
-      console.log(`✓ Saved ${saved.length} Bighorn Angler reports\n`);
       totalSaved += saved.length;
       allReports.push(...bighornReports);
     }
     
-    // 5. Gallatin River Guides (YNP rivers)
-    console.log('--- Gallatin River Guides ---');
-    const gallatinGuidesReports = await scrapeIndividualUrls('Gallatin River Guides', HATCH_SOURCES['Gallatin River Guides']);
+    // 5. Gallatin River Guides (6 YNP rivers in parallel)
+    const gallatinGuidesReports = await scrapeSource('Gallatin River Guides', HATCH_SOURCES['Gallatin River Guides']);
     if (gallatinGuidesReports.length > 0) {
       const saved = await saveHatchReports(gallatinGuidesReports);
-      console.log(`✓ Saved ${saved.length} Gallatin River Guides reports\n`);
       totalSaved += saved.length;
       allReports.push(...gallatinGuidesReports);
     }
     
-    // 6. Montana Angler (Ruby)
-    console.log('--- Montana Angler ---');
-    const montanaAnglerReports = await scrapeIndividualUrls('Montana Angler', HATCH_SOURCES['Montana Angler']);
+    // 6. Montana Angler (1 river)
+    const montanaAnglerReports = await scrapeSource('Montana Angler', HATCH_SOURCES['Montana Angler']);
     if (montanaAnglerReports.length > 0) {
       const saved = await saveHatchReports(montanaAnglerReports);
-      console.log(`✓ Saved ${saved.length} Montana Angler reports\n`);
       totalSaved += saved.length;
       allReports.push(...montanaAnglerReports);
     }
     
-    // 7. Stonefly Shop (Beaverhead)
-    console.log('--- Stonefly Shop ---');
-    const stoneflyReports = await scrapeIndividualUrls('Stonefly Shop', HATCH_SOURCES['Stonefly Shop']);
+    // 7. Stonefly Shop (1 river)
+    const stoneflyReports = await scrapeSource('Stonefly Shop', HATCH_SOURCES['Stonefly Shop']);
     if (stoneflyReports.length > 0) {
       const saved = await saveHatchReports(stoneflyReports);
-      console.log(`✓ Saved ${saved.length} Stonefly Shop reports\n`);
       totalSaved += saved.length;
       allReports.push(...stoneflyReports);
     }
