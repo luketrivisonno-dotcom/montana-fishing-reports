@@ -1,9 +1,7 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 
 const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/parks.png';
-const cheerio = require('cheerio');
-const { extractHatchData } = require('../utils/hatchExtractor');
-const db = require('../db');
 
 // NOTE: Individual river URLs are 404, using main report page for all YNP rivers
 // The page contains reports for all YNP rivers together
@@ -51,27 +49,6 @@ async function scrapeParksFlyShop() {
         }
       }
 
-      // Extract hatch data from the page content
-      const hatchData = extractHatchData(pageText);
-      
-      // Save hatch data if we found any
-      if (hatchData.hatches.length > 0) {
-        try {
-          await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river]);
-          await db.query(
-            `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
-            [river, 'Parks Fly Shop', hatchData.hatches, hatchData.fly_recommendations,
-             JSON.stringify({ extracted_from: 'Parks Fly Shop fishing report', url }),
-             hatchData.water_temp, hatchData.water_conditions,
-             dateMatch ? new Date(dateMatch[1]) : new Date()]
-          );
-          console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
-        } catch (dbError) {
-          console.error(`  → Error saving hatch data:`, dbError.message);
-        }
-      }
-
       reports.push({
         source: 'Parks Fly Shop',
         river: river,
@@ -81,7 +58,6 @@ async function scrapeParksFlyShop() {
         scraped_at: new Date(),
         icon_url: ICON_URL,
         water_clarity: waterClarity,
-        hatches: hatchData.hatches,
         content: pageText.substring(0, 10000)
       });
 

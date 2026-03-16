@@ -1,7 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { extractHatchData } = require('../utils/hatchExtractor');
-const db = require('../db');
 
 const ICON_URL = 'https://montana-fishing-reports-production.up.railway.app/favicons/yellowdog.webp';
 
@@ -71,27 +69,6 @@ async function scrapeYellowDog() {
         if (match) {
           waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
           break;
-        }
-      }
-      
-      // Extract hatch data from the page content
-      const hatchData = extractHatchData(pageText);
-      
-      // Save hatch data if we found any
-      if (hatchData.hatches.length > 0) {
-        try {
-          await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river]);
-          await db.query(
-            `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
-            [river, 'Yellow Dog Fly Fishing', hatchData.hatches, hatchData.fly_recommendations,
-             JSON.stringify({ extracted_from: 'Yellow Dog fishing report', url }),
-             hatchData.water_temp, hatchData.water_conditions,
-             dateMatch ? new Date(dateMatch[1]) : new Date()]
-          );
-          console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
-        } catch (dbError) {
-          console.error(`  → Error saving hatch data:`, dbError.message);
         }
       }
       

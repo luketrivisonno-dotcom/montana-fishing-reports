@@ -1,7 +1,6 @@
 const db = require('../db');
 const { notifyNewReports } = require('../utils/pushNotifications');
 const { standardizeDate, formatForDisplay } = require('../utils/dateStandardizer');
-const { extractAndSaveHatchData } = require('../utils/scraperHelpers');
 
 // Import working scrapers (ones with actual implementations)
 const scrapeMontanaAngler = require('./montanaangler');
@@ -133,10 +132,6 @@ async function runAllScrapers() {
               url: item.url,
               last_updated: displayDate
             });
-            // Extract hatch data from content if available
-            if (item.content) {
-              await extractAndSaveHatchData(item, item.content);
-            }
             successCount++;
           } else {
             const existingDateStr = existing.rows[0].last_updated;
@@ -186,10 +181,6 @@ async function runAllScrapers() {
                   last_updated: displayDate
                 });
               }
-              // Extract hatch data from content if available
-              if (item.content) {
-                await extractAndSaveHatchData(item, item.content);
-              }
               successCount++;
             } else {
               console.log(`⊘ Skipped (older): ${item.source} (${item.river})`);
@@ -216,6 +207,66 @@ async function runAllScrapers() {
       ORDER BY source, river, scraped_at DESC
     )
   `);
+  
+  // POST-PROCESS: Extract hatch data from the most recent report for each river
+  console.log('\n--- Extracting hatch data from most recent reports ---');
+  try {
+    const { extractHatches, getFlyRecommendations, extractWaterTemp, extractWaterConditions } = require('../utils/hatchExtractor');
+    
+    // Get the most recent report for each river (with content)
+    const latestReports = await db.query(`
+      SELECT DISTINCT ON (river) id, river, source, content, last_updated, scraped_at
+      FROM reports 
+      WHERE is_active = true AND content IS NOT NULL AND content != ''
+      ORDER BY river, scraped_at DESC
+    `);
+    
+    let hatchExtractedCount = 0;
+    
+    for (const report of latestReports.rows) {
+      try {
+        // Extract hatches from content
+        const hatches = extractHatches(report.content);
+        
+        if (hatches.length > 0) {
+          const flyRecommendations = getFlyRecommendations(hatches);
+          const waterTemp = extractWaterTemp(report.content);
+          const waterConditions = extractWaterConditions(report.content);
+          
+          // Mark previous hatch reports for this river as not current
+          await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [report.river]);
+          
+          // Insert new hatch data
+          await db.query(
+            `INSERT INTO hatch_reports 
+             (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+            [
+              report.river,
+              report.source,
+              hatches,
+              flyRecommendations,
+              JSON.stringify({ extracted_from: 'fishing report', confidence: 'medium' }),
+              waterTemp,
+              waterConditions,
+              report.last_updated ? new Date(report.last_updated) : new Date()
+            ]
+          );
+          
+          console.log(`  ✓ ${report.river}: ${hatches.length} hatches from ${report.source} (${hatches.slice(0, 3).join(', ')}${hatches.length > 3 ? '...' : ''})`);
+          hatchExtractedCount++;
+        } else {
+          console.log(`  ⊘ ${report.river}: No hatches found in ${report.source}`);
+        }
+      } catch (extractError) {
+        console.error(`  ✗ Error extracting hatches for ${report.river}:`, extractError.message);
+      }
+    }
+    
+    console.log(`--- Hatch extraction complete: ${hatchExtractedCount} rivers updated ---\n`);
+  } catch (postProcessError) {
+    console.error('Error in hatch post-processing:', postProcessError.message);
+  }
   
   console.log('\n========================================');
   console.log(`Complete: ${successCount} succeeded, ${failCount} failed`);
