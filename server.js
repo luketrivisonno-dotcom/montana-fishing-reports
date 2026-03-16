@@ -189,12 +189,7 @@ async function initDatabase() {
             UNIQUE(source, river)
         )`);
         
-        // Migration: Add content column if it doesn't exist
-        try {
-            await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS content TEXT`);
-        } catch (e) {
-            // Column might already exist
-        }
+
         
         await db.query(`CREATE TABLE IF NOT EXISTS analytics (
             id SERIAL PRIMARY KEY,
@@ -2131,59 +2126,7 @@ app.post('/api/admin/cleanup-removed-sources', async (req, res) => {
     }
 });
 
-// TEMP: Debug endpoint to check hatch data
-app.get('/api/debug/hatch-reports/:river', async (req, res) => {
-    try {
-        const { river } = req.params;
-        const result = await db.query(
-            `SELECT id, river, source, hatches, report_date, scraped_at, is_current 
-             FROM hatch_reports 
-             WHERE river = $1 
-             ORDER BY report_date DESC, scraped_at DESC 
-             LIMIT 5`,
-            [river]
-        );
-        res.json({
-            river,
-            count: result.rows.length,
-            reports: result.rows
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
-// TEMP: Debug endpoint to check reports content
-app.get('/api/debug/reports-content/:river', async (req, res) => {
-    try {
-        const { river } = req.params;
-        const result = await db.query(
-            `SELECT id, source, river, last_updated, LENGTH(content) as content_length 
-             FROM reports 
-             WHERE river = $1 AND is_active = true
-             ORDER BY scraped_at DESC`,
-            [river]
-        );
-        res.json({
-            river,
-            count: result.rows.length,
-            reports: result.rows
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// TEMP: Clear hatch data for a river
-app.post('/api/admin/clear-hatch-data/:river', async (req, res) => {
-    try {
-        const { river } = req.params;
-        const result = await db.query('DELETE FROM hatch_reports WHERE river = $1 RETURNING id', [river]);
-        res.json({ message: `Deleted ${result.rowCount} entries for ${river}` });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // Admin: Extract hatch data from all existing reports (one-time migration)
 app.post('/api/admin/extract-all-hatch-data', async (req, res) => {
