@@ -979,10 +979,30 @@ app.get('/api/usgs/history/:river',
                 });
             }
             
-            // Get current flow (most recent)
-            const currentFlow = dailyData.length > 0 ? dailyData[dailyData.length - 1].flow : null;
+            // Get REAL-TIME current flow from instantaneous endpoint (not daily)
+            let currentFlow = null;
+            try {
+                const ivResponse = await axios.get(
+                    `https://waterservices.usgs.gov/nwis/iv/?format=json&sites=${site.id}&parameterCd=00060&period=P1D`,
+                    { timeout: 5000 }
+                );
+                const ivTimeSeries = ivResponse.data.value.timeSeries;
+                if (ivTimeSeries && ivTimeSeries.length > 0) {
+                    const ivValues = ivTimeSeries[0].values[0].value;
+                    if (ivValues && ivValues.length > 0) {
+                        const latest = ivValues[ivValues.length - 1];
+                        if (latest.value !== '-999999') {
+                            currentFlow = Math.round(parseFloat(latest.value));
+                        }
+                    }
+                }
+            } catch (ivError) {
+                console.log('IV fetch failed, using daily value:', ivError.message);
+                // Fallback to most recent daily value
+                currentFlow = dailyData.length > 0 ? dailyData[dailyData.length - 1].flow : null;
+            }
             
-            // Calculate 7-day average
+            // Calculate 7-day average from daily data
             const avgFlow = dailyData.length > 0 
                 ? Math.round(dailyData.reduce((sum, d) => sum + d.flow, 0) / dailyData.length)
                 : null;
