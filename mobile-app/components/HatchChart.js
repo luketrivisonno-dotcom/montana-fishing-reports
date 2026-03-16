@@ -342,11 +342,6 @@ const HatchChart = ({ riverName, isPremium = false, hatchData: propHatchData, on
         </Text>
       )}
       
-      {/* Water conditions - only if meaningful */}
-      {hatchData?.waterConditions && (
-        <Text style={styles.conditionsSubtle}>{hatchData.waterConditions}</Text>
-      )}
-      
       {/* Primary hatches */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hatchScroll}>
         {displayHatches.map((hatch, index) => (
