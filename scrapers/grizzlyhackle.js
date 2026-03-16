@@ -67,23 +67,30 @@ async function scrapeGrizzlyHackle() {
             
             // Extract hatch data for Primary hatch source
             const hatchData = extractHatchData(pageText.toLowerCase());
+            console.log(`  → DEBUG Grizzly Hackle ${river.name}: extracted ${hatchData.hatches.length} hatches: ${hatchData.hatches.join(', ')}`);
             
             // Save hatch data if found (Primary)
             if (hatchData.hatches.length > 0) {
                 try {
+                    console.log(`  → DEBUG Saving Grizzly Hackle hatch data for ${river.name}...`);
                     await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river.name]);
-                    await db.query(
+                    console.log(`  → DEBUG Set existing reports to not current for ${river.name}`);
+                    const insertResult = await db.query(
                         `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
-                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
+                         RETURNING id`,
                         [river.name, 'Grizzly Hackle', hatchData.hatches, hatchData.fly_recommendations,
                          JSON.stringify({ extracted_from: 'Grizzly Hackle fishing report', url }),
                          hatchData.water_temp, hatchData.water_conditions,
                          lastUpdated || new Date()]
                     );
-                    console.log(`  → Grizzly Hackle hatches for ${river.name}: ${hatchData.hatches.join(', ')}`);
+                    console.log(`  → Grizzly Hackle hatches for ${river.name}: ${hatchData.hatches.join(', ')} (ID: ${insertResult.rows[0].id})`);
                 } catch (dbError) {
                     console.error(`  → Error saving Grizzly Hackle hatch data:`, dbError.message);
+                    console.error(`  → Error details:`, dbError.stack);
                 }
+            } else {
+                console.log(`  → DEBUG No hatches found for ${river.name}`);
             }
             
             reports.push({
