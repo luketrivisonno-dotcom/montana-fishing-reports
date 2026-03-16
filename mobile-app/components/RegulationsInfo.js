@@ -17,23 +17,25 @@ const COLORS = {
 // Montana fishing regulations data by river
 const REGULATIONS_DATA = {
   'Madison River': {
-    season: 'Open all year',
+    season: 'Varies by section - see details',
     restrictions: [
       'Upper Madison (Hebgen Dam to Ennis Lake): Catch and release only',
       'Lower Madison: Standard regulations apply',
-      'Fly fishing only in some sections',
+      'YNP section (MT/WY line to Madison Jct): May 1 - Oct 31, 2026',
+      'YNP section (park boundary to MT/WY line): Year-round',
     ],
-    limits: 'Check current FWP regulations - varies by section',
+    limits: 'Check current FWP/NPS regulations',
     link: 'https://fwp.mt.gov/fish/regulations',
   },
   'Yellowstone River': {
-    season: 'Open all year',
+    season: 'Varies by section - see details',
     restrictions: [
-      'Some sections have seasonal closures',
+      'Montana sections: Open all year',
+      'YNP (Gardner River confluence downstream): July 1 - Oct 31, 2026',
       'Check for Hoot Owl restrictions in summer',
       'Special regulations in Yellowstone National Park',
     ],
-    limits: 'Varies by section - check FWP regulations',
+    limits: 'Varies by section - check FWP/NPS regulations',
     link: 'https://fwp.mt.gov/fish/regulations',
   },
   'Missouri River': {
@@ -356,48 +358,64 @@ const REGULATIONS_DATA = {
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
   },
   'Slough Creek': {
-    season: 'Short season - check dates',
+    season: 'Memorial Day weekend - October 31, 2026',
     restrictions: [
       'Yellowstone National Park regulations',
       'Catch and release only',
       'Fly fishing only',
+      'Standard park season dates',
     ],
     limits: 'Catch and release',
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
   },
   'Soda Butte Creek': {
-    season: 'Short season - check dates',
+    season: 'Memorial Day weekend - October 31, 2026',
     restrictions: [
       'Yellowstone National Park regulations',
       'Some sections catch and release',
+      'Standard park season dates',
     ],
     limits: 'Check NPS regulations',
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
   },
   'Lamar River': {
-    season: 'Short season - check dates',
+    season: 'Memorial Day weekend - October 31, 2026',
     restrictions: [
       'Yellowstone National Park regulations',
       'Catch and release in most sections',
+      'Standard park season dates',
     ],
     limits: 'Check NPS regulations',
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
   },
   'Gardner River': {
-    season: 'Short season - check dates',
+    season: 'Year-round (Osprey Falls to Yellowstone River)',
     restrictions: [
       'Yellowstone National Park regulations',
-      'Some sections closed',
+      'Year-round fishing from Osprey Falls downstream',
+      'Other sections: Memorial Day - Oct 31',
     ],
     limits: 'Check NPS regulations',
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
   },
+  'Gibbon River': {
+    season: 'May 1 - October 31, 2026',
+    restrictions: [
+      'Yellowstone National Park regulations',
+      'Catch and release only',
+      'NEW: Extended season opens May 1 (was Memorial Day)',
+      'Norris Campground bridge downstream only',
+    ],
+    limits: 'Catch and release',
+    link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
+  },
   'Firehole River': {
-    season: 'Short season - check dates',
+    season: 'May 1 - October 31, 2026',
     restrictions: [
       'Yellowstone National Park regulations',
       'Catch and release only',
       'Geothermal features - check water temps',
+      'NEW: Extended season opens May 1 (was Memorial Day)',
     ],
     limits: 'Catch and release',
     link: 'https://www.nps.gov/yell/planyourvisit/fishing.htm',
