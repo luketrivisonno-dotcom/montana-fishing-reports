@@ -1507,7 +1507,7 @@ app.get('/api/premium/hatch-charts/:river',
                 waterTemp: waterTemp,
                 waterConditions: flowCondition ? flowCondition.label : hatchData.water_conditions,
                 flowCondition: flowCondition,
-                source: tempSource || hatchData.source,
+                source: hatchData.source || tempSource,
                 reportDate: hatchData.report_date,
                 isForecast: hatchData.is_forecast || false,
                 tips: generateFishingTips(river, month)
