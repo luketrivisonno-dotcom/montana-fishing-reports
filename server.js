@@ -2007,14 +2007,13 @@ async function getDynamicHatchData(riverName) {
             
             // Use USGS water temp if available, otherwise fall back to scraped temp
             const finalWaterTemp = usgsWaterTemp || scraped.water_temp;
-            const finalTempSource = usgsTempSource || scraped.source;
             
             return {
                 hatches: scraped.hatches,
                 flies: scraped.fly_recommendations || generateFlyRecommendations(scraped.hatches),
                 waterTemp: finalWaterTemp,
                 waterConditions: scraped.water_conditions,
-                source: finalTempSource,
+                source: scraped.source,
                 reportDate: scraped.report_date,
                 isScraped: true,
                 isForecast: false
