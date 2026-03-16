@@ -23,6 +23,7 @@ async function scrapeRockCreekMissoulian() {
         });
         
         const $ = cheerio.load(data);
+        const pageText = $('body').text();
         const metaDate = $('time').attr('datetime') || '';
         
         let lastUpdated = null;
@@ -37,7 +38,8 @@ async function scrapeRockCreekMissoulian() {
             last_updated: lastUpdated,
             last_updated_text: lastUpdated,
             scraped_at: new Date().toISOString(),
-            icon_url: null
+            icon_url: null,
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error(`Error scraping Rock Creek Missoulian:`, error.message);

@@ -22,7 +22,8 @@ async function scrapeBeaverheadMontanaAngler() {
             river: 'Beaverhead River',
             url: url,
             last_updated: extractedDate ? extractedDate.toISOString() : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Beaverhead Montana Angler error:', error.message);
@@ -31,7 +32,8 @@ async function scrapeBeaverheadMontanaAngler() {
             river: 'Beaverhead River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }
@@ -56,7 +58,8 @@ async function scrapeBeaverheadHeadhunters() {
             river: 'Beaverhead River',
             url: url,
             last_updated: extractedDate ? extractedDate.toISOString() : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Beaverhead Headhunters error:', error.message);
@@ -65,7 +68,8 @@ async function scrapeBeaverheadHeadhunters() {
             river: 'Beaverhead River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }

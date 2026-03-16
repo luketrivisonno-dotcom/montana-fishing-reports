@@ -87,7 +87,8 @@ async function scrapeOrvis() {
         author: 'Orvis',
         icon_url: ICON_URL,
         water_clarity: waterClarity,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       });
       
     } catch (error) {

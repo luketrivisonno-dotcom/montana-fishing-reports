@@ -47,7 +47,8 @@ async function scrapeKingfisher() {
             last_updated_text: lastUpdatedText,
             scraped_at: new Date(),
             icon_url: ICON_URL,
-            water_clarity: null
+            water_clarity: null,
+            content: pageText.substring(0, 10000)
         };
         
     } catch (error) {
@@ -61,7 +62,8 @@ async function scrapeKingfisher() {
             last_updated_text: null,
             scraped_at: new Date(),
             icon_url: ICON_URL,
-            water_clarity: null
+            water_clarity: null,
+            content: null
         };
     }
 }

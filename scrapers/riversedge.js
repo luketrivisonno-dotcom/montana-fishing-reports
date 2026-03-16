@@ -93,7 +93,8 @@ async function scrapeRiversEdge() {
         last_updated_text: lastUpdated || null,
         scraped_at: new Date(),
         icon_url: RIVERS_EDGE_ICON,
-        water_clarity: waterClarity
+        water_clarity: waterClarity,
+        content: pageText.substring(0, 10000)
       });
       
     } catch (error) {

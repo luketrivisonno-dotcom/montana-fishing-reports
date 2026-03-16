@@ -43,7 +43,8 @@ async function scrapeBoulderMontanaAngler() {
       last_updated_text: lastUpdatedText,
       scraped_at: new Date(),
       icon_url: MONTANA_ANGLER_ICON,
-      water_clarity: null
+      water_clarity: null,
+      content: pageText.substring(0, 10000)
     };
     
   } catch (error) {
@@ -56,7 +57,8 @@ async function scrapeBoulderMontanaAngler() {
       last_updated_text: null,
       scraped_at: new Date(),
       icon_url: MONTANA_ANGLER_ICON,
-      water_clarity: null
+      water_clarity: null,
+      content: null
     };
   }
 }

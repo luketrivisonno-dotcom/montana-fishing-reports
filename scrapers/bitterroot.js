@@ -23,7 +23,8 @@ async function scrapeBitterrootAnglers() {
             river: 'Bitterroot River',
             url: url,
             last_updated: extractedDate ? extractedDate.toISOString() : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Bitterroot Anglers error:', error.message);
@@ -32,7 +33,8 @@ async function scrapeBitterrootAnglers() {
             river: 'Bitterroot River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }

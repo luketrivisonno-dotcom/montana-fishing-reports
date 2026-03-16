@@ -24,7 +24,8 @@ async function scrapeYellowstoneMontanaAngler() {
             river: 'Yellowstone River',
             url: url,
             last_updated: dateMatch ? dateMatch[0] : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Yellowstone Montana Angler error:', error.message);
@@ -33,7 +34,8 @@ async function scrapeYellowstoneMontanaAngler() {
             river: 'Yellowstone River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }
@@ -58,7 +60,8 @@ async function scrapeYellowstoneRiversEdge() {
             river: 'Yellowstone River',
             url: url,
             last_updated: dateMatch ? dateMatch[1] : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Yellowstone Rivers Edge error:', error.message);
@@ -67,7 +70,8 @@ async function scrapeYellowstoneRiversEdge() {
             river: 'Yellowstone River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }
@@ -92,7 +96,8 @@ async function scrapeYellowstoneSweetwater() {
             river: 'Yellowstone River',
             url: url,
             last_updated: dateMatch ? dateMatch[1] : null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: pageText.substring(0, 10000)
         };
     } catch (error) {
         console.error('Yellowstone Sweetwater error:', error.message);
@@ -101,7 +106,8 @@ async function scrapeYellowstoneSweetwater() {
             river: 'Yellowstone River',
             url: url,
             last_updated: null,
-            scraped_at: new Date().toISOString()
+            scraped_at: new Date().toISOString(),
+            content: null
         };
     }
 }

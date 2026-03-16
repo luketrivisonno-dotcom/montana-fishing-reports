@@ -29,7 +29,8 @@ async function scrapeFlyFishFood() {
       url: url,
       last_updated: dateMatch ? dateMatch[1] : null,
       scraped_at: new Date(),
-      icon_url: ICON_URL
+      icon_url: ICON_URL,
+      content: pageText.substring(0, 10000)
     }];
     
   } catch (error) {

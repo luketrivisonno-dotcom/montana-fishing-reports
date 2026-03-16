@@ -28,35 +28,40 @@ async function scrapeJacklins() {
         river: 'Slough Creek',
         url: url,
         last_updated: dateStr,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       },
       {
         source: 'Jacklin\'s Fly Shop',
         river: 'Soda Butte Creek',
         url: url,
         last_updated: dateStr,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       },
       {
         source: 'Jacklin\'s Fly Shop',
         river: 'Lamar River',
         url: url,
         last_updated: dateStr,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       },
       {
         source: 'Jacklin\'s Fly Shop',
         river: 'Gardner River',
         url: url,
         last_updated: dateStr,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       },
       {
         source: 'Jacklin\'s Fly Shop',
         river: 'Firehole River',
         url: url,
         last_updated: dateStr,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       }
     ];
     

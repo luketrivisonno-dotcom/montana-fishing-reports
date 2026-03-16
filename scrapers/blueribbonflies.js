@@ -59,7 +59,8 @@ async function scrapeBlueRibbonFlies() {
         url: url,
         last_updated: dateStr,
         scraped_at: new Date(),
-        hatches: hatchData.hatches
+        hatches: hatchData.hatches,
+        content: pageText.substring(0, 10000)
       });
     }
     

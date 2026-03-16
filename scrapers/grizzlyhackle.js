@@ -95,7 +95,8 @@ async function scrapeGrizzlyHackle() {
                 scraped_at: new Date(),
                 icon_url: ICON_URL,
                 water_clarity: waterClarity,
-                hatches: hatchData.hatches
+                hatches: hatchData.hatches,
+                content: pageText.substring(0, 10000)
             });
             
             console.log(`  → Grizzly Hackle - ${river.name}: ${lastUpdatedText || 'No date found'}`);

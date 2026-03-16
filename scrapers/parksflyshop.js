@@ -81,7 +81,8 @@ async function scrapeParksFlyShop() {
         scraped_at: new Date(),
         icon_url: ICON_URL,
         water_clarity: waterClarity,
-        hatches: hatchData.hatches
+        hatches: hatchData.hatches,
+        content: pageText.substring(0, 10000)
       });
 
     } catch (error) {

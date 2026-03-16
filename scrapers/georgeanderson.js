@@ -36,7 +36,8 @@ async function scrapeGeorgeAnderson() {
         river: river,
         url: url,
         last_updated: dateMatch ? dateMatch[1] : null,
-        scraped_at: new Date()
+        scraped_at: new Date(),
+        content: pageText.substring(0, 10000)
       });
       
     } catch (error) {

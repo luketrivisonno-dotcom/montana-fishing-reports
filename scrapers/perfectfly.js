@@ -50,6 +50,8 @@ async function scrapePerfectFly() {
         }
       }
       
+      const pageText = cheerio.load(data)('body').text();
+      
       reports.push({
         source: 'Perfect Fly Store',
         river: river,
@@ -58,7 +60,8 @@ async function scrapePerfectFly() {
         last_updated_text: lastUpdated,
         scraped_at: new Date(),
         icon_url: ICON_URL,
-        water_clarity: waterClarity
+        water_clarity: waterClarity,
+        content: pageText.substring(0, 10000)
       });
       
     } catch (error) {
