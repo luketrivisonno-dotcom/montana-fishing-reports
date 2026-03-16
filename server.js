@@ -1542,7 +1542,7 @@ app.get('/api/hatches/:river',
             
             // If no dynamic data, use static
             if (!hatchData || !hatchData.hatches || hatchData.hatches.length === 0) {
-                const staticHatches = getStaticHatches(river);
+                const staticHatches = getStaticHatches(river) || ['Midges', 'Blue Winged Olives'];
                 hatchData = {
                     hatches: staticHatches.slice(0, 3), // Limit to 3 for non-premium
                     source: 'seasonal forecast'
