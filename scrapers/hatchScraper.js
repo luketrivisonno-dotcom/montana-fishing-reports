@@ -21,7 +21,7 @@ const HATCH_SOURCES = {
   
   // Missoula area rivers
   'The Missoulian': {
-    'Bitterroot River': 'https://www.missoulianangler.com/pages/bitterroot-river-fishing-report',
+    'Bitterroot River': 'https://www.missoulianangler.com/pages/bitterroot',
     'Blackfoot River': 'https://www.missoulianangler.com/pages/blackfoot-river-fly-fishing',
     'Clark Fork River': 'https://www.missoulianangler.com/pages/clark-fork-river-fishing-report',
     'Rock Creek': 'https://www.missoulianangler.com/pages/rock-creek-fishing-report',
