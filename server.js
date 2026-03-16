@@ -1927,7 +1927,7 @@ app.post('/api/admin/refresh-icons', async (req, res) => {
 function generateFlyRecommendations(hatches) {
     const flyPatterns = {
         'Midges': ['Zebra Midge #18-20', 'Top Secret Midge #18-22', 'Miracle Midge #20'],
-        'BWO': ['Parachute BWO #18-20', 'RS2 #20-22', 'Pheasant Tail #18'],
+        'Blue Winged Olives': ['Parachute BWO #18-20', 'RS2 #20-22', 'Pheasant Tail #18'],
         'March Browns': ['March Brown Dry #12-14', 'Hare\'s Ear #12-14'],
         'Salmonflies': ['Salmonfly Dry #4-6', 'Chubby Chernobyl #6-8', 'Pats Rubber Legs #6-8'],
         'Golden Stones': ['Golden Stone Dry #8-10', 'Kaufmann Stone #8-10'],
@@ -1936,8 +1936,10 @@ function generateFlyRecommendations(hatches) {
         'Caddis': ['Elk Hair Caddis #14-16', 'X-Caddis #16-18', 'Pupa patterns #14-16'],
         'Hoppers': ['Chubby Chernobyl #8-10', 'Morrish Hopper #10-12', 'Dave\'s Hopper #10'],
         'Tricos': ['Trico Spinner #20-22', 'Trico Dun #20-22'],
-        'Baetis': ['BWO Comparadun #20-22', 'Barr Emerger #20-22'],
-        'October Caddis': ['Orange Stimulator #10-12', 'Pupa patterns #12-14']
+        'October Caddis': ['Orange Stimulator #10-12', 'Pupa patterns #12-14'],
+        'Skwalas': ['Skwala Dry #10-12', 'Pat\'s Rubber Legs Olive #8-10'],
+        'Green Drakes': ['Green Drake Dry #10-12'],
+        'Callibaetis': ['Callibaetis Cripple #14']
     };
     
     const recommendations = [];
