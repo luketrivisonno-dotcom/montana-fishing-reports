@@ -95,10 +95,9 @@ export const initializePurchases = async () => {
       return true;
     }
     
-    // Enable debug logs - ALWAYS use DEBUG for troubleshooting
+    // Set log level (DEBUG for development, INFO for production)
     if (LOG_LEVEL) {
-      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-      console.log('[REVENUECAT] Log level set to DEBUG');
+      Purchases.setLogLevel(LOG_LEVEL.INFO);
     }
 
     const apiKey = Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android;

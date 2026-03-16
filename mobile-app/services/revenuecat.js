@@ -28,7 +28,7 @@ const API_URL = 'https://montana-fishing-reports-production.up.railway.app';
 export async function initializeRevenueCat() {
   try {
     // Set log level (use DEBUG for development, INFO for production)
-    Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+    Purchases.setLogLevel(LOG_LEVEL.INFO);
     
     // Configure with platform-specific API key
     const apiKey = Platform.OS === 'ios' ? REVENUECAT_API_KEYS.ios : REVENUECAT_API_KEYS.android;
