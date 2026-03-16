@@ -6,7 +6,7 @@ const db = require('./db');
 const { runAllScrapers } = require('./scrapers');
 const { getWeatherForRiver } = require('./utils/weather');
 const { getUSGSData, RIVER_TYPES, calculateFlowCondition } = require('./utils/usgs');
-const { getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
+const { runHatchScraper, getCurrentHatches, getStaticHatches } = require('./scrapers/hatchScraper');
 const { formatForDisplay, getRelativeTime } = require('./utils/dateStandardizer');
 
 // Security and rate limiting
@@ -433,6 +433,7 @@ initDatabase();
 cron.schedule('0 */6 * * *', () => {
     console.log('Running scheduled scrape...');
     runAllScrapers();
+    runHatchScraper();
 });
 
 // Health check endpoint
@@ -1576,8 +1577,8 @@ app.get('/api/hatches/:river',
 // Trigger hatch scrape manually
 app.post('/api/scrape-hatches', scrapeLimiter, async (req, res) => {
     try {
-        // Hatch data is now extracted during regular scrape post-processing
-        res.json({ message: 'Hatch scraping is now part of regular scrape. Run /api/scrape instead.' });
+        await runHatchScraper();
+        res.json({ message: 'Hatch scrape completed' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
