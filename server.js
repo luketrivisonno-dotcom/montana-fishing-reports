@@ -2215,3 +2215,4 @@ app.listen(PORT, () => {
 module.exports = { normalizeSource, formatDateForDisplay };
 // Deploy timestamp: Fri Mar 13 17:44:31 MDT 2026
 // Cache clear trigger: Sun Mar 15 19:19:46 MDT 2026
+// Deploy: Sun Mar 15 20:45:25 MDT 2026
