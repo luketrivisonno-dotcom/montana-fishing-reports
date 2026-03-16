@@ -112,8 +112,8 @@ async function runAllScrapers() {
           
           if (existing.rows.length === 0) {
             await db.query(
-              `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity, content) 
-               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8, $9)
+              `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity) 
+               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8)
                ON CONFLICT (source, river) DO UPDATE SET
                  url = EXCLUDED.url,
                  last_updated = EXCLUDED.last_updated,
@@ -121,9 +121,8 @@ async function runAllScrapers() {
                  scraped_at = EXCLUDED.scraped_at,
                  is_active = true,
                  icon_url = EXCLUDED.icon_url,
-                 water_clarity = EXCLUDED.water_clarity,
-                 content = EXCLUDED.content`,
-              [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null, item.content || null]
+                 water_clarity = EXCLUDED.water_clarity`,
+              [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null]
             );
             console.log(`✓ Inserted: ${item.source} (${item.river}) - ${displayDate}`);
             // Track for push notification
@@ -164,14 +163,6 @@ async function runAllScrapers() {
                new Date(item.scraped_at) > new Date(existing.rows[0].scraped_at)) ||  // Same date, newer scrape
               (!newDate && !existingDate) ||  // Both have no date, allow refresh
               isExistingVeryRecent;  // Existing date is suspiciously recent (likely fake)
-            
-            // Always update content when available (for hatch extraction)
-            if (item.content) {
-              await db.query(
-                `UPDATE reports SET content = $1 WHERE source = $2 AND river = $3`,
-                [item.content, item.source, item.river]
-              );
-            }
             
             if (shouldUpdate) {
               await db.query(
@@ -216,66 +207,6 @@ async function runAllScrapers() {
       ORDER BY source, river, scraped_at DESC
     )
   `);
-  
-  // POST-PROCESS: Extract hatch data from the most recent report for each river
-  console.log('\n--- Extracting hatch data from most recent reports ---');
-  try {
-    const { extractHatches, getFlyRecommendations, extractWaterTemp, extractWaterConditions } = require('../utils/hatchExtractor');
-    
-    // Get the most recent report for each river (with content)
-    const latestReports = await db.query(`
-      SELECT DISTINCT ON (river) id, river, source, content, last_updated, scraped_at
-      FROM reports 
-      WHERE is_active = true AND content IS NOT NULL AND content != ''
-      ORDER BY river, scraped_at DESC
-    `);
-    
-    let hatchExtractedCount = 0;
-    
-    for (const report of latestReports.rows) {
-      try {
-        // Extract hatches from content
-        const hatches = extractHatches(report.content);
-        
-        if (hatches.length > 0) {
-          const flyRecommendations = getFlyRecommendations(hatches);
-          const waterTemp = extractWaterTemp(report.content);
-          const waterConditions = extractWaterConditions(report.content);
-          
-          // Mark previous hatch reports for this river as not current
-          await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [report.river]);
-          
-          // Insert new hatch data
-          await db.query(
-            `INSERT INTO hatch_reports 
-             (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
-            [
-              report.river,
-              report.source,
-              hatches,
-              flyRecommendations,
-              JSON.stringify({ extracted_from: 'fishing report', confidence: 'medium' }),
-              waterTemp,
-              waterConditions,
-              report.last_updated ? new Date(report.last_updated) : new Date()
-            ]
-          );
-          
-          console.log(`  ✓ ${report.river}: ${hatches.length} hatches from ${report.source} (${hatches.slice(0, 3).join(', ')}${hatches.length > 3 ? '...' : ''})`);
-          hatchExtractedCount++;
-        } else {
-          console.log(`  ⊘ ${report.river}: No hatches found in ${report.source}`);
-        }
-      } catch (extractError) {
-        console.error(`  ✗ Error extracting hatches for ${report.river}:`, extractError.message);
-      }
-    }
-    
-    console.log(`--- Hatch extraction complete: ${hatchExtractedCount} rivers updated ---\n`);
-  } catch (postProcessError) {
-    console.error('Error in hatch post-processing:', postProcessError.message);
-  }
   
   console.log('\n========================================');
   console.log(`Complete: ${successCount} succeeded, ${failCount} failed`);

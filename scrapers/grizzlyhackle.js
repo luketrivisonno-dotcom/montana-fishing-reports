@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { extractHatchData } = require('../utils/hatchExtractor');
+const db = require('../db');
 
 const RIVERS = [
     { name: 'Bitterroot River', path: 'bitterroot-river-fishing-report' },
@@ -60,6 +62,25 @@ async function scrapeGrizzlyHackle() {
                 if (match) {
                     waterClarity = match[1] ? match[1].trim().substring(0, 50) : match[0].trim().substring(0, 50);
                     break;
+                }
+            }
+            
+            // Extract and save hatch data
+            const hatchData = extractHatchData(pageText);
+            if (hatchData.hatches.length > 0) {
+                try {
+                    await db.query(`UPDATE hatch_reports SET is_current = false WHERE river = $1`, [river.name]);
+                    await db.query(
+                        `INSERT INTO hatch_reports (river, source, hatches, fly_recommendations, hatch_details, water_temp, water_conditions, report_date, is_current)
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+                        [river.name, 'Grizzly Hackle', hatchData.hatches, hatchData.fly_recommendations,
+                         JSON.stringify({ extracted_from: 'Grizzly Hackle' }),
+                         hatchData.water_temp, hatchData.water_conditions,
+                         lastUpdated || new Date()]
+                    );
+                    console.log(`  → Hatches: ${hatchData.hatches.join(', ')}`);
+                } catch (e) {
+                    console.error(`  → Error saving hatch data:`, e.message);
                 }
             }
             
