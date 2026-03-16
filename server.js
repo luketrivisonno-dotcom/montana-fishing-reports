@@ -2123,6 +2123,28 @@ app.post('/api/admin/cleanup-removed-sources', async (req, res) => {
     }
 });
 
+// TEMP: Debug endpoint to check hatch data
+app.get('/api/debug/hatch-reports/:river', async (req, res) => {
+    try {
+        const { river } = req.params;
+        const result = await db.query(
+            `SELECT id, river, source, hatches, report_date, scraped_at, is_current 
+             FROM hatch_reports 
+             WHERE river = $1 
+             ORDER BY report_date DESC, scraped_at DESC 
+             LIMIT 5`,
+            [river]
+        );
+        res.json({
+            river,
+            count: result.rows.length,
+            reports: result.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found', path: req.path });
