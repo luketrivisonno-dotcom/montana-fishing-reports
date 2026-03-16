@@ -65,7 +65,7 @@ async function scrapeIndividualUrls(sourceName, urlMap) {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         },
-        timeout: 10000  // Reduced timeout
+        timeout: 15000  // 15 second timeout
       });
       
       const $ = cheerio.load(data);
@@ -106,7 +106,7 @@ async function scrapeIndividualUrls(sourceName, urlMap) {
     }
     
     // Small delay between requests
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
   
   return results;
