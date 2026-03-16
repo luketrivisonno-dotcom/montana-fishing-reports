@@ -1555,13 +1555,9 @@ app.get('/api/hatches/:river',
                 };
             }
             
-            // Generate fly recommendations based on hatches
-            const flyRecommendations = generateFlyRecommendations(hatchData.hatches).slice(0, 3);
-            
             res.json({
                 river,
                 currentHatches: hatchData.hatches,
-                recommendedFlies: flyRecommendations,
                 source: hatchData.source,
                 waterConditions: flowCondition ? flowCondition.label : null,
                 flowCondition: flowCondition,
