@@ -1970,6 +1970,7 @@ function generateFishingTips(river, month) {
 }
 
 // DYNAMIC HATCH DATA - combines seasonal patterns with real-time conditions
+// Updated: Fix for null fly recommendations
 async function getDynamicHatchData(riverName) {
     const month = new Date().toLocaleString('en-US', { month: 'short' });
     
