@@ -112,8 +112,8 @@ async function runAllScrapers() {
           
           if (existing.rows.length === 0) {
             await db.query(
-              `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity) 
-               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8)
+              `INSERT INTO reports (source, river, url, last_updated, last_updated_text, scraped_at, is_active, icon_url, water_clarity, content) 
+               VALUES ($1, $2, $3, $4, $5, $6, true, $7, $8, $9)
                ON CONFLICT (source, river) DO UPDATE SET
                  url = EXCLUDED.url,
                  last_updated = EXCLUDED.last_updated,
@@ -121,8 +121,9 @@ async function runAllScrapers() {
                  scraped_at = EXCLUDED.scraped_at,
                  is_active = true,
                  icon_url = EXCLUDED.icon_url,
-                 water_clarity = EXCLUDED.water_clarity`,
-              [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null]
+                 water_clarity = EXCLUDED.water_clarity,
+                 content = EXCLUDED.content`,
+              [item.source, item.river, item.url, dateString, displayDate, item.scraped_at, item.icon_url || null, item.water_clarity || null, item.content || null]
             );
             console.log(`✓ Inserted: ${item.source} (${item.river}) - ${displayDate}`);
             // Track for push notification
@@ -167,9 +168,9 @@ async function runAllScrapers() {
             if (shouldUpdate) {
               await db.query(
                 `UPDATE reports 
-                 SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6
-                 WHERE source = $7 AND river = $8`,
-                [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
+                 SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6, content = $7
+                 WHERE source = $8 AND river = $9`,
+                [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.content || null, item.source, item.river]
               );
               console.log(`✓ Updated: ${item.source} (${item.river}) - ${displayDate}`);
               // Track for push notification (only if actually new content with newer date)

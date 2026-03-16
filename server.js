@@ -183,10 +183,18 @@ async function initDatabase() {
             last_updated TIMESTAMP,
             last_updated_text VARCHAR(50),
             author VARCHAR(100),
+            content TEXT,
             scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_active BOOLEAN DEFAULT true,
             UNIQUE(source, river)
         )`);
+        
+        // Migration: Add content column if it doesn't exist
+        try {
+            await db.query(`ALTER TABLE reports ADD COLUMN IF NOT EXISTS content TEXT`);
+        } catch (e) {
+            // Column might already exist
+        }
         
         await db.query(`CREATE TABLE IF NOT EXISTS analytics (
             id SERIAL PRIMARY KEY,
