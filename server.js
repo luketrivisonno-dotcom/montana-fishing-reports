@@ -2145,6 +2145,64 @@ app.get('/api/debug/hatch-reports/:river', async (req, res) => {
     }
 });
 
+// Admin: Extract hatch data from all existing reports (one-time migration)
+app.post('/api/admin/extract-all-hatch-data', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        const { extractAndSaveHatchData } = require('./utils/scraperHelpers');
+        
+        // Get all active reports with content
+        const reportsResult = await db.query(
+            `SELECT id, source, river, content, last_updated 
+             FROM reports 
+             WHERE is_active = true AND content IS NOT NULL AND content != ''`
+        );
+        
+        console.log(`Extracting hatch data from ${reportsResult.rows.length} reports...`);
+        
+        let extracted = 0;
+        let skipped = 0;
+        const results = [];
+        
+        for (const report of reportsResult.rows) {
+            try {
+                const result = await extractAndSaveHatchData(report, report.content);
+                if (result) {
+                    extracted++;
+                    results.push({
+                        river: report.river,
+                        source: report.source,
+                        hatches: result.hatches.length,
+                        hatchNames: result.hatches
+                    });
+                    console.log(`✓ ${report.source} (${report.river}): ${result.hatches.length} hatches`);
+                } else {
+                    skipped++;
+                }
+            } catch (err) {
+                console.error(`Error extracting from ${report.source}:`, err.message);
+                skipped++;
+            }
+        }
+        
+        res.json({
+            message: 'Hatch data extraction complete',
+            totalReports: reportsResult.rows.length,
+            extracted,
+            skipped,
+            results: results.slice(0, 20) // Limit results in response
+        });
+        
+    } catch (error) {
+        console.error('Extract all hatch data error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found', path: req.path });
