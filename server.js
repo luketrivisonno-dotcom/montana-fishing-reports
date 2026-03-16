@@ -2152,6 +2152,27 @@ app.get('/api/debug/hatch-reports/:river', async (req, res) => {
     }
 });
 
+// TEMP: Debug endpoint to check reports content
+app.get('/api/debug/reports-content/:river', async (req, res) => {
+    try {
+        const { river } = req.params;
+        const result = await db.query(
+            `SELECT id, source, river, last_updated, LENGTH(content) as content_length 
+             FROM reports 
+             WHERE river = $1 AND is_active = true
+             ORDER BY scraped_at DESC`,
+            [river]
+        );
+        res.json({
+            river,
+            count: result.rows.length,
+            reports: result.rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Admin: Extract hatch data from all existing reports (one-time migration)
 app.post('/api/admin/extract-all-hatch-data', async (req, res) => {
     // TEMP: Allow without auth for debugging - remove in production
