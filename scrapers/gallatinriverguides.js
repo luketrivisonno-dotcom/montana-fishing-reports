@@ -27,10 +27,6 @@ async function scrapeGallatinRiverGuides() {
       });
       
       // Gallatin River Guides uses format like "PublicationDate: 'Fri Mar 06 19:50:10 UTC 2026'"
-      const dateMatch = 
-        data.match(/PublicationDate:\s*'([^']+)'/) ||
-        data.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-      
       const $ = cheerio.load(data);
       const pageText = $('body').text();
       
