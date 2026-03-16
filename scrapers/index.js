@@ -165,12 +165,20 @@ async function runAllScrapers() {
               (!newDate && !existingDate) ||  // Both have no date, allow refresh
               isExistingVeryRecent;  // Existing date is suspiciously recent (likely fake)
             
+            // Always update content when available (for hatch extraction)
+            if (item.content) {
+              await db.query(
+                `UPDATE reports SET content = $1 WHERE source = $2 AND river = $3`,
+                [item.content, item.source, item.river]
+              );
+            }
+            
             if (shouldUpdate) {
               await db.query(
                 `UPDATE reports 
-                 SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6, content = $7
-                 WHERE source = $8 AND river = $9`,
-                [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.content || null, item.source, item.river]
+                 SET last_updated = $1, last_updated_text = $2, scraped_at = $3, url = $4, is_active = true, icon_url = $5, water_clarity = $6
+                 WHERE source = $7 AND river = $8`,
+                [dateString, displayDate, item.scraped_at, item.url, item.icon_url || null, item.water_clarity || null, item.source, item.river]
               );
               console.log(`✓ Updated: ${item.source} (${item.river}) - ${displayDate}`);
               // Track for push notification (only if actually new content with newer date)
