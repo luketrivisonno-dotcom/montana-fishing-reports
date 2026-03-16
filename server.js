@@ -2174,6 +2174,17 @@ app.get('/api/debug/reports-content/:river', async (req, res) => {
     }
 });
 
+// TEMP: Clear hatch data for a river
+app.post('/api/admin/clear-hatch-data/:river', async (req, res) => {
+    try {
+        const { river } = req.params;
+        const result = await db.query('DELETE FROM hatch_reports WHERE river = $1 RETURNING id', [river]);
+        res.json({ message: `Deleted ${result.rowCount} entries for ${river}` });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Admin: Extract hatch data from all existing reports (one-time migration)
 app.post('/api/admin/extract-all-hatch-data', async (req, res) => {
     // TEMP: Allow without auth for debugging - remove in production
