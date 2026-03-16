@@ -2080,10 +2080,21 @@ app.get('/api/hatches/:river',
             const { river } = req.params;
             const hatchData = await getDynamicHatchData(river);
             
+            // DEBUG: Log hatchData to see what we're getting
+            console.log('DEBUG hatchData:', { 
+                hasHatches: !!hatchData.hatches, 
+                hasFlies: !!hatchData.flies, 
+                fliesLength: hatchData.flies ? hatchData.flies.length : 0 
+            });
+            
+            const flies = hatchData.flies && hatchData.flies.length > 0 
+                ? hatchData.flies 
+                : generateFlyRecommendations(hatchData.hatches);
+            
             res.json({
                 river,
                 currentHatches: hatchData.hatches.slice(0, 2), // Limited for free tier
-                recommendedFlies: (hatchData.flies || []).slice(0, 3), // Limited for free tier
+                recommendedFlies: flies.slice(0, 3), // Limited for free tier
                 waterTemp: hatchData.waterTemp,
                 waterConditions: hatchData.waterConditions,
                 source: hatchData.source
