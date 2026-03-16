@@ -20,11 +20,11 @@ const HATCH_SOURCES = {
   },
   
   // Missoula area rivers
-  'Grizzly Hackle': {
-    'Bitterroot River': 'https://grizzlyhackle.com/pages/bitterroot-river-fishing-report',
-    'Blackfoot River': 'https://grizzlyhackle.com/pages/blackfoot-river-fishing-report',
-    'Clark Fork River': 'https://grizzlyhackle.com/pages/clark-fork-river-fishing-report',
-    'Rock Creek': 'https://grizzlyhackle.com/pages/rock-creek-fishing-report',
+  'The Missoulian': {
+    'Bitterroot River': 'https://www.missoulianangler.com/pages/bitterroot-river-fishing-report',
+    'Blackfoot River': 'https://www.missoulianangler.com/pages/blackfoot-river-fly-fishing',
+    'Clark Fork River': 'https://www.missoulianangler.com/pages/clark-fork-river-fishing-report',
+    'Rock Creek': 'https://www.missoulianangler.com/pages/rock-creek-fishing-report',
   },
   
   // Bighorn River
@@ -177,14 +177,14 @@ async function runHatchScraper() {
       allReports.push(...yellowDogReports);
     }
     
-    // 3. Grizzly Hackle (Bitterroot, Blackfoot, Clark Fork, Rock Creek)
-    console.log('--- Grizzly Hackle ---');
-    const grizzlyReports = await scrapeIndividualUrls('Grizzly Hackle', HATCH_SOURCES['Grizzly Hackle']);
-    if (grizzlyReports.length > 0) {
-      const saved = await saveHatchReports(grizzlyReports);
-      console.log(`✓ Saved ${saved.length} Grizzly Hackle reports\n`);
+    // 3. The Missoulian (Bitterroot, Blackfoot, Clark Fork, Rock Creek)
+    console.log('--- The Missoulian ---');
+    const missoulianReports = await scrapeIndividualUrls('The Missoulian', HATCH_SOURCES['The Missoulian']);
+    if (missoulianReports.length > 0) {
+      const saved = await saveHatchReports(missoulianReports);
+      console.log(`✓ Saved ${saved.length} The Missoulian reports\n`);
       totalSaved += saved.length;
-      allReports.push(...grizzlyReports);
+      allReports.push(...missoulianReports);
     }
     
     // 4. Bighorn Angler (Bighorn)
