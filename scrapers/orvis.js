@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { saveReports } = require('../utils/scraperHelpers');
 
+// Orvis URLs - removed Bitterroot (broken)
 const ORVIS_URLS = {
   'Gallatin River': 'https://www.orvis.com/fishing-report/gallatin-river',
   'Upper Madison River': 'https://www.orvis.com/fishing-report/upper-madison-river',
@@ -57,9 +57,8 @@ async function scrapeOrvis() {
         source: 'Orvis',
         river: river,
         url: url,
-        title: `${river} - Orvis Fishing Report`,
         last_updated: finalDate || new Date().toLocaleDateString(),
-        author: 'Orvis'
+        scraped_at: new Date()
       });
       
     } catch (error) {
@@ -67,14 +66,7 @@ async function scrapeOrvis() {
     }
   }
   
-  if (reports.length > 0) {
-    console.log(`\nOrvis: Found ${reports.length} reports`);
-    const saved = await saveReports(reports);
-    console.log(`Orvis: Saved ${saved.length} reports\n`);
-    return saved;
-  }
-  
-  return [];
+  return reports.length > 0 ? reports : null;
 }
 
 module.exports = scrapeOrvis;

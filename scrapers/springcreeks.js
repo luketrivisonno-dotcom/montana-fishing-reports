@@ -103,6 +103,4 @@ async function scrapeSpringCreekReports() {
   return reports;
 }
 
-HEAD
-module.exports = { scrapeSpringCreekReports };
 module.exports = { scrapeSpringCreekReports };
