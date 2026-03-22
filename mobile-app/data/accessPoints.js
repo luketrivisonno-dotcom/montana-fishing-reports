@@ -1,0 +1,405 @@
+export const ACCESS_POINTS = {
+  'Missouri River': [
+    { name: 'Faber Reservoir', lat: 48.26268, lon: -109.13737, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754319' },
+    { name: 'Bailey Reservoir', lat: 48.47477, lon: -110.11437, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754692' },
+    { name: 'Bearpaw Lake', lat: 48.31699, lon: -109.65775, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754321' },
+    { name: 'Fresno Tailwater', lat: 48.59838, lon: -109.94099, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754315' },
+    { name: 'Little Muddy Creek', lat: 47.34031704, lon: -111.60807421, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754636' },
+    { name: 'Bull Pasture', lat: 47.00149046, lon: -111.99787659, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754658' },
+    { name: 'Lake Helena', lat: 46.70712, lon: -111.9149, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754654' },
+    { name: 'Wolf Creek Bridge', lat: 47.01983, lon: -112.01111, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753728' },
+    { name: 'Upper Prickly Pear', lat: 46.63484, lon: -111.97917, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754714' },
+    { name: 'Craig', lat: 47.07256, lon: -111.96304, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753704' },
+    { name: 'Dearborn', lat: 47.12585, lon: -111.90735, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753706' },
+    { name: 'Stickney Creek', lat: 47.11625, lon: -111.94576, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753722' },
+    { name: 'Prewett Creek', lat: 47.17129, lon: -111.82704, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753750' },
+    { name: 'Mountain Palace', lat: 47.16255, lon: -111.82309, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753712' },
+    { name: 'Pelican Point', lat: 47.20094, lon: -111.77949, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753672' },
+    { name: 'Eagle Island', lat: 47.12091, lon: -111.89019, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753742' },
+    { name: 'Lone Tree', lat: 47.05569543, lon: -111.96533441, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754656' },
+    { name: 'Prickly Pear', lat: 46.92987, lon: -112.12234, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753714' },
+    { name: 'Hardy Bridge', lat: 47.16816, lon: -111.83532, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753708' },
+    { name: 'York Bridge', lat: 46.71142, lon: -111.81165, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753478' },
+    { name: 'Causeway', lat: 46.70243, lon: -111.9009, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753442' },
+    { name: 'Helena Valley Reservoir', lat: 46.64354, lon: -111.87975, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753474' },
+    { name: 'Mid Canon', lat: 47.12548, lon: -111.88508, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753694' },
+    { name: 'Wing Dam', lat: 47.29525, lon: -111.67765, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753738' },
+    { name: 'Dunes', lat: 47.40442, lon: -111.5314, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753696' },
+    { name: 'Lichen Cliff', lat: 46.93877, lon: -112.12172, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753710' },
+    { name: 'Spite Hill', lat: 47.12112, lon: -111.93735, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753720' },
+    { name: 'Devils Kitchen', lat: 47.13871, lon: -111.85194, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753676' },
+    { name: 'Eureka Reservoir', lat: 47.87772, lon: -112.31407, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753674' },
+    { name: 'Bynum Reservoir', lat: 47.95988779, lon: -112.40543498, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753684' },
+    { name: 'Pishkun Reservoir', lat: 47.68187, lon: -112.46533, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753624' },
+    { name: 'Arod Lake', lat: 47.99551, lon: -112.02842, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753642' },
+    { name: 'Willow Creek Reservoir', lat: 47.5478, lon: -112.44045, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753628' },
+    { name: 'Medicine River', lat: 47.53258, lon: -111.71626, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753680' },
+    { name: 'Fort Shaw', lat: 47.51375, lon: -111.81532, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753682' },
+    { name: 'Amelia Island', lat: 46.31333, lon: -107.2392, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754670' },
+    { name: 'Widow Coulee', lat: 47.62784, lon: -111.03187, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754569' },
+    { name: 'Truly Bridge', lat: 47.35454458, lon: -111.43702962, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753736' },
+    { name: 'Lower Smith River', lat: 47.39279, lon: -111.44887, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753700' },
+    { name: 'Ulm Bridge', lat: 47.4299, lon: -111.49898, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753698' },
+    { name: 'Big Bend', lat: 47.38983, lon: -111.34015, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753702' },
+    { name: 'Cottonwood Grove', lat: 47.42061, lon: -111.38069, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754718' },
+    { name: 'White Bear', lat: 47.43414, lon: -111.29174, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753756' },
+    { name: 'Carter Ferry', lat: 47.75585, lon: -110.899, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753640' },
+    { name: 'Loma Bridge', lat: 47.93191, lon: -110.50547, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753692' },
+    { name: 'Fort Logan', lat: 46.74513695, lon: -111.17401085, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754579' },
+    { name: 'Roche Jaune', lat: 46.42081, lon: -105.85662, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754385' },
+    { name: 'Fort Peck Dredge Cut Pond', lat: 48.05553, lon: -106.44177, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754323' },
+    { name: 'Culbertson Bridge', lat: 48.12247, lon: -104.47528, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754483' },
+    { name: 'Diamond Willow', lat: 47.75593, lon: -104.05443, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754395' },
+    { name: 'Sidney Bridge', lat: 47.67342, lon: -104.15671, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754377' },
+    { name: 'Johnson Reservoir', lat: 47.31316, lon: -105.09635, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754375' },
+    { name: 'Stipek', lat: 47.20962, lon: -104.65515, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754666' },
+    { name: 'Fallon Bridge', lat: 46.85675, lon: -105.11361, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754383' },
+    { name: 'School Trust', lat: 48.04854, lon: -106.36408, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754541' },
+    { name: 'Glasgow Base Pond', lat: 48.44867, lon: -106.57695, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754325' },
+    { name: 'Duck Creek', lat: 47.98612, lon: -106.5252, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754329' },
+    { name: 'Kinsey Bridge', lat: 46.53358, lon: -105.71289, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754397' },
+    { name: 'Snowden Bridge', lat: 48.00575, lon: -104.10325, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754621' },
+    { name: 'Gartside Reservoir', lat: 47.58626, lon: -104.27128, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754393' },
+    { name: 'Seven Sisters', lat: 47.5738, lon: -104.22277, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754581' },
+    { name: 'Elk Island', lat: 47.47588, lon: -104.30127, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754638' },
+    { name: 'Bonfield', lat: 46.63139, lon: -105.56784, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754401' },
+    { name: 'Twelve Mile Dam', lat: 46.24689, lon: -105.7499, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754387' },
+    { name: 'Far West', lat: 46.28029, lon: -106.48424, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754407' },
+    { name: 'Intake Dam', lat: 47.28432, lon: -104.51933, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754381' },
+    { name: 'South Sandstone', lat: 46.33256, lon: -104.47414, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754405' },
+    { name: 'Rock Creek', lat: 47.76763, lon: -106.28588, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754327' },
+    { name: 'Black Bridge', lat: 47.09993, lon: -104.72665, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754623' },
+    { name: 'Bjornberg Bridge', lat: 48.50798, lon: -107.21653, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754317' },
+    { name: 'Whitetail Reservoir', lat: 48.8914, lon: -105.15664, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754311' },
+    { name: 'Cole Ponds', lat: 48.53905, lon: -107.46843, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754309' },
+    { name: 'Rosebud West', lat: 46.26319, lon: -106.69468, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754403' },
+    { name: 'Rosebud East', lat: 46.2739, lon: -106.6777, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754423' },
+    { name: 'Lewis and Clark', lat: 48.06811, lon: -105.53745, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754485' },
+    { name: 'Alkali Creek', lat: 48.34307, lon: -107.94821, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754259' },
+    { name: 'Broadus Bridge', lat: 45.42797, lon: -105.40328, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754399' },
+    { name: 'Martinsdale Reservoir', lat: 46.45061, lon: -110.28213, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753678' },
+    { name: 'Selkirk', lat: 46.46467, lon: -110.22376, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753808' },
+    { name: 'Harlowton', lat: 46.42899, lon: -109.83759, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754664' }
+  ],
+  'Yellowstone River': [
+    { name: 'Loch Leven', lat: 45.45721, lon: -110.62422, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753564' },
+    { name: 'Queen of the Waters', lat: 45.04377, lon: -110.73163, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753436' },
+    { name: 'Dan Bailey', lat: 45.42045, lon: -110.63664, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753422' },
+    
+    { name: 'Hatchery', lat: 47.00765, lon: -109.35074, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754682' },
+    { name: 'Lazy KB', lat: 47.0739, lon: -109.42728, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754515' },
+    { name: 'Reed & Bowles', lat: 47.09463, lon: -109.4653, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754517' },
+    { name: 'Carroll Trail', lat: 47.08176, lon: -109.44549, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753740' },
+    { name: 'Spring Creek', lat: 47.02936, lon: -109.38066, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753626' },
+    { name: 'Big Casino Creek Reservoir', lat: 47.03639, lon: -109.42836, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753658' },
+    { name: 'Upper Carter Pond', lat: 47.15505, lon: -109.42786, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753670' },
+    { name: 'Lower Carter Pond', lat: 47.14375, lon: -109.4294, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753668' },
+    { name: 'Hruska', lat: 47.11126, lon: -109.50574, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753688' },
+    { name: 'Brewery Flats', lat: 47.04711, lon: -109.41233, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753650' },
+    { name: 'Jim Posewitz Free River', lat: 45.60726, lon: -110.5734, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753542' },
+    { name: 'Pine Creek', lat: 45.51182, lon: -110.58341, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753434' },
+    { name: 'Emigrant', lat: 45.36703, lon: -110.7255, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753530' },
+    { name: 'Emigrant West', lat: 45.37657, lon: -110.72437, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753532' },
+    { name: 'Grey Owl', lat: 45.39787, lon: -110.70414, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753550' },
+    { name: 'Chicory', lat: 45.39763, lon: -110.70213, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753510' },
+    
+    
+    
+    { name: 'Point of Rocks', lat: 45.25476, lon: -110.8694, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753466' },
+    
+    { name: 'Crystal Cross', lat: 45.20224, lon: -110.89983, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754493' },
+    { name: 'Dailey Lake', lat: 45.26001529, lon: -110.81174626, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753414' },
+    { name: 'Sheep Mountain', lat: 45.73056, lon: -110.40705, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753470' },
+    { name: 'Springdale Bridge', lat: 45.74353, lon: -110.23135, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753416' },
+    { name: 'Grannis', lat: 45.75024, lon: -110.49252, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754678' },
+    { name: 'Grey Bear', lat: 45.7864, lon: -110.06635, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753844' },
+    { name: 'Otter Creek', lat: 45.85508, lon: -109.91574, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753854' },
+    { name: 'Indian Fort', lat: 45.71537, lon: -109.54857, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753850' },
+    { name: 'Buffalo Jump', lat: 45.43636, lon: -109.79713, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753828' },
+    { name: 'Moraine', lat: 45.46296, lon: -109.75635, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753864' },
+    { name: 'Big Rock', lat: 45.79293, lon: -109.96446, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753804' },
+    { name: 'Bratten', lat: 45.71669, lon: -109.63017, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753810' },
+    
+    { name: 'Pelican', lat: 45.75276, lon: -109.76764, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753866' },
+    { name: 'Castle Rock', lat: 45.47303, lon: -109.74104, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753838' },
+    { name: 'Highway 89 Bridge', lat: 45.71723, lon: -110.4664, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753556' },
+    
+    { name: 'Bridger', lat: 45.29623, lon: -108.90049, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754495' },
+    
+    { name: 'Whitebird', lat: 45.57523, lon: -109.33702, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753880' },
+    { name: 'Weymiller', lat: 45.02685, lon: -109.06094, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754672' },
+    { name: 'Holmgren Ranch', lat: 45.66329, lon: -109.34832, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754257' },
+    { name: 'Swinging Bridge', lat: 45.58431, lon: -109.33162, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753874' },
+    
+    { name: 'Water Birch', lat: 45.31476, lon: -109.19197, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753878' },
+    
+    { name: 'Beaver Lodge', lat: 45.26473, lon: -109.2195, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753812' },
+    { name: 'Horsethief Station', lat: 45.2374, lon: -109.2318, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753848' },
+    { name: 'South Hills', lat: 45.74304, lon: -108.50976, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753814' },
+    
+    { name: 'Bundy Bridge', lat: 45.9955, lon: -108.01181, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754662' },
+    { name: 'Blue Creek', lat: 45.7354, lon: -108.53259, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/76174250' },
+    { name: 'Myers Bridge', lat: 46.25444, lon: -107.34204, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754391' },
+    { name: 'Duck Creek Bridge', lat: 45.68696, lon: -108.64225, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754471' },
+    { name: 'Broadview Pond', lat: 46.10451, lon: -108.88334, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753806' },
+    { name: 'Bridger Bend', lat: 45.10641, lon: -109.02257, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753834' }
+  ],
+  'Bighorn River': [
+    { name: 'Afterbay Access (Boat Launch)', lat: 45.31719, lon: -107.92084, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false },
+    { name: '3 Mile Access (Boat Launch)', lat: 45.34414, lon: -107.87728, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false },
+    { name: 'Voyagers Rest', lat: 45.99683, lon: -108.13059, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753858' },
+    { name: 'Captain Clark', lat: 46.07385, lon: -107.71838, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753836' },
+    { name: 'General Custer', lat: 45.92642, lon: -107.57859, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753842' },
+    { name: 'Grant Marsh', lat: 45.84424867, lon: -107.59097316, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754577' },
+    { name: 'Manuel Lisa', lat: 46.14475, lon: -107.46603, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753862' },
+    { name: 'Arapooish', lat: 45.75382, lon: -107.56795, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753824' },
+    { name: 'Two Leggins', lat: 45.64534, lon: -107.65865, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753876' },
+    { name: 'Bighorn', lat: 45.4146, lon: -107.78648, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753822' },
+    { name: 'East Bridge', lat: 45.79656, lon: -108.46824, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753818' },
+    { name: 'Bluewater Springs', lat: 45.33161, lon: -108.80229, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753885' },
+    { name: 'Homestead Isle', lat: 45.60623, lon: -108.87823, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753846' },
+    { name: 'Buffalo Mirage', lat: 45.61277, lon: -108.84205, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753830' },
+    { name: 'Gritty Stone', lat: 45.99529, lon: -108.16938, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753856' }
+  ],
+  'Madison River': [
+    { name: 'Lyons Bridge', lat: 44.8991, lon: -111.59259, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753518' },
+    { name: 'Three Dollar Bridge', lat: 44.83193, lon: -111.51416, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754533' },
+    { name: 'Ennis', lat: 45.34442, lon: -111.72309, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753534' },
+    { name: 'McAtee Bridge', lat: 45.09665, lon: -111.66151, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753516' },
+    { name: 'Varney Bridge', lat: 45.229, lon: -111.75195, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753404' },
+    { name: 'Eight Mile Ford', lat: 45.29998, lon: -111.75405, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753528' },
+    { name: 'Burnt Tree Hole', lat: 45.31492, lon: -111.74869, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753506' },
+    { name: 'Valley Garden', lat: 45.36725, lon: -111.70539, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753456' },
+    { name: 'Meadow Lake', lat: 45.44336, lon: -111.70797, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753410' }
+  ],
+  'Gallatin River': [
+    { name: 'Kirk Wildlife Refuge', lat: 45.51036, lon: -111.26106, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753560' },
+    { name: 'Axtell Bridge', lat: 45.62339, lon: -111.20486, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753492' },
+    { name: 'Bozeman Pond', lat: 45.67377, lon: -111.08123, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753336' },
+    { name: 'Cherry River', lat: 45.72433, lon: -111.06495, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753420' },
+    { name: 'Slip & Slide', lat: 45.16564, lon: -110.84027, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753454' },
+    { name: 'Cameron Bridge', lat: 45.73773, lon: -111.22012, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753426' },
+    { name: 'Four Corners', lat: 45.85996, lon: -111.29005, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753540' },
+    { name: 'Erwin Bridge', lat: 45.76922, lon: -111.23904, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753536' }
+  ],
+  'Jefferson River': [
+    { name: 'Silver Star', lat: 45.68639, lon: -112.28244, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753448' },
+    { name: 'Mayflower Bridge', lat: 45.85795, lon: -112.01591, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753568' },
+    { name: 'Parrot Castle', lat: 45.81238, lon: -112.11847, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753428' },
+    { name: 'Kountz Bridge', lat: 45.84355, lon: -112.06324, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753562' },
+    { name: 'Piedmont Pond', lat: 45.84368, lon: -112.11519, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754605' },
+    { name: 'Toston', lat: 46.17199, lon: -111.4452, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753480' },
+    { name: 'Fairweather', lat: 46.02773, lon: -111.41831, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753412' },
+    { name: 'Harrison Lake', lat: 45.69942, lon: -111.70798, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753406' },
+    { name: 'Blackbird', lat: 45.90138, lon: -111.5269, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753500' },
+    { name: 'Damselfly', lat: 45.6232, lon: -111.54809, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754720' },
+    { name: 'Three Forks Ponds', lat: 45.89334283, lon: -111.53669411, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753460' },
+    { name: 'Cardwell Bridge', lat: 45.85384, lon: -111.95092, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753432' },
+    { name: 'Sappington Bridge', lat: 45.80401, lon: -111.75127, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753444' },
+    { name: 'Drouillard', lat: 45.89764, lon: -111.59402, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753526' },
+    { name: 'Bud Lilly', lat: 45.88741, lon: -111.42855, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754710' },
+    { name: 'Limespur', lat: 45.82254, lon: -111.87491, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753430' },
+    { name: 'Milwaukee', lat: 45.8986, lon: -111.52628, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753570' },
+    { name: 'Gallatin Forks', lat: 45.88979, lon: -111.32781, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753544' },
+    { name: 'Greycliff', lat: 45.70191, lon: -111.51418, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753468' },
+    { name: 'Cobblestone', lat: 45.77293, lon: -111.5158, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753512' }
+  ],
+  'Bitterroot River': [
+    { name: 'Forest Cooper', lat: 45.96901, lon: -114.14079, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754521' },
+    { name: 'Angevine', lat: 46.89663, lon: -113.76333, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754559' },
+    { name: 'Gillies Bridge', lat: 46.33025531, lon: -113.53623474, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754183' },
+    { name: 'Weigh Station', lat: 46.8797, lon: -113.85248, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754561' },
+    { name: 'Demmons', lat: 46.24729, lon: -114.17688, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754487' },
+    { name: 'Bell Crossing', lat: 46.44434, lon: -114.12629, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754137' },
+    { name: 'Woodside Bridge', lat: 46.31324, lon: -114.14482, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754109' },
+    { name: 'Kona Bridge', lat: 46.89857, lon: -114.15167, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754650' },
+    { name: 'John & Nancy Owen FAS', lat: 46.52119, lon: -114.10643, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/91552932' },
+    { name: 'Poker Joe', lat: 46.58602, lon: -114.06829, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754187' },
+    { name: 'Wally Crawford', lat: 46.09178, lon: -114.17493, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754217' },
+    { name: 'Darby Bridge', lat: 46.01456, lon: -114.16391, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754519' },
+    { name: 'Bass Creek', lat: 46.56674, lon: -114.10113, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754129' },
+    { name: 'Tucker Crossing', lat: 46.36838, lon: -114.13737, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754143' },
+    { name: 'Chief Looking Glass', lat: 46.66165, lon: -114.05355, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754131' },
+    { name: 'Florence Bridge', lat: 46.63211, lon: -114.05154, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754145' },
+    { name: 'Deep Creek', lat: 46.92973, lon: -114.2107, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754571' },
+    { name: 'Thibodeau Rapids', lat: 46.95311, lon: -113.61894, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753892' },
+    { name: 'Sheep Flats', lat: 46.9478, lon: -113.62948, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753890' },
+    { name: 'Red Rocks', lat: 46.94152, lon: -113.59848, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753894' },
+    { name: 'Johnsrud Park', lat: 46.91644, lon: -113.67854, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754243' },
+    { name: 'K. Ross Toole', lat: 46.90393, lon: -113.72593, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754165' },
+    { name: 'Schwartz Creek', lat: 46.75194, lon: -113.71844, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754197' },
+    { name: 'Daigles Eddy', lat: 46.93979, lon: -113.63484, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753906' },
+    { name: 'Belmont Creek', lat: 46.9533, lon: -113.56656, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753900' },
+    { name: 'Thibodeau', lat: 46.95252, lon: -113.61191, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753904' },
+    { name: 'Whitaker Bridge', lat: 46.94277, lon: -113.59983, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753902' },
+    { name: 'Sha-Ron', lat: 46.88136, lon: -113.93465, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754199' },
+    { name: 'Marco Flats', lat: 46.88969, lon: -113.82973, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754175' },
+    { name: 'Turah', lat: 46.82216, lon: -113.80821, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754207' },
+    { name: 'Kelly Island', lat: 46.86686, lon: -114.10004, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754163' },
+    { name: 'Roundup', lat: 46.94598536, lon: -113.43310729, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753898' },
+    { name: 'Hannon Memorial', lat: 45.97282, lon: -114.1401, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754135' },
+    { name: 'C. Ben White Memorial', lat: 45.9216589, lon: -114.1422349, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/75108293' },
+    { name: 'Beavertail Pond', lat: 46.72918, lon: -113.57836, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754167' },
+    { name: 'Ducharme', lat: 47.69286, lon: -114.07053, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753995' },
+    { name: 'Kohrs Bend', lat: 46.49873, lon: -112.74101, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754169' },
+    { name: 'Ninemile Prairie', lat: 46.94439, lon: -113.50276, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754245' }
+  ],
+  'Blackfoot River': [
+    { name: 'Harpers Lake', lat: 47.0216, lon: -113.38056, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754115' },
+    { name: 'Bearmouth', lat: 46.7001, lon: -113.43195, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754133' },
+    { name: 'Six Stall', lat: 46.96548, lon: -113.37886, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754597' },
+    { name: 'Clearwater Crossing', lat: 47.00106, lon: -113.38001, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754449' },
+    { name: 'Upsata Lake', lat: 47.07304, lon: -113.2298, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754103' },
+    { name: 'Monture Creek', lat: 47.03648, lon: -113.21986, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754181' },
+    { name: 'Russell Gates Memorial', lat: 47.0234361, lon: -113.30602344, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754195' },
+    { name: 'Three Stall', lat: 46.93754433, lon: -113.38747826, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753896' },
+    { name: 'River Junction', lat: 46.98574, lon: -113.13637, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754125' },
+    { name: 'Harry Morgan', lat: 46.98095, lon: -113.09732, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754161' },
+    { name: 'Cedar Meadow', lat: 46.89735, lon: -113.05945, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754157' },
+    { name: 'Scotty Brown Bridge', lat: 47.01838, lon: -113.24022, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754652' },
+    { name: 'Nilan Reservoir', lat: 47.47291, lon: -112.51975, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753690' },
+    { name: 'Little Blackfoot', lat: 46.56876, lon: -112.66589, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754607' },
+    { name: 'Stuart Mill Bay', lat: 46.1748, lon: -113.27537, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754543' },
+    { name: 'Racetrack Pond FAS', lat: 46.2714, lon: -112.7409, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/90942798' },
+    { name: 'Fishtrap Creek', lat: 45.87066, lon: -113.22433, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753538' }
+  ],
+  'Beaverhead River': [
+    { name: 'Grasshopper', lat: 45.10008, lon: -112.77756, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754489' },
+    { name: 'Selway Park', lat: 45.2351, lon: -112.6252, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/67814639' },
+    { name: 'Blacktail Meadows', lat: 45.22375, lon: -112.6378, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754531' },
+    { name: 'Corrals', lat: 45.11423, lon: -112.75359, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753520' },
+    { name: 'Silver Springs Bridge', lat: 45.41182, lon: -112.20584, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753496' },
+    { name: 'Brownes Bridge', lat: 45.54671, lon: -112.6923, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753504' },
+    { name: 'Cornell Park Fishing Access Site', lat: 45.2171, lon: -112.6585, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/89003401' },
+    { name: 'High Bridge', lat: 45.01781, lon: -112.83749, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753552' },
+    { name: 'Glen', lat: 45.46666, lon: -112.66906, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753546' },
+    { name: 'Tony Schoonen FAS', lat: 45.43651, lon: -112.56646, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753572' },
+    { name: 'Henneberry', lat: 45.05969, lon: -112.81502, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753418' },
+    { name: 'Pipe Organ', lat: 45.06561, lon: -112.80037, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754491' },
+    { name: 'Poindexter Slough', lat: 45.18547, lon: -112.67877, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753408' }
+  ],
+  'Ruby River': [
+    { name: 'Ruby Island', lat: 45.32415, lon: -112.11523, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753494' },
+    { name: 'Alder Bridge', lat: 45.3198, lon: -112.11765, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753490' },
+    { name: 'Vigilante', lat: 45.25993, lon: -112.10055, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753486' },
+    { name: 'Ruby Dam', lat: 45.24169, lon: -112.10982, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753484' },
+    { name: 'Kalsta Bridge', lat: 45.52576, lon: -112.70256, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753558' }
+  ],
+  'Big Hole River': [
+    { name: 'George Grant Memorial', lat: 45.7777, lon: -112.84826, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753524' },
+    { name: 'Greenwood Bottoms', lat: 45.77807, lon: -112.83752, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753548' },
+    { name: 'Powerhouse', lat: 45.76003, lon: -112.80116, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753514' },
+    { name: 'Maidenrock', lat: 45.65558, lon: -112.69611, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753424' },
+    { name: 'Salmon Fly', lat: 45.62439, lon: -112.68805, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753438' }
+  ],
+  'Clark Fork River': [
+    { name: 'Lower Osprey', lat: 47.02214, lon: -114.64553, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754595' },
+    { name: 'Middle Osprey', lat: 47.01952, lon: -114.62746, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754630' },
+    { name: 'Upper Osprey', lat: 47.0139, lon: -114.59952, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754593' },
+    { name: 'Big Pine', lat: 46.98956, lon: -114.6626, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754101' },
+    { name: 'Tarkio East', lat: 47.02075, lon: -114.65328, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754211' },
+    { name: 'Tarkio', lat: 47.01377, lon: -114.73735, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754209' },
+    { name: 'Forks', lat: 46.92625, lon: -114.7014, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754159' },
+    { name: 'Paradise Crossing', lat: 47.38347, lon: -114.79906, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754634' },
+    { name: 'Cyr Bridge', lat: 47.00528, lon: -114.57914, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754149' },
+    { name: 'Erskine', lat: 47.01348, lon: -114.28484, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754153' },
+    { name: 'Kookoosint', lat: 47.34365, lon: -114.7084, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754611' },
+    { name: 'Forest Grove', lat: 47.07621, lon: -114.76141, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754155' },
+    { name: 'Natural Pier', lat: 47.01504, lon: -114.50671, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754127' },
+    { name: 'Big Eddy', lat: 47.19336, lon: -114.87987, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754113' },
+    { name: 'Flatiron Ridge', lat: 47.6289, lon: -115.40609, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753985' },
+    { name: 'Confluentus Corner', lat: 47.58276, lon: -115.23703, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/91580432' },
+    { name: 'McKay Landing', lat: 47.53683, lon: -115.07921, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753999' },
+    { name: 'St. Regis', lat: 47.30197, lon: -115.08802, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754205' },
+    { name: 'Dry Creek', lat: 47.22524, lon: -114.96361, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754151' },
+    { name: 'Petty Creek', lat: 46.99112, lon: -114.44539, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754185' }
+  ],
+  'Flathead River': [
+    { name: 'Island Lake', lat: 48.23289, lon: -114.9762, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754499' },
+    { name: 'Tetrault Lake', lat: 48.94831, lon: -115.1083, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753989' },
+    { name: 'Walstad', lat: 47.81127, lon: -114.26549, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754043' },
+    { name: 'Shady Lane', lat: 48.21126, lon: -114.26243, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754585' },
+    { name: 'Kokanee Bend', lat: 48.34989, lon: -114.21425, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754007' },
+    { name: 'McWenneger Slough', lat: 48.22052, lon: -114.20413, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754660' },
+    { name: 'Pine Grove Pond', lat: 48.24992, lon: -114.28738, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754706' },
+    { name: 'Bootjack Lake', lat: 48.41828, lon: -114.49415, type: 'both', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754057' },
+    { name: 'Pressentine', lat: 48.2914, lon: -114.22345, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754009' },
+    { name: 'Old Steel Bridge', lat: 48.20883, lon: -114.25579, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754005' },
+    { name: 'Somers', lat: 48.07748, lon: -114.23552, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754047' },
+    { name: 'Sportsmans Bridge', lat: 48.0908, lon: -114.1176, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754011' },
+    { name: 'Beaver Lake', lat: 48.43109, lon: -114.42123, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753975' },
+    { name: 'Teakettle', lat: 48.36581, lon: -114.17102, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754013' },
+    { name: 'Blanchard Lake', lat: 48.39369, lon: -114.36661, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753963' },
+    { name: 'Conclow', lat: 47.87171, lon: -114.25568, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/86432922' },
+    { name: 'Sophie Lake', lat: 48.9555, lon: -115.1264, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754051' },
+    { name: 'Loon Lake/Ferndale', lat: 48.02623, lon: -113.99097, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753981' },
+    { name: 'Bigfork', lat: 48.0605, lon: -114.07837, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753993' },
+    { name: 'Woods Bay', lat: 48.00054, lon: -114.06327, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754037' },
+    { name: 'Swan River', lat: 48.04185, lon: -113.97846, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753977' },
+    { name: 'Smith Lake', lat: 48.10732, lon: -114.44142, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753969' },
+    { name: 'Horseshoe Lake/Ferndale', lat: 48.0217, lon: -113.99758, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754001' },
+    { name: 'Echo Lake', lat: 48.13062, lon: -114.03798, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754619' },
+    { name: 'Glen Lake', lat: 48.87, lon: -114.94991, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753961' },
+    { name: 'Skyles Lake', lat: 48.40453, lon: -114.40189, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753987' }
+  ],
+  'Boulder River': [
+    { name: 'Boulder Forks', lat: 45.65769, lon: -110.10872, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753826' },
+    
+    { name: 'Boulder Forks', lat: 45.657690, lon: -110.108720, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
+  ],
+  'Stillwater River': [
+    { name: 'Absaroka', lat: 45.52886, lon: -109.46838, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753820' },
+    { name: 'Cliff Swallow', lat: 45.51492, lon: -109.63208, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753840' },
+    
+    { name: 'Absaroka', lat: 45.643330, lon: -109.404440, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false }
+  ],
+  'Spring Creeks': [
+    { name: 'Sunny Brook Springs', lat: 45.30887, lon: -110.89089, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754529' },
+    
+    
+    
+    { name: 'Bull Springs', lat: 45.2785, lon: -109.20959, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753832' }
+  ],
+  'Rock Creek': [
+    
+  ],
+  'Clarks Fork River': [
+    { name: 'Clarks Fork Yellowstone', lat: 45.26429, lon: -108.91495, type: 'wade', parking: true, restrooms: false, boatRamp: false, camping: false, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39754253' }
+  ],
+  'Rosebud Creek': [
+    { name: 'Rosebud Isle', lat: 45.45074, lon: -109.50677, type: 'boat', parking: true, restrooms: false, boatRamp: true, camping: true, fwpUrl: 'https://myfwp.mt.gov/fishMT/fas/39753872' }
+  ],
+};
+// Import BLM access points
+import BLM_ACCESS_POINTS from './blmAccessPoints.json';
+
+// Helper function to get all access points as a flat array
+export function getAllAccessPoints() {
+  const allPoints = [];
+  Object.entries(ACCESS_POINTS).forEach(([river, points]) => {
+    points.forEach(point => {
+      allPoints.push(point);
+    });
+  });
+  // Add BLM access points
+  BLM_ACCESS_POINTS.forEach(point => {
+    allPoints.push({
+      ...point,
+      parking: true,
+      restrooms: false,
+      camping: false,
+      fwpUrl: null
+    });
+  });
+  return allPoints;
+}
+
+// Helper function to get BLM access points
+export function getBLMAccessPoints() {
+  return BLM_ACCESS_POINTS;
+}
+
+// Helper function to get access points for a specific river
+export function getAccessPointsForRiver(riverName) {
+  return ACCESS_POINTS[riverName] || [];
+}

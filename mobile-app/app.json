@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "Montana Fishing Reports",
+    "slug": "montana-fishing-reports",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2d4a3e"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luketrivisonno.montanafishing",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to show nearby rivers and access points.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2d4a3e"
+      },
+      "package": "com.luketrivisonno.montanafishing",
+      "versionCode": 2,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "com.android.vending.BILLING"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2d4a3e"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9219871596282320~8470354941",
+          "iosAppId": "ca-app-pub-9219871596282320~8470354941"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8bbce139-ae0b-4bd5-85ec-990e653cf760"
+      }
+    },
+    "owner": "ltriv"
+  }
+}

@@ -1,0 +1,44 @@
+# Build artifacts
+ios/build/
+android/build/
+android/app/build/
+*.apk
+*.aab
+*.ipa
+
+# Node modules (already installed in build environment)
+node_modules/.cache/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+__tests__/
+*.test.js
+*.spec.js
+
+# Documentation
+README.md
+docs/
+
+# Misc
+*.zip
+*.tar.gz
