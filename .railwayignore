@@ -1,0 +1,8 @@
+mobile-app/
+node_modules/
+.git/
+.DS_Store
+*.log
+mobile-app/node_modules/
+mobile-app/.expo/
+mobile-app/dist/
